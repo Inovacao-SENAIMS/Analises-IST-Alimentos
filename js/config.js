@@ -1,6 +1,6 @@
 /* Configuração pública: substitua apenas a URL pelo Web App implantado. */
 window.APP_CONFIG = {
-  apiUrl: 'COLE_AQUI_A_URL_DO_WEB_APP',
+  apiUrl: 'https://script.google.com/macros/s/AKfycbwH_94kvA7DDv9alK4qs-JF_cnDdU7ib-BUP3WxvVNXmQ3qcjntjrDywnrneN8bMhjX/exec',
   sessionStorageKey: 'ist_alimentos_sessao',
   sessionHours: 8,
   formularios: [
