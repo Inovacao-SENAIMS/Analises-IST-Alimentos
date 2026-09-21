@@ -13,12 +13,20 @@ const requiredFiles = [
   'pages/historico-solicitacoes.html',
   'css/style.css', 'js/config.js', 'js/auth.js', 'js/menu.js',
   'js/validacoes.js', 'js/form-analise-sementes.js', 'js/form-amostras-fiscais.js', 'js/cadastro.js', 'js/perfil.js',
-  'components/componentes.js',
+  'components/componentes.js', 'components/pdf-relatorios.js',
   'apps-script/Code.gs', 'README.md'
 ];
 
 test('entrega todos os arquivos públicos do aplicativo', () => {
   for (const file of requiredFiles) assert.equal(existsSync(join(root, file)), true, file);
+});
+
+test('módulo compartilhado expõe relatórios PDF sem dados laboratoriais', () => {
+  const pdf = readFileSync(join(root, 'components/pdf-relatorios.js'), 'utf8');
+  for (const nome of ['RelatoriosPdf', 'baixarComprovante', 'baixarIndividual', 'baixarResumo', 'jsPDF']) {
+    assert.match(pdf, new RegExp(nome));
+  }
+  assert.doesNotMatch(pdf, /data_recebimento|peso_amostra_g|observacoes_laboratorio/);
 });
 
 test('contrato contém as ações e abas do fluxo', () => {
