@@ -190,3 +190,20 @@ test('ações das análises usam componentes de botões padronizados', () => {
     assert.match(html, /data-componente="botao-voltar-menu"/);
   }
 });
+
+test('páginas de análise e histórico carregam os recursos de relatório PDF', () => {
+  const paginas = [
+    'pages/formulario-analise-sementes.html',
+    'pages/formulario-analise-microbiologica.html',
+    'pages/formulario-amostras-fiscais.html',
+    'pages/formulario-analise-sementes-r08.html',
+    'pages/historico-solicitacoes.html'
+  ];
+  for (const file of paginas) {
+    const html = readFileSync(join(root, file), 'utf8');
+    assert.match(html, /cdnjs\.cloudflare\.com\/ajax\/libs\/jspdf\/2\.5\.1/);
+    assert.match(html, /\.\.\/components\/pdf-relatorios\.js/);
+  }
+  assert.match(readFileSync(join(root, 'components/componentes.js'), 'utf8'), /renderizarBotaoBaixarPdf/);
+  assert.match(readFileSync(join(root, 'components/componentes.js'), 'utf8'), /renderizarBotaoExportarResumo/);
+});

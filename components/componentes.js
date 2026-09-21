@@ -38,6 +38,14 @@
     return `<button id="${id}" class="button secondary form-clear-button" type="button">Limpar</button>`;
   }
 
+  function renderizarBotaoBaixarPdf(id = 'download-pdf', texto = 'Baixar comprovante em PDF') {
+    return `<button id="${id}" class="button pdf-download-button" type="button" hidden>${texto}</button>`;
+  }
+
+  function renderizarBotaoExportarResumo(id = 'export-summary-pdf') {
+    return `<button id="${id}" class="button pdf-summary-button" type="button">Exportar relatório resumido</button>`;
+  }
+
   function renderizarSidebar(paginaAtiva = 'servicos') {
     return `
       <aside class="sidebar">
@@ -125,6 +133,14 @@
       alvo.outerHTML = renderizarBotaoLimpar(alvo.dataset.id || 'clear-button');
     });
 
+    document.querySelectorAll('[data-componente="botao-baixar-pdf"]').forEach((alvo) => {
+      alvo.outerHTML = renderizarBotaoBaixarPdf(alvo.dataset.id || 'download-pdf', alvo.dataset.texto || 'Baixar comprovante em PDF');
+    });
+
+    document.querySelectorAll('[data-componente="botao-exportar-resumo"]').forEach((alvo) => {
+      alvo.outerHTML = renderizarBotaoExportarResumo(alvo.dataset.id || 'export-summary-pdf');
+    });
+
     document.querySelectorAll('[data-sidebar-toggle]').forEach((botao) => {
       botao.addEventListener('click', () => {
         document.querySelector('.sidebar')?.classList.toggle('open');
@@ -145,6 +161,8 @@
     renderizarBotaoAdicionarAmostra,
     renderizarBotaoEnviar,
     renderizarBotaoLimpar,
+    renderizarBotaoBaixarPdf,
+    renderizarBotaoExportarResumo,
     renderizarSidebar,
     renderizarRodape,
     renderizarCabecalhoFormulario,
