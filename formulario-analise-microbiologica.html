@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Solicitação de Análise Microbiológica | SENAI FIEMS</title>
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <div data-componente="form-header"></div>
+
+    <main class="app-shell page">
+      <a class="back-link" href="menu.html">← Voltar ao menu</a>
+      <p class="eyebrow">Serviço microbiológico</p>
+      <h1 class="page-heading">Solicitação de Análise Microbiológica</h1>
+      <p class="page-lead">Preencha os dados da amostra e selecione os ensaios desejados.</p>
+      <div id="micro-status" class="status" role="alert"></div>
+
+      <form id="micro-form" novalidate>
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">1</span>
+            <div>
+              <h2 class="section-title">Dados do Cliente</h2>
+              <p class="section-description">Todos os campos desta seção são obrigatórios.</p>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="razao-social">Razão Social <span>*</span></label>
+              <input id="razao-social" name="razaoSocial" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="cpf-cnpj-micro">CNPJ/CPF <span>*</span></label>
+              <input id="cpf-cnpj-micro" name="cpfCnpj" inputmode="numeric" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="responsavel">Responsável <span>*</span></label>
+              <input id="responsavel" name="responsavel" required>
+              <small class="error-message"></small>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">2</span>
+            <div>
+              <h2 class="section-title">Dados da Amostra</h2>
+              <p class="section-description">Informe os dados de identificação, produção e coleta.</p>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="tipo-amostra">Tipo de amostra <span>*</span></label>
+              <input id="tipo-amostra" name="tipoAmostra" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="lote-micro">Lote <span>*</span></label>
+              <input id="lote-micro" name="lote" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="lacre">Lacre <span>*</span></label>
+              <input id="lacre" name="lacre" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="data-validade">Data de validade <span>*</span></label>
+              <input id="data-validade" name="dataValidade" type="date" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="data-producao">Data de produção <span>*</span></label>
+              <input id="data-producao" name="dataProducao" type="date" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="hora-producao">Hora da produção <span>*</span></label>
+              <input id="hora-producao" name="horaProducao" type="time" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="local-coleta">Local da coleta <span>*</span></label>
+              <input id="local-coleta" name="localColeta" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="data-coleta">Data da coleta <span>*</span></label>
+              <input id="data-coleta" name="dataColeta" type="date" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="hora-coleta">Hora da coleta <span>*</span></label>
+              <input id="hora-coleta" name="horaColeta" type="time" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="temperatura-coleta">Temperatura da coleta (°C) <span>*</span></label>
+              <input id="temperatura-coleta" name="temperaturaColeta" type="number" step="0.1" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="responsavel-coleta">Responsável pela coleta <span>*</span></label>
+              <input id="responsavel-coleta" name="responsavelColeta" required>
+              <small class="error-message"></small>
+            </div>
+          </div>
+          <fieldset class="field full" style="border:0;padding:0;margin:18px 0 0">
+            <legend class="legend-label">Finalidade <span style="color:var(--erro)">*</span></legend>
+            <div class="radio-group">
+              <label class="choice"><input type="radio" name="finalidade" value="Controle de Qualidade" required>Controle de Qualidade</label>
+              <label class="choice"><input type="radio" name="finalidade" value="Amostra Fiscal">Amostra Fiscal</label>
+              <label class="choice"><input type="radio" name="finalidade" value="SEBRAETEC">SEBRAETEC</label>
+              <label class="choice"><input type="radio" name="finalidade" value="Outros">Outros</label>
+            </div>
+            <div id="finalidade-outros-micro" class="field" hidden style="margin-top:10px">
+              <label for="finalidade-outros">Especifique <span>*</span></label>
+              <input id="finalidade-outros" name="finalidadeOutros">
+              <small class="error-message"></small>
+            </div>
+          </fieldset>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">3</span>
+            <div>
+              <h2 class="section-title">Ensaios Requeridos</h2>
+              <p class="section-description">Selecione pelo menos um ensaio de interesse.</p>
+            </div>
+          </div>
+          <div class="notice">Marque os ensaios que deseja solicitar para esta amostra.</div>
+          <div id="micro-ensaios" class="micro-assay-groups"></div>
+          <small id="micro-ensaios-error" class="error-message"></small>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">4</span>
+            <div>
+              <h2 class="section-title">Autorizações</h2>
+              <p class="section-description">Autorizações opcionais para situações fora dos limites estabelecidos.</p>
+            </div>
+          </div>
+          <div class="check-grid">
+            <label class="choice"><input type="checkbox" name="autorizaTemperatura">AUTORIZO a realização dos ensaios mesmo a TEMPERATURA ultrapassando os limites máximo ou mínimo estabelecidos.</label>
+            <label class="choice"><input type="checkbox" name="autorizaTempo">AUTORIZO a realização dos ensaios mesmo que o TEMPO tenha ultrapassado o limite máximo estabelecido.</label>
+          </div>
+          <label class="choice" style="margin-top:16px"><input id="declaracao-micro" type="checkbox" name="declaracao" required>Declaro que as informações prestadas são verdadeiras e autorizo a análise da amostra descrita.</label>
+          <small id="declaracao-micro-error" class="error-message"></small>
+        </section>
+
+        <div class="form-actions">
+          <button id="micro-submit" class="button primary" type="submit">Enviar Solicitação</button>
+          <button id="micro-clear" class="button secondary" type="button">Limpar</button>
+          <a class="button secondary" href="menu.html">Voltar ao menu</a>
+        </div>
+      </form>
+
+      <div data-componente="footer"></div>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="components/componentes.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/validacoes.js"></script>
+    <script src="js/form-analise-microbiologica.js"></script>
+  </body>
+</html>

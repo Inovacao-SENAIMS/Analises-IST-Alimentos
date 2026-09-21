@@ -6,6 +6,7 @@ import test from 'node:test';
 const root = process.cwd();
 const requiredFiles = [
   'index.html', 'menu.html', 'formulario-analise-sementes.html',
+  'formulario-analise-microbiologica.html',
   'cadastro.html', 'dados-pessoais.html',
   'css/style.css', 'js/config.js', 'js/auth.js', 'js/menu.js',
   'js/validacoes.js', 'js/form-analise-sementes.js', 'js/cadastro.js', 'js/perfil.js',
@@ -19,7 +20,7 @@ test('entrega todos os arquivos públicos do aplicativo', () => {
 
 test('contrato contém as ações e abas do fluxo', () => {
   const source = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
-  for (const token of ['doPost', 'login', 'cadastrarUsuario', 'obterPerfil', 'salvarSolicitacao', 'listarOpcoes', 'Usuarios', 'Solicitacoes', 'Amostras', 'Client_User', 'Manager_User', 'Administrator_User']) {
+  for (const token of ['doPost', 'login', 'cadastrarUsuario', 'obterPerfil', 'salvarSolicitacao', 'salvarSolicitacaoMicrobiologica', 'listarOpcoes', 'Usuarios', 'Solicitacoes', 'Amostras', 'SolicitacoesMicrobiologicas', 'EnsaiosMicrobiologicos', 'Client_User', 'Manager_User', 'Administrator_User']) {
     assert.match(source, new RegExp(token));
   }
 });
@@ -49,6 +50,12 @@ test('cadastro e navegação usam logo, sidebar e grupos', () => {
   assert.match(perfil, /data-perfil-grupo/);
 });
 
+test('catálogo centralizado expõe os dois serviços de análise', () => {
+  const config = readFileSync(join(root, 'js/config.js'), 'utf8');
+  assert.match(config, /analise-sementes/);
+  assert.match(config, /analise-microbiologica/);
+});
+
 test('páginas usam pontos de montagem dos componentes reutilizáveis', () => {
   const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
   for (const nome of ['renderizarSidebar', 'renderizarRodape', 'renderizarCabecalhoFormulario', 'renderizarBotao', 'renderizarIcone']) {
@@ -59,4 +66,15 @@ test('páginas usam pontos de montagem dos componentes reutilizáveis', () => {
     assert.match(html, /data-componente/);
     assert.match(html, /components\/componentes\.js/);
   }
+});
+
+test('análise microbiológica mantém o formulário e os campos laboratoriais separados', () => {
+  const html = readFileSync(join(root, 'formulario-analise-microbiologica.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/form-analise-microbiologica.js'), 'utf8');
+  const config = readFileSync(join(root, 'js/config.js'), 'utf8');
+  assert.match(html, /Razão Social/);
+  assert.match(html, /Amostra Fiscal/);
+  assert.match(script, /salvarSolicitacaoMicrobiologica/);
+  assert.match(config, /M04/);
+  assert.doesNotMatch(html, /Data de recebimento|Temperatura de recebimento|Análise Crítica|Situação da amostra/);
 });

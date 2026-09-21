@@ -64,6 +64,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--azul-500); box-s
 .choice:has(input:checked) { border-color: var(--azul-500); background: #f0fafb; }
 .notice { padding: 13px 15px; border-left: 4px solid var(--azul-500); border-radius: 9px; color: var(--azul-900); background: #edf9fa; font-size: .9rem; line-height: 1.5; }
 .notice.warning { border-color: #d49427; background: #fff8e8; }
+.micro-assay-groups { display: grid; gap: 22px; margin-top: 20px; }
+.micro-assay-group h3 { margin: 0 0 10px; color: var(--azul-900); font-size: 1rem; }
+.micro-assay-list { display: grid; gap: 9px; }
+.micro-assay-choice { align-items: flex-start; line-height: 1.4; }
+.assay-code { flex: 0 0 46px; color: var(--brand-accent-dark); font-size: .8rem; font-weight: 800; }
 .sample-list { display: grid; gap: 16px; }
 .sample-card { overflow: hidden; border: 1px solid var(--cinza-300); border-radius: 16px; background: var(--branco); }
 .sample-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 16px; background: #f3f8f7; border-bottom: 1px solid var(--cinza-300); }

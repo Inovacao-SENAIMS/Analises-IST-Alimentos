@@ -13,6 +13,8 @@ Aplicativo estático em HTML, CSS e JavaScript puro para coletar solicitações 
 
 As páginas HTML usam pontos de montagem `data-componente` e carregam `components/componentes.js`. Assim, alterações de navegação, rodapé ou cabeçalho são feitas em um único lugar.
 
+O menu possui dois serviços: análise de sementes e análise microbiológica. A segunda análise usa as abas `SolicitacoesMicrobiologicas` e `EnsaiosMicrobiologicos`.
+
 ## 1. Criar a planilha
 
 Crie uma planilha Google e quatro abas com estes nomes e cabeçalhos na primeira linha.
@@ -60,6 +62,22 @@ solicitacao_id | numero | especie | cultivar | safra | peneira | lote | represen
 ```
 
 As três últimas colunas são reservadas para preenchimento do laboratório.
+
+### `SolicitacoesMicrobiologicas`
+
+```text
+solicitacao_id | data_hora_envio | usuario | razao_social | cpf_cnpj | responsavel | tipo_amostra | lote | lacre | data_validade | data_producao | hora_producao | local_coleta | data_coleta | hora_coleta | temperatura_coleta | responsavel_coleta | finalidade | finalidade_outros | autoriza_temperatura | autoriza_tempo | data_recebimento | temperatura_recebimento | hora_recebimento | quantidade_amostra | peso_volume | numero_amostra | responsavel_recebimento | situacao_amostra | observacoes_laboratorio
+```
+
+As colunas a partir de `data_recebimento` são reservadas ao laboratório e não aparecem no formulário público.
+
+### `EnsaiosMicrobiologicos`
+
+```text
+solicitacao_id | numero | grupo | codigo | ensaio | resultado | observacoes_laboratorio
+```
+
+As duas últimas colunas são reservadas ao laboratório. Os ensaios exibidos ao cliente são definidos em `js/config.js`, preservando os códigos da especificação microbiológica.
 
 ## 2. Publicar o Apps Script
 

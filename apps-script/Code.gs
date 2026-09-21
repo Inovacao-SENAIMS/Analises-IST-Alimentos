@@ -6,7 +6,9 @@ const ABAS = {
   USUARIOS: 'Usuarios',
   CONFIG: 'Config',
   SOLICITACOES: 'Solicitacoes',
-  AMOSTRAS: 'Amostras'
+  AMOSTRAS: 'Amostras',
+  SOLICITACOES_MICRO: 'SolicitacoesMicrobiologicas',
+  ENSAIOS_MICRO: 'EnsaiosMicrobiologicos'
 };
 
 const GRUPOS = {
@@ -32,6 +34,8 @@ function doPost(e) {
         return responder_(listarOpcoes(entrada.token));
       case 'salvarSolicitacao':
         return responder_(salvarSolicitacao(entrada.dados, entrada.token));
+      case 'salvarSolicitacaoMicrobiologica':
+        return responder_(salvarSolicitacaoMicrobiologica(entrada.dados, entrada.token));
       default:
         return responder_(falha_('Operação não reconhecida.'));
     }
@@ -322,4 +326,66 @@ function salvarSolicitacao(dados, token) {
   });
 
   return sucesso_('Solicitação salva.', { solicitacaoId: id });
+}
+
+function salvarSolicitacaoMicrobiologica(dados, token) {
+  const usuario = validarToken_(token);
+  if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
+
+  if (!dados || !dados.razaoSocial || !dados.tipoAmostra || !dados.finalidade || !dados.ensaios || !dados.ensaios.length) {
+    return falha_('Preencha os campos obrigatórios antes de enviar.');
+  }
+
+  const agora = new Date();
+  const id = 'MICRO-' + Utilities.formatDate(
+    agora,
+    Session.getScriptTimeZone() || 'America/Cuiaba',
+    'yyyyMMdd-HHmmss'
+  ) + '-' + Utilities.getUuid().slice(0, 6).toUpperCase();
+
+  const solicitacoes = valoresComCabecalho_(ABAS.SOLICITACOES_MICRO);
+  const dadosSolicitacao = {
+    solicitacao_id: id,
+    data_hora_envio: agora,
+    usuario: usuario.email,
+    razao_social: dados.razaoSocial,
+    cpf_cnpj: dados.cpfCnpj,
+    responsavel: dados.responsavel,
+    tipo_amostra: dados.tipoAmostra,
+    lote: dados.lote,
+    lacre: dados.lacre,
+    data_validade: dados.dataValidade,
+    data_producao: dados.dataProducao,
+    hora_producao: dados.horaProducao,
+    local_coleta: dados.localColeta,
+    data_coleta: dados.dataColeta,
+    hora_coleta: dados.horaColeta,
+    temperatura_coleta: dados.temperaturaColeta,
+    responsavel_coleta: dados.responsavelColeta,
+    finalidade: dados.finalidade,
+    finalidade_outros: dados.finalidadeOutros,
+    autoriza_temperatura: dados.autorizacoes?.temperatura,
+    autoriza_tempo: dados.autorizacoes?.tempo
+  };
+
+  solicitacoes.aba.appendRow(solicitacoes.cabecalho.map(function (coluna) {
+    return dadosSolicitacao[coluna] === undefined ? '' : dadosSolicitacao[coluna];
+  }));
+
+  const ensaios = valoresComCabecalho_(ABAS.ENSAIOS_MICRO);
+  dados.ensaios.forEach(function (ensaio, indice) {
+    const dadosEnsaio = {
+      solicitacao_id: id,
+      numero: indice + 1,
+      grupo: ensaio.grupo,
+      codigo: ensaio.codigo,
+      ensaio: ensaio.ensaio
+    };
+
+    ensaios.aba.appendRow(ensaios.cabecalho.map(function (coluna) {
+      return dadosEnsaio[coluna] === undefined ? '' : dadosEnsaio[coluna];
+    }));
+  });
+
+  return sucesso_('Solicitação microbiológica salva.', { solicitacaoId: id });
 }
