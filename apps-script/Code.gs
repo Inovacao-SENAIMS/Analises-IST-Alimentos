@@ -8,7 +8,11 @@ const ABAS = {
   SOLICITACOES: 'Solicitacoes',
   AMOSTRAS: 'Amostras',
   SOLICITACOES_MICRO: 'SolicitacoesMicrobiologicas',
-  ENSAIOS_MICRO: 'EnsaiosMicrobiologicos'
+  ENSAIOS_MICRO: 'EnsaiosMicrobiologicos',
+  SOLICITACOES_FISCAIS: 'SolicitacoesAmostrasFiscais',
+  AMOSTRAS_FISCAIS: 'AmostrasFiscais',
+  SOLICITACOES_R08: 'SolicitacoesSementesR08',
+  AMOSTRAS_R08: 'AmostrasSementesR08'
 };
 
 const GRUPOS = {
@@ -30,12 +34,20 @@ function doPost(e) {
         return responder_(cadastrarUsuario(entrada.nome, entrada.email, entrada.senha));
       case 'obterPerfil':
         return responder_(obterPerfil(entrada.token));
+      case 'listarUsuariosAdmin':
+        return responder_(listarUsuariosAdmin(entrada.token));
+      case 'atualizarUsuarioAdmin':
+        return responder_(atualizarUsuarioAdmin(entrada.dados, entrada.token));
       case 'listarOpcoes':
         return responder_(listarOpcoes(entrada.token));
       case 'salvarSolicitacao':
         return responder_(salvarSolicitacao(entrada.dados, entrada.token));
       case 'salvarSolicitacaoMicrobiologica':
         return responder_(salvarSolicitacaoMicrobiologica(entrada.dados, entrada.token));
+      case 'salvarSolicitacaoAmostrasFiscais':
+        return responder_(salvarSolicitacaoAmostrasFiscais(entrada.dados, entrada.token));
+      case 'salvarSolicitacaoSementesR08':
+        return responder_(salvarSolicitacaoSementesR08(entrada.dados, entrada.token));
       default:
         return responder_(falha_('Operação não reconhecida.'));
     }
@@ -234,6 +246,71 @@ function obterPerfil(token) {
   });
 }
 
+function administrador_(token) {
+  const usuario = validarToken_(token);
+  if (!usuario) return { erro: falha_('SessÃ£o expirada. FaÃ§a login novamente.') };
+  if (usuario.grupo !== GRUPOS.ADMIN) return { erro: falha_('Acesso restrito ao administrador.') };
+  return { usuario: usuario };
+}
+
+function listarUsuariosAdmin(token) {
+  const acesso = administrador_(token);
+  if (acesso.erro) return acesso.erro;
+
+  const tabela = valoresComCabecalho_(ABAS.USUARIOS);
+  const emailColuna = coluna_(tabela.cabecalho, 'email');
+  const nomeColuna = coluna_(tabela.cabecalho, 'nome');
+  const ativoColuna = coluna_(tabela.cabecalho, 'ativo');
+  const grupoColuna = coluna_(tabela.cabecalho, 'grupo');
+  const dataColuna = coluna_(tabela.cabecalho, 'data_cadastro');
+
+  const usuarios = tabela.linhas.map(function (linha) {
+    return {
+      email: String(linha[emailColuna] || '').trim(),
+      nome: String(linha[nomeColuna] || '').trim(),
+      ativo: ativo_(linha[ativoColuna]),
+      grupo: grupoValido_(String(linha[grupoColuna] || '').trim())
+        ? String(linha[grupoColuna]).trim()
+        : GRUPOS.CLIENTE,
+      dataCadastro: dataColuna >= 0 && linha[dataColuna] ? linha[dataColuna] : null
+    };
+  }).filter(function (usuario) {
+    return usuario.email;
+  });
+
+  return sucesso_('UsuÃ¡rios carregados.', { usuarios: usuarios });
+}
+
+function atualizarUsuarioAdmin(dados, token) {
+  const acesso = administrador_(token);
+  if (acesso.erro) return acesso.erro;
+
+  const email = String(dados && dados.email || '').trim().toLowerCase();
+  const grupo = String(dados && dados.grupo || '').trim();
+  const ativo = dados && (dados.ativo === true || String(dados.ativo).toLowerCase() === 'true');
+
+  if (!email || !grupoValido_(grupo)) return falha_('Informe um e-mail e um grupo vÃ¡lido.');
+  if (email === acesso.usuario.email.toLowerCase() && (!ativo || grupo !== GRUPOS.ADMIN)) {
+    return falha_('O administrador atual nÃ£o pode remover o prÃ³prio acesso.');
+  }
+
+  const tabela = valoresComCabecalho_(ABAS.USUARIOS);
+  const emailColuna = coluna_(tabela.cabecalho, 'email');
+  const ativoColuna = coluna_(tabela.cabecalho, 'ativo');
+  const grupoColuna = coluna_(tabela.cabecalho, 'grupo');
+  if (ativoColuna < 0 || grupoColuna < 0) return falha_('A aba Usuarios precisa das colunas ativo e grupo.');
+
+  const indice = tabela.linhas.findIndex(function (linha) {
+    return String(linha[emailColuna] || '').trim().toLowerCase() === email;
+  });
+  if (indice < 0) return falha_('UsuÃ¡rio nÃ£o encontrado.');
+
+  tabela.aba.getRange(indice + 2, ativoColuna + 1).setValue(ativo);
+  tabela.aba.getRange(indice + 2, grupoColuna + 1).setValue(grupo);
+
+  return sucesso_('UsuÃ¡rio atualizado.', { email: email, ativo: ativo, grupo: grupo });
+}
+
 function listarOpcoes(token) {
   if (!validarToken_(token)) return falha_('Sessão expirada. Faça login novamente.');
 
@@ -254,6 +331,14 @@ function listarOpcoes(token) {
 }
 
 function salvarSolicitacao(dados, token) {
+  return salvarSolicitacaoSementes_(dados, token, ABAS.SOLICITACOES, ABAS.AMOSTRAS, 'IST');
+}
+
+function salvarSolicitacaoSementesR08(dados, token) {
+  return salvarSolicitacaoSementes_(dados, token, ABAS.SOLICITACOES_R08, ABAS.AMOSTRAS_R08, 'SEMR08');
+}
+
+function salvarSolicitacaoSementes_(dados, token, nomeAbaSolicitacoes, nomeAbaAmostras, prefixo) {
   const usuario = validarToken_(token);
   if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
 
@@ -263,13 +348,13 @@ function salvarSolicitacao(dados, token) {
   if (dados.amostras.length > 8) return falha_('O limite de 8 amostras foi excedido.');
 
   const agora = new Date();
-  const id = 'IST-' + Utilities.formatDate(
+  const id = prefixo + '-' + Utilities.formatDate(
     agora,
     Session.getScriptTimeZone() || 'America/Cuiaba',
     'yyyyMMdd-HHmmss'
   ) + '-' + Utilities.getUuid().slice(0, 6).toUpperCase();
 
-  const solicitacoes = valoresComCabecalho_(ABAS.SOLICITACOES);
+  const solicitacoes = valoresComCabecalho_(nomeAbaSolicitacoes);
   const dadosSolicitacao = {
     solicitacao_id: id,
     data_hora_envio: agora,
@@ -302,7 +387,7 @@ function salvarSolicitacao(dados, token) {
     return dadosSolicitacao[coluna] === undefined ? '' : dadosSolicitacao[coluna];
   }));
 
-  const amostras = valoresComCabecalho_(ABAS.AMOSTRAS);
+  const amostras = valoresComCabecalho_(nomeAbaAmostras);
   dados.amostras.forEach(function (amostra, indice) {
     const dadosAmostra = {
       solicitacao_id: id,
@@ -326,6 +411,75 @@ function salvarSolicitacao(dados, token) {
   });
 
   return sucesso_('Solicitação salva.', { solicitacaoId: id });
+}
+
+function salvarSolicitacaoAmostrasFiscais(dados, token) {
+  const usuario = validarToken_(token);
+  if (!usuario) return falha_('SessÃ£o expirada. FaÃ§a login novamente.');
+
+  if (!dados || !dados.razaoSocial || !dados.cpfCnpj || !dados.produto || !dados.objetivo || !dados.analises || !dados.analises.length) {
+    return falha_('Preencha os campos obrigatÃ³rios antes de enviar.');
+  }
+
+  const agora = new Date();
+  const id = 'FISCAL-' + Utilities.formatDate(
+    agora,
+    Session.getScriptTimeZone() || 'America/Cuiaba',
+    'yyyyMMdd-HHmmss'
+  ) + '-' + Utilities.getUuid().slice(0, 6).toUpperCase();
+
+  const solicitacoes = valoresComCabecalho_(ABAS.SOLICITACOES_FISCAIS);
+  const dadosSolicitacao = {
+    solicitacao_id: id,
+    data_hora_envio: agora,
+    usuario: usuario.email,
+    protocolo_entrada: dados.protocoloEntrada,
+    numero_protocolo: dados.numeroProtocolo,
+    razao_social: dados.razaoSocial,
+    cpf_cnpj: dados.cpfCnpj,
+    nome_fantasia: dados.nomeFantasia,
+    proprietario: dados.proprietario,
+    ie: dados.ie,
+    endereco: dados.endereco,
+    email: dados.email,
+    telefone: dados.telefone,
+    fax: dados.fax,
+    municipio: dados.municipio,
+    cep: dados.cep,
+    registro_rotulo: dados.registroRotulo,
+    registro_orgao: dados.registroOrgao,
+    objetivo: dados.objetivo,
+    analise_microbiologica: dados.analises.indexOf('microbiologica') >= 0,
+    analise_fisico_quimica: dados.analises.indexOf('fisico-quimica') >= 0,
+    observacoes: dados.observacoes
+  };
+
+  solicitacoes.aba.appendRow(solicitacoes.cabecalho.map(function (coluna) {
+    return dadosSolicitacao[coluna] === undefined ? '' : dadosSolicitacao[coluna];
+  }));
+
+  const amostras = valoresComCabecalho_(ABAS.AMOSTRAS_FISCAIS);
+  const dadosAmostra = {
+    solicitacao_id: id,
+    numero: 1,
+    produto: dados.produto,
+    marca: dados.marca,
+    quantidade: dados.quantidade,
+    lote: dados.lote,
+    data_fabricacao: dados.dataFabricacao,
+    data_validade: dados.dataValidade,
+    coletor_nome: dados.coletorNome,
+    coletor_telefone: dados.coletorTelefone,
+    data_coleta: dados.dataColeta,
+    hora_coleta: dados.horaColeta,
+    observacoes: dados.observacoes
+  };
+
+  amostras.aba.appendRow(amostras.cabecalho.map(function (coluna) {
+    return dadosAmostra[coluna] === undefined ? '' : dadosAmostra[coluna];
+  }));
+
+  return sucesso_('SolicitaÃ§Ã£o fiscal salva.', { solicitacaoId: id });
 }
 
 function salvarSolicitacaoMicrobiologica(dados, token) {

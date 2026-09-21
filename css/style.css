@@ -33,6 +33,12 @@ a { color: inherit; }
 .component-icon { display: inline-flex; width: 1.2rem; height: 1.2rem; justify-content: center; align-items: center; line-height: 1; }
 .component-icon svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
 .app-header { background: var(--azul-900); color: var(--branco); box-shadow: 0 4px 20px rgba(0,0,0,.12); }
+.form-header-light { color: var(--azul-900); background: var(--bg); border-bottom: 1px solid var(--cinza-300); box-shadow: none; }
+.form-header-light .brand-subtitle { color: var(--azul-900); font-size: .95rem; font-weight: 800; letter-spacing: .01em; }
+.form-header-light .user-name { display: inline; color: var(--azul-900); font-size: 1rem; font-weight: 600; }
+.form-header-light .user-name strong { font-size: 1.08rem; font-weight: 800; }
+.form-header-light .button.secondary { color: var(--azul-900); background: transparent; border-color: var(--azul-900); }
+.form-header-light .button.secondary:hover { color: var(--branco); background: var(--azul-900); }
 .header-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
 .brand-mark { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 14px; background: var(--verde-500); font-size: 22px; }
@@ -84,6 +90,16 @@ input:focus, select:focus, textarea:focus { border-color: var(--azul-500); box-s
 .button.primary { color: var(--branco); background: var(--azul-700); }
 .button.primary:hover { background: var(--azul-900); }
 .button.secondary { color: var(--azul-700); background: var(--branco); border-color: var(--cinza-300); }
+.form-clear-button { color: var(--azul-700); background: #eef3f8; border-color: #c6d4e2; }
+.form-clear-button:hover { color: var(--azul-900); background: #e1eaf2; }
+.form-menu-button { color: #fff; background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-dark)); border-color: transparent; box-shadow: 0 8px 18px rgba(232,73,16,.2); }
+.form-menu-button:hover { color: #fff; background: linear-gradient(135deg, #f35a1f, var(--brand-accent)); }
+.form-back-button { margin-bottom: 18px; }
+.form-menu-button .button-arrow { font-size: 1.65rem; line-height: .7; }
+.sample-add-button { color: #fff; background: linear-gradient(135deg, #238b57, #17663f); border-color: transparent; box-shadow: 0 8px 18px rgba(35,139,87,.18); }
+.sample-add-button:hover { color: #fff; background: linear-gradient(135deg, #2cae6b, #238b57); }
+.logout-button { border: 0; color: var(--azul-900); background: transparent; box-shadow: none; }
+.logout-button:hover { color: var(--brand-accent-dark); background: transparent; }
 .button.danger { color: var(--erro); background: #fff5f3; border-color: #f3c4be; }
 .button:disabled { opacity: .6; cursor: wait; transform: none; }
 .form-actions { position: sticky; bottom: 12px; z-index: 3; display: flex; flex-wrap: wrap; gap: 10px; padding: 13px; background: rgba(255,255,255,.94); border: 1px solid var(--cinza-300); border-radius: 16px; box-shadow: var(--sombra); }
@@ -109,6 +125,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--azul-500); box-s
 .form-card .button { width: fit-content; margin-top: auto; color: #fff; background: linear-gradient(135deg, #e84910, #c93708); border: 0; box-shadow: 0 8px 18px rgba(0,0,0,.14); }
 .form-card .button:hover { background: linear-gradient(135deg, #f35a1f, #d9440d); }
 .back-link { display: inline-block; margin-bottom: 18px; color: var(--azul-700); font-weight: 700; text-decoration: none; }
+.back-link.form-menu-button { display: inline-flex; align-items: center; gap: 10px; color: #fff; font-weight: 800; text-decoration: none; }
 .desktop-table-header { display: none; }
 .app-layout { background: var(--bg); }
 .app-frame { min-height: 100vh; display: grid; grid-template-columns: 254px minmax(0, 1fr); }
@@ -139,6 +156,16 @@ input:focus, select:focus, textarea:focus { border-color: var(--azul-500); box-s
 .profile-fields strong { color: var(--azul-900); font-size: 1.05rem; }
 .role-pill { display: inline-flex; width: fit-content; padding: 6px 10px; border-radius: 999px; color: var(--brand-accent-dark) !important; background: var(--brand-accent-soft); font-size: .82rem !important; }
 .app-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 42px; padding-top: 18px; border-top: 1px solid var(--border); color: var(--muted); font-size: .75rem; }
+.admin-card { padding: 22px; }
+.admin-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; color: var(--azul-900); }
+.admin-table-wrap { overflow-x: auto; }
+.admin-table { width: 100%; min-width: 760px; border-collapse: collapse; color: var(--cinza-900); font-size: .86rem; }
+.admin-table th, .admin-table td { padding: 13px 12px; border-bottom: 1px solid var(--cinza-300); text-align: left; vertical-align: middle; }
+.admin-table th { color: var(--azul-900); background: #f4f7fa; font-size: .76rem; letter-spacing: .04em; text-transform: uppercase; }
+.admin-table td .button { min-height: 36px; padding: 8px 12px; font-size: .8rem; }
+.admin-group { min-width: 170px; padding: 8px 10px; border-radius: 8px; }
+.admin-active { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; font-weight: 700; }
+.admin-active input { width: auto; accent-color: var(--brand-accent); }
 .login-page > .app-footer { width: min(460px, calc(100% - 48px)); margin: -8px auto 0; border-top: 0; }
 @media (min-width: 640px) {
   .user-name { display: inline; }
@@ -169,4 +196,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--azul-500); box-s
   .mobile-menu-button { border: 0; color: var(--azul-900); background: transparent; font-size: 1.3rem; }
   .content-inner { width: min(100% - 32px, 620px); padding: 34px 0 56px; }
   .profile-card { flex-direction: column; }
+  .admin-card { padding: 16px; }
+  .admin-toolbar { align-items: flex-start; flex-direction: column; }
+  .admin-table { min-width: 0; }
+  .admin-table thead { display: none; }
+  .admin-table, .admin-table tbody, .admin-table tr, .admin-table td { display: block; width: 100%; }
+  .admin-table tr { margin-bottom: 14px; padding: 10px; border: 1px solid var(--cinza-300); border-radius: 12px; background: var(--branco); }
+  .admin-table td { display: grid; grid-template-columns: 118px minmax(0, 1fr); gap: 10px; padding: 9px 4px; border-bottom: 0; }
+  .admin-table td::before { content: attr(data-label); color: var(--muted); font-size: .75rem; font-weight: 800; text-transform: uppercase; }
 }

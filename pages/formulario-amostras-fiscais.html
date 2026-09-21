@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Amostras Fiscais - Alimentos | SENAI FIEMS</title>
+    <link rel="stylesheet" href="../css/style.css">
+  </head>
+  <body>
+    <div data-componente="form-header"></div>
+
+    <main class="app-shell page">
+      <div data-componente="botao-voltar-menu" data-classe="form-back-button"></div>
+      <p class="eyebrow">Serviço fiscal</p>
+      <h1 class="page-heading">Solicitação de Análise para Amostras Fiscais - Alimentos</h1>
+      <p class="page-lead">Preencha os dados do local, produto e coleta. Os campos de recepção são exclusivos do laboratório.</p>
+      <div id="fiscal-status" class="status" role="alert"></div>
+
+      <form id="fiscal-form" novalidate>
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">1</span>
+            <div>
+              <h2 class="section-title">Protocolo e local de coleta</h2>
+              <p class="section-description">Informe a identificação do estabelecimento e do registro oficial.</p>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="protocolo-entrada">Protocolo de Entrada Geral</label>
+              <input id="protocolo-entrada" name="protocoloEntrada">
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="numero-protocolo">N° do protocolo</label>
+              <input id="numero-protocolo" name="numeroProtocolo">
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="razao-social-fiscal">Razão Social <span>*</span></label>
+              <input id="razao-social-fiscal" name="razaoSocial" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="cpf-cnpj-fiscal">CNPJ/CPF <span>*</span></label>
+              <input id="cpf-cnpj-fiscal" name="cpfCnpj" inputmode="numeric" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="nome-fantasia">Nome Fantasia <span>*</span></label>
+              <input id="nome-fantasia" name="nomeFantasia" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="proprietario">Proprietário <span>*</span></label>
+              <input id="proprietario" name="proprietario" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="ie">IE <span>*</span></label>
+              <input id="ie" name="ie" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field full">
+              <label for="endereco-fiscal">Endereço <span>*</span></label>
+              <input id="endereco-fiscal" name="endereco" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="email-fiscal">E-mail <span>*</span></label>
+              <input id="email-fiscal" name="email" type="email" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="telefone-fiscal">Telefone <span>*</span></label>
+              <input id="telefone-fiscal" name="telefone" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="fax-fiscal">Fax</label>
+              <input id="fax-fiscal" name="fax">
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="municipio-fiscal">Município <span>*</span></label>
+              <input id="municipio-fiscal" name="municipio" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="cep-fiscal">CEP <span>*</span></label>
+              <input id="cep-fiscal" name="cep" inputmode="numeric" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="registro-rotulo">Registro de Rótulo <span>*</span></label>
+              <input id="registro-rotulo" name="registroRotulo" required>
+              <small class="error-message"></small>
+            </div>
+          </div>
+          <fieldset class="field full" style="border:0;padding:0;margin:18px 0 0">
+            <legend class="legend-label">Registro no <span style="color:var(--erro)">*</span></legend>
+            <div class="radio-group">
+              <label class="choice"><input type="radio" name="registroOrgao" value="SIM" required>SIM</label>
+              <label class="choice"><input type="radio" name="registroOrgao" value="SIE">SIE</label>
+              <label class="choice"><input type="radio" name="registroOrgao" value="SIF">SIF</label>
+              <label class="choice"><input type="radio" name="registroOrgao" value="SISB">SISB</label>
+            </div>
+          </fieldset>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">2</span>
+            <div>
+              <h2 class="section-title">Informações do produto</h2>
+              <p class="section-description">Identifique o produto e o lote que será analisado.</p>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="produto-fiscal">Produto <span>*</span></label>
+              <input id="produto-fiscal" name="produto" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="marca-fiscal">Marca <span>*</span></label>
+              <input id="marca-fiscal" name="marca" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="quantidade-fiscal">Quantidade <span>*</span></label>
+              <input id="quantidade-fiscal" name="quantidade" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="lote-fiscal">N° de lote <span>*</span></label>
+              <input id="lote-fiscal" name="lote" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="fabricacao-fiscal">Data de Fabricação <span>*</span></label>
+              <input id="fabricacao-fiscal" name="dataFabricacao" type="date" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="validade-fiscal">Data de Validade <span>*</span></label>
+              <input id="validade-fiscal" name="dataValidade" type="date" required>
+              <small class="error-message"></small>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">3</span>
+            <div>
+              <h2 class="section-title">Objetivo e análises solicitadas</h2>
+              <p class="section-description">Selecione o tipo de fiscalização e pelo menos uma análise.</p>
+            </div>
+          </div>
+          <fieldset style="border:0;padding:0;margin:0">
+            <legend class="legend-label">Objetivo da amostra <span style="color:var(--erro)">*</span></legend>
+            <div class="radio-group">
+              <label class="choice"><input type="radio" name="objetivo" value="Fiscal Indicativo" required>Fiscal Indicativo</label>
+              <label class="choice"><input type="radio" name="objetivo" value="Fiscal Representativo">Fiscal Representativo</label>
+            </div>
+          </fieldset>
+          <fieldset style="border:0;padding:0;margin:18px 0 0">
+            <legend class="legend-label">Análises solicitadas <span style="color:var(--erro)">*</span></legend>
+            <div class="check-grid">
+              <label class="choice"><input type="checkbox" name="analises" value="microbiologica">Microbiológica</label>
+              <label class="choice"><input type="checkbox" name="analises" value="fisico-quimica">Físico-Química</label>
+            </div>
+            <small id="analises-fiscal-error" class="error-message"></small>
+          </fieldset>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">4</span>
+            <div>
+              <h2 class="section-title">Responsável pela coleta</h2>
+              <p class="section-description">Informe os dados da pessoa responsável pela coleta.</p>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="coletor-nome">Nome <span>*</span></label>
+              <input id="coletor-nome" name="coletorNome" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="coletor-telefone">Telefone <span>*</span></label>
+              <input id="coletor-telefone" name="coletorTelefone" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="data-coleta-fiscal">Data da Coleta <span>*</span></label>
+              <input id="data-coleta-fiscal" name="dataColeta" type="date" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field">
+              <label for="hora-coleta-fiscal">Hora da Coleta <span>*</span></label>
+              <input id="hora-coleta-fiscal" name="horaColeta" type="time" required>
+              <small class="error-message"></small>
+            </div>
+            <div class="field full">
+              <label for="observacoes-fiscal">Observações</label>
+              <textarea id="observacoes-fiscal" name="observacoes"></textarea>
+              <small class="error-message"></small>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <label class="choice"><input id="declaracao-fiscal" type="checkbox" name="declaracao" required>Declaro que as informações prestadas são verdadeiras e autorizo a análise da amostra descrita.</label>
+          <small id="declaracao-fiscal-error" class="error-message"></small>
+        </section>
+
+        <div class="form-actions">
+          <button id="fiscal-submit" class="button primary" type="submit">Enviar Solicitação</button>
+          <button id="fiscal-clear" class="button secondary form-clear-button" type="button">Limpar</button>
+          <div data-componente="botao-voltar-menu"></div>
+        </div>
+      </form>
+
+      <div data-componente="footer"></div>
+    </main>
+
+    <script src="../js/config.js"></script>
+    <script src="../components/componentes.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/validacoes.js"></script>
+    <script src="../js/form-amostras-fiscais.js"></script>
+  </body>
+</html>

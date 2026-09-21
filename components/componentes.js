@@ -8,7 +8,9 @@
     sair: '<svg viewBox="0 0 24 24" focusable="false"><path d="M10 5H5v14h5"/><path d="m14 8 4 4-4 4"/><path d="M18 12H9"/></svg>',
     menu: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg>',
     seedling: '<svg viewBox="0 0 24 24" focusable="false"><path d="M12 20V9"/><path d="M12 13c-4.5 0-7-2.5-7-7 4.5 0 7 2.5 7 7Z"/><path d="M12 10c0-4.5 2.5-7 7-7 0 4.5-2.5 7-7 7Z"/></svg>',
-    flask: '<svg viewBox="0 0 24 24" focusable="false"><path d="M9 3h6M10 3v6l-5.5 9.2A1.2 1.2 0 0 0 5.5 20h13a1.2 1.2 0 0 0 1-1.8L14 9V3"/><path d="M8 15h8"/></svg>'
+    flask: '<svg viewBox="0 0 24 24" focusable="false"><path d="M9 3h6M10 3v6l-5.5 9.2A1.2 1.2 0 0 0 5.5 20h13a1.2 1.2 0 0 0 1-1.8L14 9V3"/><path d="M8 15h8"/></svg>',
+    clipboard: '<svg viewBox="0 0 24 24" focusable="false"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M9 10h6M9 14h6M9 18h3"/></svg>',
+    admin: '<svg viewBox="0 0 24 24" focusable="false"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg>'
   };
 
   function renderizarIcone(nome) {
@@ -17,6 +19,14 @@
 
   function renderizarBotao(texto, classe = 'secondary', atributos = '') {
     return `<button class="button ${classe}" ${atributos}>${texto}</button>`;
+  }
+
+  function renderizarBotaoVoltarMenu(classeExtra = '') {
+    return `<a class="button form-menu-button ${classeExtra}" href="menu.html"><span class="button-arrow" aria-hidden="true">←</span><span>Voltar ao menu</span></a>`;
+  }
+
+  function renderizarBotaoAdicionarAmostra() {
+    return '<button id="add-sample" class="button sample-add-button" type="button">+ Adicionar amostra</button>';
   }
 
   function renderizarSidebar(paginaAtiva = 'servicos') {
@@ -33,6 +43,9 @@
           <a class="${paginaAtiva === 'perfil' ? 'active' : ''}" href="dados-pessoais.html">
             ${renderizarIcone('perfil')}<span>Dados pessoais</span>
           </a>
+          <a data-admin-only hidden class="${paginaAtiva === 'administracao' ? 'active' : ''}" href="administracao-usuarios.html">
+            ${renderizarIcone('admin')}<span>Administração</span>
+          </a>
         </nav>
         <div class="sidebar-footer">
           <div class="sidebar-user">
@@ -42,7 +55,7 @@
               <small data-usuario-grupo>Client_User</small>
             </span>
           </div>
-          ${renderizarBotao(`${renderizarIcone('sair')}Sair`, 'sidebar-logout', 'data-logout type="button"')}
+          ${renderizarBotao(`${renderizarIcone('sair')}Sair`, 'logout-button sidebar-logout', 'data-logout type="button"')}
         </div>
       </aside>`;
   }
@@ -57,7 +70,7 @@
 
   function renderizarCabecalhoFormulario() {
     return `
-      <header class="app-header">
+      <header class="app-header form-header-light">
         <div class="app-shell header-inner">
           <a class="brand" href="menu.html">
             <img class="senai-logo" src="${window.APP_CONFIG?.assetBase || ''}design/brand/logo_senai_fiems.png" alt="SENAI FIEMS">
@@ -65,7 +78,7 @@
           </a>
           <div class="user-actions">
             <span class="user-name">Olá, <strong data-usuario-nome></strong></span>
-            ${renderizarBotao('Sair', 'secondary', 'data-logout type="button"')}
+            ${renderizarBotao('Sair', 'logout-button', 'data-logout type="button"')}
           </div>
         </div>
       </header>`;
@@ -84,6 +97,14 @@
       alvo.outerHTML = renderizarCabecalhoFormulario();
     });
 
+    document.querySelectorAll('[data-componente="botao-voltar-menu"]').forEach((alvo) => {
+      alvo.outerHTML = renderizarBotaoVoltarMenu(alvo.dataset.classe || '');
+    });
+
+    document.querySelectorAll('[data-componente="botao-adicionar-amostra"]').forEach((alvo) => {
+      alvo.outerHTML = renderizarBotaoAdicionarAmostra();
+    });
+
     document.querySelectorAll('[data-sidebar-toggle]').forEach((botao) => {
       botao.addEventListener('click', () => {
         document.querySelector('.sidebar')?.classList.toggle('open');
@@ -100,6 +121,8 @@
   window.AppComponents = {
     renderizarIcone,
     renderizarBotao,
+    renderizarBotaoVoltarMenu,
+    renderizarBotaoAdicionarAmostra,
     renderizarSidebar,
     renderizarRodape,
     renderizarCabecalhoFormulario,

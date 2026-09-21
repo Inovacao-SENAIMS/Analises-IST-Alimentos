@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Administração de usuários | SENAI FIEMS</title>
+    <link rel="stylesheet" href="../css/style.css">
+  </head>
+  <body class="app-layout">
+    <div class="app-frame">
+      <div data-componente="sidebar" data-pagina-ativa="administracao"></div>
+
+      <main class="content-area">
+        <div class="mobile-topbar">
+          <button class="mobile-menu-button" data-sidebar-toggle type="button" aria-label="Abrir menu">☰</button>
+          <img class="senai-logo" src="../design/brand/logo_senai_fiems.png" alt="SENAI FIEMS">
+        </div>
+
+        <div class="content-inner">
+          <p class="eyebrow">Administração</p>
+          <h1 class="page-heading">Gestão de usuários</h1>
+          <p class="page-lead">Ative ou desative acessos e defina o grupo de cada usuário. Senhas não são exibidas nesta tela.</p>
+          <div id="admin-status" class="status" role="alert"></div>
+
+          <section class="card admin-card">
+            <div class="admin-toolbar">
+              <strong>Usuários cadastrados</strong>
+              <button id="admin-refresh" class="button secondary" type="button">Atualizar lista</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Grupo</th>
+                    <th>Status</th>
+                    <th>Data de cadastro</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-body"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <div data-componente="footer"></div>
+        </div>
+      </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../components/componentes.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin-usuarios.js"></script>
+  </body>
+</html>

@@ -110,6 +110,10 @@
       elemento.textContent = sessao.nome || sessao.email;
     });
 
+    document.querySelectorAll('[data-admin-only]').forEach((elemento) => {
+      elemento.hidden = sessao.grupo !== 'Administrator_User';
+    });
+
     document.querySelectorAll('[data-logout]').forEach((botao) => {
       botao.addEventListener('click', () => {
         limparSessao();

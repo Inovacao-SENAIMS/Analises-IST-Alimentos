@@ -5,6 +5,8 @@
   const form = document.querySelector('#seed-form');
   if (!form) return;
 
+  const apiAction = form.dataset.apiAction || 'salvarSolicitacao';
+
   const sampleList = document.querySelector('#sample-list');
   const addButton = document.querySelector('#add-sample');
   const count = document.querySelector('#sample-count');
@@ -323,7 +325,7 @@
     status.className = 'status show loading';
 
     try {
-      const resultado = await AppAuth.requisitarApi('salvarSolicitacao', { dados: coletar() });
+      const resultado = await AppAuth.requisitarApi(apiAction, { dados: coletar() });
       status.textContent = `Solicitação enviada com sucesso. Número: ${resultado.dados.solicitacaoId}`;
       status.className = 'status show success';
       window.scrollTo({ top: 0, behavior: 'smooth' });

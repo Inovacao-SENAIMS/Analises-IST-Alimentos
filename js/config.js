@@ -19,6 +19,20 @@ window.APP_CONFIG = {
       descricao: 'Solicitação de ensaios microbiológicos para água, gelo, alimentos e bebidas',
       icone: 'flask',
       caminho: 'formulario-analise-microbiologica.html'
+    },
+    {
+      id: 'amostras-fiscais',
+      titulo: 'Amostras Fiscais - Alimentos',
+      descricao: 'Solicitação de análise fiscal indicativa ou representativa de alimentos.',
+      icone: 'clipboard',
+      caminho: 'formulario-amostras-fiscais.html'
+    },
+    {
+      id: 'analise-sementes-r08',
+      titulo: 'Análise de Sementes R.08',
+      descricao: 'Solicitação de análise de sementes conforme o formulário revisado R.08.',
+      icone: 'seedling',
+      caminho: 'formulario-analise-sementes-r08.html'
     }
   ],
   ensaiosMicrobiologicos: {

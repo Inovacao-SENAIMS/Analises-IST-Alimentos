@@ -13,11 +13,11 @@ Aplicativo estático em HTML, CSS e JavaScript puro para coletar solicitações 
 
 As páginas HTML ficam organizadas em `pages/`, usam pontos de montagem `data-componente` e carregam `components/componentes.js`. O `index.html` da raiz funciona como entrada compatível com o GitHub Pages e redireciona para `pages/index.html`. Assim, alterações de navegação, rodapé, cabeçalho ou ícones SVG são feitas em um único lugar.
 
-O menu possui dois serviços: análise de sementes e análise microbiológica. A segunda análise usa as abas `SolicitacoesMicrobiologicas` e `EnsaiosMicrobiologicos`.
+O menu possui quatro serviços: análise de sementes, análise microbiológica, amostras fiscais de alimentos e análise de sementes R.08. Cada fluxo possui suas próprias abas de gravação para preservar o histórico e facilitar futuras revisões.
 
 ## 1. Criar a planilha
 
-Crie uma planilha Google e quatro abas com estes nomes e cabeçalhos na primeira linha.
+Crie uma planilha Google e dez abas com estes nomes e cabeçalhos na primeira linha.
 
 ### `Usuarios`
 
@@ -78,6 +78,38 @@ solicitacao_id | numero | grupo | codigo | ensaio | resultado | observacoes_labo
 ```
 
 As duas últimas colunas são reservadas ao laboratório. Os ensaios exibidos ao cliente são definidos em `js/config.js`, preservando os códigos da especificação microbiológica.
+
+### `SolicitacoesAmostrasFiscais`
+
+```text
+solicitacao_id | data_hora_envio | usuario | protocolo_entrada | numero_protocolo | razao_social | cpf_cnpj | nome_fantasia | proprietario | ie | endereco | email | telefone | fax | municipio | cep | registro_rotulo | registro_orgao | objetivo | analise_microbiologica | analise_fisico_quimica | observacoes | data_recebimento | hora_recebimento | responsavel_recebimento | condicao_amostra | observacoes_recepcao
+```
+
+As colunas a partir de `data_recebimento` são reservadas à recepção/laboratório e não aparecem no formulário público.
+
+### `AmostrasFiscais`
+
+```text
+solicitacao_id | numero | produto | marca | quantidade | lote | data_fabricacao | data_validade | coletor_nome | coletor_telefone | data_coleta | hora_coleta | observacoes | resultado | observacoes_laboratorio
+```
+
+As colunas `resultado` e `observacoes_laboratorio` são reservadas ao laboratório.
+
+### `SolicitacoesSementesR08`
+
+```text
+solicitacao_id | data_hora_envio | usuario | requerente | renasem_requerente | pagante | cpf_cnpj | endereco | data_amostragem | procedencia | amostrador | renasem_amostrador | num_proposta | finalidade | finalidade_outros | ensaio_pureza | ensaio_pms | ensaio_outras_sementes | ensaio_infestadas | ensaio_germinacao | ensaio_vigor_ea | ensaio_tetrazolio | ensaio_frio | ensaio_emergencia | observacoes | data_recebimento | responsavel_recebimento | observacoes_laboratorio
+```
+
+As colunas a partir de `data_recebimento` são reservadas ao laboratório.
+
+### `AmostrasSementesR08`
+
+```text
+solicitacao_id | numero | especie | cultivar | safra | peneira | lote | representatividade | categoria | tratamento | trat_produto | trat_principio_ativo | trat_dosagem | peso_amostra_g | analise_critica | protocolo
+```
+
+As três últimas colunas são reservadas ao laboratório e não aparecem na página pública R.08.
 
 ## 2. Publicar o Apps Script
 
