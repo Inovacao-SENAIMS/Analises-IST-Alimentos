@@ -8,9 +8,11 @@ Crie uma planilha Google e quatro abas com estes nomes e cabeçalhos na primeira
 
 ### `Usuarios`
 
-`email | senha | nome | ativo`
+`email | senha | nome | ativo | grupo | data_cadastro`
 
-Adicione um usuário inicial, por exemplo `usuario@empresa.com | troque-esta-senha | Nome do Usuário | TRUE`. Para produção, substitua a senha de demonstração por uma política de credenciais adequada; este exemplo mantém a validação compatível com a especificação solicitada.
+Adicione um usuário inicial, por exemplo `usuario@empresa.com | troque-esta-senha | Nome do Usuário | TRUE | Administrator_User | 2026-09-21`. Usuários criados pela tela pública entram automaticamente como `Client_User`.
+
+Os grupos disponíveis são `Client_User`, `Manager_User` e `Administrator_User`. A atribuição inicial de Manager e Administrator é feita diretamente na coluna `grupo` da aba `Usuarios`; o cliente nunca escolhe o próprio grupo. O Apps Script consulta essa coluna a cada operação protegida, portanto alterações de `ativo` ou `grupo` têm efeito no próximo acesso/operação.
 
 ### `Config`
 
@@ -57,6 +59,8 @@ As três últimas colunas são reservadas para preenchimento do laboratório.
 5. Implante, autorize o projeto e copie a URL que termina em `/exec`.
 6. Cole essa URL em `js/config.js`, no campo `apiUrl`.
 7. Se o código do Apps Script mudar depois da implantação, use **Gerenciar implantações → Editar → Nova versão → Implantar**. Editar o arquivo local não atualiza o Web App hospedado.
+
+O cadastro público está em `cadastro.html`; após o sucesso, o usuário volta para `index.html`. O menu autenticado possui a sidebar com Serviços, Dados pessoais e Sair. A página `dados-pessoais.html` mostra o grupo retornado pelo servidor, sem permitir edição de permissões.
 
 O segredo usado para assinar tokens é criado automaticamente em Script Properties na primeira execução. O token expira em 8 horas e é validado em `listarOpcoes` e `salvarSolicitacao`.
 

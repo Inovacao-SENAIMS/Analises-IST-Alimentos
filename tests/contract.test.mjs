@@ -6,8 +6,9 @@ import test from 'node:test';
 const root = process.cwd();
 const requiredFiles = [
   'index.html', 'menu.html', 'formulario-analise-sementes.html',
+  'cadastro.html', 'dados-pessoais.html',
   'css/style.css', 'js/config.js', 'js/auth.js', 'js/menu.js',
-  'js/validacoes.js', 'js/form-analise-sementes.js',
+  'js/validacoes.js', 'js/form-analise-sementes.js', 'js/cadastro.js', 'js/perfil.js',
   'apps-script/Code.gs', 'README.md'
 ];
 
@@ -17,7 +18,7 @@ test('entrega todos os arquivos públicos do aplicativo', () => {
 
 test('contrato contém as ações e abas do fluxo', () => {
   const source = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
-  for (const token of ['doPost', 'login', 'salvarSolicitacao', 'listarOpcoes', 'Usuarios', 'Solicitacoes', 'Amostras']) {
+  for (const token of ['doPost', 'login', 'cadastrarUsuario', 'obterPerfil', 'salvarSolicitacao', 'listarOpcoes', 'Usuarios', 'Solicitacoes', 'Amostras', 'Client_User', 'Manager_User', 'Administrator_User']) {
     assert.match(source, new RegExp(token));
   }
 });
@@ -32,4 +33,16 @@ test('frontend mantém os requisitos de segurança e coleta', () => {
   assert.match(html, /Para emissão de BAS devem ser solicitados os ensaios definitivos/);
   assert.match(form, /data-definitivo/);
   assert.match(form, /tratamento/);
+});
+
+test('cadastro e navegação usam logo, sidebar e grupos', () => {
+  const cadastro = readFileSync(join(root, 'cadastro.html'), 'utf8');
+  const cadastroScript = readFileSync(join(root, 'js/cadastro.js'), 'utf8');
+  const menu = readFileSync(join(root, 'menu.html'), 'utf8');
+  const perfil = readFileSync(join(root, 'dados-pessoais.html'), 'utf8');
+  assert.match(cadastroScript, /cadastrarUsuario/);
+  assert.match(cadastro, /logo_senai_fiems\.png/);
+  assert.match(menu, /sidebar/);
+  assert.match(menu, /dados-pessoais\.html/);
+  assert.match(perfil, /data-perfil-grupo/);
 });

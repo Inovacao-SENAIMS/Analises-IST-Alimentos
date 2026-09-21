@@ -50,7 +50,12 @@
   async function fazerLogin(email, senha) {
     const resultado = await requisitarApi('login', { email, senha }, false);
     const expiraEm = Date.now() + config.sessionHours * 60 * 60 * 1000;
-    localStorage.setItem(key, JSON.stringify({ token: resultado.dados.token, nome: resultado.dados.nome, email: resultado.dados.email, expiraEm }));
+    localStorage.setItem(key, JSON.stringify({ token: resultado.dados.token, nome: resultado.dados.nome, email: resultado.dados.email, grupo: resultado.dados.grupo, expiraEm }));
+    return resultado.dados;
+  }
+
+  async function cadastrarUsuario(nome, email, senha) {
+    const resultado = await requisitarApi('cadastrarUsuario', { nome, email, senha }, false);
     return resultado.dados;
   }
 
@@ -61,5 +66,5 @@
     document.querySelectorAll('[data-logout]').forEach((botao) => botao.addEventListener('click', () => { limparSessao(); window.location.href = 'index.html'; }));
   }
 
-  window.AppAuth = { obterSessao, sessaoValida, limparSessao, exigirSessao, requisitarApi, fazerLogin, configurarCabecalho };
+  window.AppAuth = { obterSessao, sessaoValida, limparSessao, exigirSessao, requisitarApi, fazerLogin, cadastrarUsuario, configurarCabecalho };
 })();

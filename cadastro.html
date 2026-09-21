@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Criar acesso | SENAI FIEMS</title><link rel="stylesheet" href="css/style.css"></head>
+<body class="login-page">
+  <main class="card login-card cadastro-card">
+    <img class="senai-logo login-logo" src="design/brand/logo_senai_fiems.png" alt="SENAI FIEMS">
+    <p class="eyebrow">Portal de serviços</p><h1 class="page-heading">Crie seu acesso</h1><p class="page-lead">Cadastre seus dados para solicitar serviços de análise de sementes.</p>
+    <div id="cadastro-status" class="status" role="alert"></div>
+    <form id="cadastro-form" novalidate>
+      <div class="field"><label for="nome">Nome completo <span>*</span></label><input id="nome" name="nome" autocomplete="name" required><small class="error-message"></small></div>
+      <div class="field"><label for="email">E-mail <span>*</span></label><input id="email" name="email" type="email" autocomplete="email" required><small class="error-message"></small></div>
+      <div class="field"><label for="senha">Defina uma senha <span>*</span></label><input id="senha" name="senha" type="password" minlength="8" autocomplete="new-password" required><small class="error-message">Mínimo de 8 caracteres.</small></div>
+      <div class="field"><label for="confirmar-senha">Confirme a senha <span>*</span></label><input id="confirmar-senha" name="confirmarSenha" type="password" minlength="8" autocomplete="new-password" required><small class="error-message"></small></div>
+      <button class="button primary" type="submit" style="width:100%;margin-top:8px">Criar acesso</button>
+    </form>
+    <p class="form-footer">Já possui acesso? <a href="index.html">Voltar para o login</a></p>
+  </main>
+  <script src="js/config.js"></script><script src="js/auth.js"></script><script src="js/cadastro.js"></script>
+</body></html>

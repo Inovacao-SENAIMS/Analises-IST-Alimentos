@@ -3,14 +3,16 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Entrar | IST Alimentos</title><link rel="stylesheet" href="css/style.css"></head>
 <body class="login-page">
   <main class="card login-card">
-    <a class="brand" href="index.html"><span class="brand-mark">🌱</span><span><span class="brand-title">IST Alimentos</span><span class="brand-subtitle">Coleta de solicitações laboratoriais</span></span></a>
-    <h1 class="page-heading">Acesse sua conta</h1><p class="page-lead">Entre para registrar uma nova solicitação de análise.</p>
+    <img class="senai-logo login-logo" src="design/brand/logo_senai_fiems.png" alt="SENAI FIEMS">
+    <p class="eyebrow">Portal de serviços</p><h1 class="page-heading">Acesse sua conta</h1><p class="page-lead">Entre para registrar uma nova solicitação de análise.</p>
     <div id="login-status" class="status" role="alert"></div>
     <form id="login-form" novalidate><div class="field"><label for="email">E-mail <span>*</span></label><input id="email" name="email" type="email" autocomplete="username" required><small class="error-message"></small></div><div class="field"><label for="senha">Senha <span>*</span></label><input id="senha" name="senha" type="password" autocomplete="current-password" required><small class="error-message"></small></div><button class="button primary" type="submit" style="width:100%;margin-top:8px">Entrar</button></form>
+    <p class="form-footer">Ainda não possui acesso? <a href="cadastro.html">Criar uma conta</a></p>
     <p class="login-help">A sessão permanece ativa por até 8 horas neste dispositivo.</p>
   </main>
   <script src="js/config.js"></script><script src="js/auth.js"></script><script>
     if (AppAuth.sessaoValida()) window.location.href = 'menu.html';
+    if (new URLSearchParams(window.location.search).get('cadastro') === 'sucesso') { const status = document.querySelector('#login-status'); status.textContent = 'Cadastro realizado. Agora entre com seu e-mail e senha.'; status.className = 'status show success'; }
     document.querySelector('#login-form').addEventListener('submit', async (evento) => { evento.preventDefault(); const form = evento.currentTarget; const status = document.querySelector('#login-status'); const email = form.email.value.trim(); const senha = form.senha.value; status.className = 'status'; if (!email || !senha) { status.textContent = 'Informe seu e-mail e sua senha.'; status.classList.add('show','error'); return; } const botao = form.querySelector('button'); botao.disabled = true; status.textContent = 'Validando acesso…'; status.classList.add('show','loading'); try { await AppAuth.fazerLogin(email, senha); window.location.href = 'menu.html'; } catch (erro) { status.textContent = erro.message; status.className = 'status show error'; botao.disabled = false; } });
   </script>
 </body></html>

@@ -1,6 +1,10 @@
 /* Renderiza os cards a partir do catálogo centralizado. */
 (function () {
   AppAuth.configurarCabecalho();
+  document.querySelectorAll('[data-sidebar-toggle]').forEach((botao) => botao.addEventListener('click', () => document.querySelector('.sidebar')?.classList.toggle('open')));
+  const sessao = AppAuth.obterSessao();
+  if (sessao) document.querySelectorAll('[data-usuario-inicial]').forEach((elemento) => { elemento.textContent = (sessao.nome || 'U').trim().charAt(0).toUpperCase(); });
+  if (sessao?.grupo) document.querySelectorAll('[data-usuario-grupo]').forEach((elemento) => { elemento.textContent = sessao.grupo; });
   const alvo = document.querySelector('[data-formularios]');
   if (!alvo) return;
   alvo.innerHTML = APP_CONFIG.formularios.map((formulario) => `

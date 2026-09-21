@@ -1,8 +1,9 @@
 /**
  * API do aplicativo IST Alimentos.
- * Configure as abas e cabeçalhos exatamente como descrito no README antes de publicar.
+ * A aba Usuarios recebe os grupos Client_User, Manager_User ou Administrator_User.
  */
 const ABAS = { USUARIOS: 'Usuarios', CONFIG: 'Config', SOLICITACOES: 'Solicitacoes', AMOSTRAS: 'Amostras' };
+const GRUPOS = { CLIENTE: 'Client_User', GESTOR: 'Manager_User', ADMIN: 'Administrator_User' };
 const EXPIRACAO_MS = 8 * 60 * 60 * 1000;
 
 function doPost(e) {
@@ -10,11 +11,13 @@ function doPost(e) {
     const entrada = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     switch (entrada.acao) {
       case 'login': return responder_(login(entrada.email, entrada.senha));
+      case 'cadastrarUsuario': return responder_(cadastrarUsuario(entrada.nome, entrada.email, entrada.senha));
+      case 'obterPerfil': return responder_(obterPerfil(entrada.token));
       case 'listarOpcoes': return responder_(listarOpcoes(entrada.token));
       case 'salvarSolicitacao': return responder_(salvarSolicitacao(entrada.dados, entrada.token));
-      default: return responder_({ sucesso: false, mensagem: 'Operação não reconhecida.', dados: null });
+      default: return responder_(falha_('Operação não reconhecida.'));
     }
-  } catch (erro) { return responder_({ sucesso: false, mensagem: 'Não foi possível processar a solicitação.', dados: null }); }
+  } catch (erro) { return responder_(falha_('Não foi possível processar a solicitação.')); }
 }
 
 function responder_(resultado) { return ContentService.createTextOutput(JSON.stringify(resultado)).setMimeType(ContentService.MimeType.JSON); }
@@ -22,20 +25,51 @@ function sucesso_(mensagem, dados) { return { sucesso: true, mensagem: mensagem,
 function falha_(mensagem) { return { sucesso: false, mensagem: mensagem, dados: null }; }
 function planilha_() { return SpreadsheetApp.getActiveSpreadsheet(); }
 function valoresComCabecalho_(nomeAba) { const aba = planilha_().getSheetByName(nomeAba); if (!aba) throw new Error('Aba ausente'); const valores = aba.getDataRange().getValues(); return { aba: aba, cabecalho: valores.shift().map(String), linhas: valores }; }
+function coluna_(cabecalho, nome) { return cabecalho.indexOf(nome); }
+function ativo_(valor) { const normalizado = String(valor).toLowerCase().trim(); return normalizado !== 'false' && normalizado !== 'não' && normalizado !== 'nao' && normalizado !== '0'; }
+function grupoValido_(grupo) { return [GRUPOS.CLIENTE, GRUPOS.GESTOR, GRUPOS.ADMIN].indexOf(grupo) >= 0; }
+
+function usuarioPorEmail_(email) {
+  const tabela = valoresComCabecalho_(ABAS.USUARIOS); const emailCol = coluna_(tabela.cabecalho, 'email'); const linha = tabela.linhas.find(function (item) { return String(item[emailCol]).toLowerCase().trim() === String(email || '').toLowerCase().trim(); });
+  if (!linha) return null;
+  const grupoCol = coluna_(tabela.cabecalho, 'grupo'); const grupo = grupoCol >= 0 && grupoValido_(String(linha[grupoCol]).trim()) ? String(linha[grupoCol]).trim() : GRUPOS.CLIENTE;
+  return { tabela: tabela, linha: linha, email: String(linha[emailCol]).trim(), nome: String(linha[coluna_(tabela.cabecalho, 'nome')]).trim(), senha: String(linha[coluna_(tabela.cabecalho, 'senha')]), ativo: ativo_(linha[coluna_(tabela.cabecalho, 'ativo')]), grupo: grupo };
+}
 
 function login(email, senha) {
   if (!email || !senha) return falha_('Informe e-mail e senha.');
-  const tabela = valoresComCabecalho_(ABAS.USUARIOS); const emailCol = tabela.cabecalho.indexOf('email'); const senhaCol = tabela.cabecalho.indexOf('senha'); const nomeCol = tabela.cabecalho.indexOf('nome'); const ativoCol = tabela.cabecalho.indexOf('ativo');
-  const linha = tabela.linhas.find(function (item) { return String(item[emailCol]).toLowerCase().trim() === String(email).toLowerCase().trim() && String(item[senhaCol]) === String(senha) && String(item[ativoCol]).toLowerCase() !== 'false' && String(item[ativoCol]).toLowerCase() !== 'não'; });
-  if (!linha) return falha_('E-mail ou senha inválidos.');
-  const token = criarToken_(String(linha[emailCol]).trim(), String(linha[nomeCol]).trim()); return sucesso_('Login realizado.', { token: token, email: String(linha[emailCol]).trim(), nome: String(linha[nomeCol]).trim() });
+  const usuario = usuarioPorEmail_(email);
+  if (!usuario || !usuario.ativo || usuario.senha !== String(senha)) return falha_('E-mail ou senha inválidos.');
+  const token = criarToken_(usuario); return sucesso_('Login realizado.', { token: token, email: usuario.email, nome: usuario.nome, grupo: usuario.grupo });
+}
+
+function cadastrarUsuario(nome, email, senha) {
+  nome = String(nome || '').trim(); email = String(email || '').trim().toLowerCase(); senha = String(senha || '');
+  if (nome.length < 2 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || senha.length < 8) return falha_('Informe nome, e-mail válido e senha com pelo menos 8 caracteres.');
+  if (usuarioPorEmail_(email)) return falha_('Já existe um cadastro com este e-mail.');
+  const tabela = valoresComCabecalho_(ABAS.USUARIOS); const cabecalho = tabela.cabecalho;
+  ['grupo', 'data_cadastro'].forEach(function (nomeColuna) { if (coluna_(cabecalho, nomeColuna) < 0) { tabela.aba.getRange(1, cabecalho.length + 1).setValue(nomeColuna); cabecalho.push(nomeColuna); } });
+  const valores = cabecalho.map(function (coluna) { const mapa = { email: email, senha: senha, nome: nome, ativo: true, grupo: GRUPOS.CLIENTE, data_cadastro: new Date() }; return mapa[coluna] === undefined ? '' : mapa[coluna]; });
+  tabela.aba.appendRow(valores); return sucesso_('Cadastro realizado.', { email: email, grupo: GRUPOS.CLIENTE });
 }
 
 function segredo_() { const propriedades = PropertiesService.getScriptProperties(); let segredo = propriedades.getProperty('TOKEN_SECRET'); if (!segredo) { segredo = Utilities.getUuid() + Utilities.getUuid(); propriedades.setProperty('TOKEN_SECRET', segredo); } return segredo; }
-function criarToken_(email, nome) { const dados = { email: email, nome: nome, exp: Date.now() + EXPIRACAO_MS, nonce: Utilities.getUuid() }; const corpo = Utilities.base64EncodeWebSafe(JSON.stringify(dados)); const assinatura = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(corpo, segredo_())); return corpo + '.' + assinatura; }
-function validarToken_(token) { try { const partes = String(token || '').split('.'); if (partes.length !== 2) return null; const assinatura = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(partes[0], segredo_())); if (assinatura !== partes[1]) return null; const dados = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(partes[0])).getDataAsString()); if (!dados.email || Number(dados.exp) <= Date.now()) return null; return dados; } catch (_) { return null; } }
+function criarToken_(usuario) { const dados = { email: usuario.email, nome: usuario.nome, grupo: usuario.grupo, exp: Date.now() + EXPIRACAO_MS, nonce: Utilities.getUuid() }; const corpo = Utilities.base64EncodeWebSafe(JSON.stringify(dados)); const assinatura = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(corpo, segredo_())); return corpo + '.' + assinatura; }
+function validarToken_(token) {
+  try {
+    const partes = String(token || '').split('.'); if (partes.length !== 2) return null; const assinatura = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(partes[0], segredo_())); if (assinatura !== partes[1]) return null;
+    const dados = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(partes[0])).getDataAsString()); if (!dados.email || Number(dados.exp) <= Date.now()) return null;
+    const usuario = usuarioPorEmail_(dados.email); if (!usuario || !usuario.ativo) return null; return usuario;
+  } catch (_) { return null; }
+}
 
-function listarOpcoes(token) { if (!validarToken_(token)) return falha_('Sessão expirada. Faça login novamente.'); const tabela = valoresComCabecalho_(ABAS.CONFIG); const tipoCol = tabela.cabecalho.indexOf('tipo'); const valorCol = tabela.cabecalho.indexOf('valor'); const resultado = { peneiras: [], categorias: [] }; tabela.linhas.forEach(function (linha) { const tipo = String(linha[tipoCol]).toLowerCase().trim(); const valor = String(linha[valorCol]).trim(); if (valor && resultado[tipo + 's']) resultado[tipo + 's'].push(valor); }); return sucesso_('Opções carregadas.', resultado); }
+function obterPerfil(token) { const usuario = validarToken_(token); if (!usuario) return falha_('Sessão expirada. Faça login novamente.'); return sucesso_('Perfil carregado.', { email: usuario.email, nome: usuario.nome, grupo: usuario.grupo }); }
+
+function listarOpcoes(token) {
+  if (!validarToken_(token)) return falha_('Sessão expirada. Faça login novamente.');
+  const tabela = valoresComCabecalho_(ABAS.CONFIG); const tipoCol = coluna_(tabela.cabecalho, 'tipo'); const valorCol = coluna_(tabela.cabecalho, 'valor'); const resultado = { peneiras: [], categorias: [] };
+  tabela.linhas.forEach(function (linha) { const tipo = String(linha[tipoCol]).toLowerCase().trim(); const valor = String(linha[valorCol]).trim(); if (valor && resultado[tipo + 's']) resultado[tipo + 's'].push(valor); }); return sucesso_('Opções carregadas.', resultado);
+}
 
 function salvarSolicitacao(dados, token) {
   const usuario = validarToken_(token); if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
