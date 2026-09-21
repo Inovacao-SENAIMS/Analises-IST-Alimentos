@@ -207,3 +207,16 @@ test('páginas de análise e histórico carregam os recursos de relatório PDF',
   assert.match(readFileSync(join(root, 'components/componentes.js'), 'utf8'), /renderizarBotaoBaixarPdf/);
   assert.match(readFileSync(join(root, 'components/componentes.js'), 'utf8'), /renderizarBotaoExportarResumo/);
 });
+
+test('formulários liberam comprovante PDF somente após envio bem-sucedido', () => {
+  for (const file of [
+    'js/form-analise-sementes.js',
+    'js/form-analise-microbiologica.js',
+    'js/form-amostras-fiscais.js'
+  ]) {
+    const script = readFileSync(join(root, file), 'utf8');
+    assert.match(script, /RelatoriosPdf\.baixarComprovante/);
+    assert.match(script, /solicitacaoId/);
+    assert.match(script, /botaoPdf\.hidden = false/);
+  }
+});

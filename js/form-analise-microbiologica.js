@@ -8,6 +8,24 @@
   const status = document.querySelector('#micro-status');
   const ensaiosAlvo = document.querySelector('#micro-ensaios');
   const ensaios = APP_CONFIG.ensaiosMicrobiologicos;
+  const botaoPdf = document.querySelector('#micro-pdf');
+  let ultimoComprovante = null;
+
+  function prepararComprovante(dados, solicitacaoId) {
+    return {
+      solicitacaoId,
+      titulo: 'Solicitação de Análise Microbiológica',
+      dataEnvio: new Date().toLocaleString('pt-BR'),
+      campos: [
+        ['Razão social', dados.razaoSocial], ['CPF/CNPJ', dados.cpfCnpj], ['Responsável', dados.responsavel],
+        ['Tipo de amostra', dados.tipoAmostra], ['Lote', dados.lote], ['Finalidade', dados.finalidade]
+      ].map(([rotulo, valor]) => ({ rotulo, valor })),
+      relacionados: dados.ensaios.map((ensaio, indice) => ({
+        numero: indice + 1,
+        campos: [{ rotulo: 'Ensaio', valor: ensaio.ensaio }, { rotulo: 'Código', valor: ensaio.codigo }]
+      }))
+    };
+  }
 
   function escapeHtml(valor) {
     return String(valor ?? '').replace(/[&<>"']/g, (char) => ({
@@ -140,6 +158,8 @@
     if (!window.confirm('Deseja limpar todos os dados preenchidos?')) return;
     form.reset();
     document.querySelector('#finalidade-outros-micro').hidden = true;
+    ultimoComprovante = null;
+    botaoPdf.hidden = true;
     limparStatus();
   });
 
@@ -154,7 +174,10 @@
     status.className = 'status show loading';
 
     try {
-      const resultado = await AppAuth.requisitarApi('salvarSolicitacaoMicrobiologica', { dados: coletar() });
+      const dados = coletar();
+      const resultado = await AppAuth.requisitarApi('salvarSolicitacaoMicrobiologica', { dados });
+      ultimoComprovante = prepararComprovante(dados, resultado.dados.solicitacaoId);
+      botaoPdf.hidden = false;
       status.textContent = `Solicitação enviada com sucesso. Número: ${resultado.dados.solicitacaoId}`;
       status.className = 'status show success';
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -163,6 +186,15 @@
       status.className = 'status show error';
       botao.disabled = false;
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
+  botaoPdf.addEventListener('click', () => {
+    try {
+      RelatoriosPdf.baixarComprovante(ultimoComprovante);
+    } catch (erro) {
+      status.textContent = erro.message;
+      status.className = 'status show error';
     }
   });
 

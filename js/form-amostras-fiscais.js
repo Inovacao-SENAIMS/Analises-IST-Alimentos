@@ -6,6 +6,21 @@
   if (!form) return;
 
   const status = document.querySelector('#fiscal-status');
+  const botaoPdf = document.querySelector('#fiscal-pdf');
+  let ultimoComprovante = null;
+
+  function prepararComprovante(dados, solicitacaoId) {
+    return {
+      solicitacaoId,
+      titulo: 'Solicitação de Amostras Fiscais - Alimentos',
+      dataEnvio: new Date().toLocaleString('pt-BR'),
+      campos: [
+        ['Razão social', dados.razaoSocial], ['CPF/CNPJ', dados.cpfCnpj], ['Produto', dados.produto],
+        ['Lote', dados.lote], ['Objetivo', dados.objetivo], ['Análises solicitadas', dados.analises.join(', ')]
+      ].map(([rotulo, valor]) => ({ rotulo, valor })),
+      relacionados: []
+    };
+  }
 
   function limparStatus() {
     status.className = 'status';
@@ -74,6 +89,8 @@
     limparStatus();
     document.querySelector('#analises-fiscal-error').textContent = '';
     document.querySelector('#declaracao-fiscal-error').textContent = '';
+    ultimoComprovante = null;
+    botaoPdf.hidden = true;
   });
 
   form.addEventListener('submit', async (evento) => {
@@ -87,7 +104,10 @@
     status.className = 'status show loading';
 
     try {
-      const resultado = await AppAuth.requisitarApi('salvarSolicitacaoAmostrasFiscais', { dados: coletar() });
+      const dados = coletar();
+      const resultado = await AppAuth.requisitarApi('salvarSolicitacaoAmostrasFiscais', { dados });
+      ultimoComprovante = prepararComprovante(dados, resultado.dados.solicitacaoId);
+      botaoPdf.hidden = false;
       status.textContent = `Solicitação enviada com sucesso. Número: ${resultado.dados.solicitacaoId}`;
       status.className = 'status show success';
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -96,6 +116,15 @@
       status.className = 'status show error';
       botao.disabled = false;
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
+  botaoPdf.addEventListener('click', () => {
+    try {
+      RelatoriosPdf.baixarComprovante(ultimoComprovante);
+    } catch (erro) {
+      status.textContent = erro.message;
+      status.className = 'status show error';
     }
   });
 })();

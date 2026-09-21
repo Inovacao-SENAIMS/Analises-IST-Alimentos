@@ -10,6 +10,7 @@
   const sampleList = document.querySelector('#sample-list');
   const addButton = document.querySelector('#add-sample');
   const count = document.querySelector('#sample-count');
+  const botaoPdf = document.querySelector('#seed-pdf');
   const ensaios = [
     'pureza', 'pms', 'outrasSementes', 'infestadas', 'germinacao',
     'vigorEa', 'tetrazolio', 'frio', 'emergencia'
@@ -17,6 +18,28 @@
 
   let opcoes = APP_CONFIG.opcoesPadrao;
   let amostras = [];
+  let ultimoComprovante = null;
+
+  function prepararComprovante(dados, solicitacaoId) {
+    const titulo = apiAction === 'salvarSolicitacaoSementesR08'
+      ? 'Solicitação de Análise de Sementes R.08'
+      : 'Solicitação de Análise de Sementes';
+    return {
+      solicitacaoId,
+      titulo,
+      dataEnvio: new Date().toLocaleString('pt-BR'),
+      campos: [
+        ['Requerente', dados.requerente], ['RENASEM (Requerente)', dados.renasemRequerente],
+        ['Pagante', dados.pagante], ['CPF/CNPJ', dados.cpfCnpj], ['Finalidade', dados.finalidade],
+        ['Observações', dados.observacoes]
+      ].map(([rotulo, valor]) => ({ rotulo, valor })),
+      relacionados: dados.amostras.map((amostra) => ({
+        numero: amostra.numero,
+        campos: [['Espécie', amostra.especie], ['Cultivar', amostra.cultivar], ['Safra', amostra.safra], ['Lote', amostra.lote], ['Categoria', amostra.categoria], ['Tratamento', amostra.tratamento]]
+          .map(([rotulo, valor]) => ({ rotulo, valor }))
+      }))
+    };
+  }
 
   function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -310,6 +333,8 @@
     renderizarAmostras();
     document.querySelector('#finalidade-outros-wrap').hidden = true;
     document.querySelector('#bas-notice').hidden = true;
+    ultimoComprovante = null;
+    botaoPdf.hidden = true;
     limparStatus();
   });
 
@@ -325,7 +350,10 @@
     status.className = 'status show loading';
 
     try {
-      const resultado = await AppAuth.requisitarApi(apiAction, { dados: coletar() });
+      const dados = coletar();
+      const resultado = await AppAuth.requisitarApi(apiAction, { dados });
+      ultimoComprovante = prepararComprovante(dados, resultado.dados.solicitacaoId);
+      botaoPdf.hidden = false;
       status.textContent = `Solicitação enviada com sucesso. Número: ${resultado.dados.solicitacaoId}`;
       status.className = 'status show success';
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -334,6 +362,16 @@
       status.className = 'status show error';
       botao.disabled = false;
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
+  botaoPdf.addEventListener('click', () => {
+    try {
+      RelatoriosPdf.baixarComprovante(ultimoComprovante);
+    } catch (erro) {
+      const status = document.querySelector('#form-status');
+      status.textContent = erro.message;
+      status.className = 'status show error';
     }
   });
 
