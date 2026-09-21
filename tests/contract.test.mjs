@@ -210,6 +210,7 @@ test('páginas de análise e histórico carregam os recursos de relatório PDF',
   for (const file of paginas) {
     const html = readFileSync(join(root, file), 'utf8');
     assert.match(html, /cdnjs\.cloudflare\.com\/ajax\/libs\/jspdf\/2\.5\.1/);
+    assert.match(html, /sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==/);
     assert.match(html, /\.\.\/components\/pdf-relatorios\.js/);
   }
   assert.match(readFileSync(join(root, 'components/componentes.js'), 'utf8'), /renderizarBotaoBaixarPdf/);
