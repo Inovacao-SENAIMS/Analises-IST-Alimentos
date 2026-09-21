@@ -10,6 +10,7 @@ const requiredFiles = [
   'pages/formulario-amostras-fiscais.html', 'pages/formulario-analise-sementes-r08.html',
   'pages/cadastro.html', 'pages/dados-pessoais.html',
   'pages/administracao-usuarios.html',
+  'pages/historico-solicitacoes.html',
   'css/style.css', 'js/config.js', 'js/auth.js', 'js/menu.js',
   'js/validacoes.js', 'js/form-analise-sementes.js', 'js/form-amostras-fiscais.js', 'js/cadastro.js', 'js/perfil.js',
   'components/componentes.js',
@@ -22,7 +23,7 @@ test('entrega todos os arquivos públicos do aplicativo', () => {
 
 test('contrato contém as ações e abas do fluxo', () => {
   const source = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
-  for (const token of ['doPost', 'login', 'cadastrarUsuario', 'obterPerfil', 'listarUsuariosAdmin', 'atualizarUsuarioAdmin', 'salvarSolicitacao', 'salvarSolicitacaoSementesR08', 'salvarSolicitacaoMicrobiologica', 'salvarSolicitacaoAmostrasFiscais', 'listarOpcoes', 'Usuarios', 'Solicitacoes', 'Amostras', 'SolicitacoesMicrobiologicas', 'EnsaiosMicrobiologicos', 'SolicitacoesAmostrasFiscais', 'AmostrasFiscais', 'SolicitacoesSementesR08', 'AmostrasSementesR08', 'Client_User', 'Manager_User', 'Administrator_User']) {
+  for (const token of ['doPost', 'login', 'cadastrarUsuario', 'obterPerfil', 'listarUsuariosAdmin', 'atualizarUsuarioAdmin', 'listarHistoricoSolicitacoes', 'obterDetalhesSolicitacao', 'salvarSolicitacao', 'salvarSolicitacaoSementesR08', 'salvarSolicitacaoMicrobiologica', 'salvarSolicitacaoAmostrasFiscais', 'listarOpcoes', 'Usuarios', 'Solicitacoes', 'Amostras', 'SolicitacoesMicrobiologicas', 'EnsaiosMicrobiologicos', 'SolicitacoesAmostrasFiscais', 'AmostrasFiscais', 'SolicitacoesSementesR08', 'AmostrasSementesR08', 'Client_User', 'Manager_User', 'Administrator_User']) {
     assert.match(source, new RegExp(token));
   }
 });
@@ -110,6 +111,20 @@ test('administração de usuários possui rota protegida e não expõe senhas', 
   assert.match(readFileSync(join(root, 'css/style.css'), 'utf8'), /\.admin-refresh-button/);
 });
 
+test('histórico possui rota, filtro protegido e detalhes públicos', () => {
+  const pagina = readFileSync(join(root, 'pages/historico-solicitacoes.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/historico-solicitacoes.js'), 'utf8');
+  const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  assert.match(pagina, /data-pagina-ativa="historico"/);
+  assert.match(script, /listarHistoricoSolicitacoes/);
+  assert.match(script, /obterDetalhesSolicitacao/);
+  assert.match(componentes, /data-historico/);
+  assert.match(api, /SolicitacoesSementesR08/);
+  assert.match(api, /SolicitacoesAmostrasFiscais/);
+  assert.doesNotMatch(script, /data_recebimento|peso_amostra_g|senha/);
+});
+
 test('páginas organizadas e entrada do GitHub Pages preservada', () => {
   const entrada = readFileSync(join(root, 'index.html'), 'utf8');
   assert.match(entrada, /pages\/index\.html/);
@@ -122,7 +137,7 @@ test('formulário de sementes mantém contraste e ações visuais do cabeçalho'
   const css = readFileSync(join(root, 'css/style.css'), 'utf8');
   const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
   assert.match(html, /data-componente="botao-voltar-menu" data-classe="form-back-button"/);
-  assert.match(html, /class="button secondary form-clear-button"/);
+  assert.match(html, /data-componente="botao-limpar" data-id="clear-button"/);
   assert.match(componentes, /form-menu-button/);
   assert.match(css, /\.form-menu-button/);
   assert.match(css, /\.form-header-light/);
@@ -150,4 +165,20 @@ test('footer compartilhado permanece no rodapé sem sobrepor conteúdo', () => {
   assert.match(css, /\.content-inner > \.app-footer \{[^}]*margin-top: auto/);
   assert.match(css, /\.page > \.app-footer \{[^}]*margin-top: auto/);
   assert.doesNotMatch(css, /\.app-footer\s*\{[^}]*position:\s*fixed/);
+});
+
+test('ações das análises usam componentes de botões padronizados', () => {
+  const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
+  assert.match(componentes, /renderizarBotaoEnviar/);
+  assert.match(componentes, /renderizarBotaoLimpar/);
+  for (const file of [
+    'pages/formulario-analise-sementes.html',
+    'pages/formulario-analise-microbiologica.html',
+    'pages/formulario-amostras-fiscais.html'
+  ]) {
+    const html = readFileSync(join(root, file), 'utf8');
+    assert.match(html, /data-componente="botao-enviar"/);
+    assert.match(html, /data-componente="botao-limpar"/);
+    assert.match(html, /data-componente="botao-voltar-menu"/);
+  }
 });

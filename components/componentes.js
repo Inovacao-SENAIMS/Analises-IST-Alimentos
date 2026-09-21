@@ -10,7 +10,8 @@
     seedling: '<svg viewBox="0 0 24 24" focusable="false"><path d="M12 20V9"/><path d="M12 13c-4.5 0-7-2.5-7-7 4.5 0 7 2.5 7 7Z"/><path d="M12 10c0-4.5 2.5-7 7-7 0 4.5-2.5 7-7 7Z"/></svg>',
     flask: '<svg viewBox="0 0 24 24" focusable="false"><path d="M9 3h6M10 3v6l-5.5 9.2A1.2 1.2 0 0 0 5.5 20h13a1.2 1.2 0 0 0 1-1.8L14 9V3"/><path d="M8 15h8"/></svg>',
     clipboard: '<svg viewBox="0 0 24 24" focusable="false"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M9 10h6M9 14h6M9 18h3"/></svg>',
-    admin: '<svg viewBox="0 0 24 24" focusable="false"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg>'
+    admin: '<svg viewBox="0 0 24 24" focusable="false"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg>',
+    historico: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5M8 17h3"/></svg>'
   };
 
   function renderizarIcone(nome) {
@@ -29,6 +30,14 @@
     return '<button id="add-sample" class="button sample-add-button" type="button">+ Adicionar amostra</button>';
   }
 
+  function renderizarBotaoEnviar(id = 'submit-button', texto = 'Enviar Solicitação') {
+    return `<button id="${id}" class="button primary" type="submit">${texto}</button>`;
+  }
+
+  function renderizarBotaoLimpar(id = 'clear-button') {
+    return `<button id="${id}" class="button secondary form-clear-button" type="button">Limpar</button>`;
+  }
+
   function renderizarSidebar(paginaAtiva = 'servicos') {
     return `
       <aside class="sidebar">
@@ -45,6 +54,9 @@
           </a>
           <a data-admin-only hidden class="${paginaAtiva === 'administracao' ? 'active' : ''}" href="administracao-usuarios.html">
             ${renderizarIcone('admin')}<span>Administração</span>
+          </a>
+          <a data-historico class="${paginaAtiva === 'historico' ? 'active' : ''}" href="historico-solicitacoes.html">
+            ${renderizarIcone('historico')}<span>Histórico</span>
           </a>
         </nav>
         <div class="sidebar-footer">
@@ -105,6 +117,14 @@
       alvo.outerHTML = renderizarBotaoAdicionarAmostra();
     });
 
+    document.querySelectorAll('[data-componente="botao-enviar"]').forEach((alvo) => {
+      alvo.outerHTML = renderizarBotaoEnviar(alvo.dataset.id || 'submit-button', alvo.dataset.texto || 'Enviar Solicitação');
+    });
+
+    document.querySelectorAll('[data-componente="botao-limpar"]').forEach((alvo) => {
+      alvo.outerHTML = renderizarBotaoLimpar(alvo.dataset.id || 'clear-button');
+    });
+
     document.querySelectorAll('[data-sidebar-toggle]').forEach((botao) => {
       botao.addEventListener('click', () => {
         document.querySelector('.sidebar')?.classList.toggle('open');
@@ -123,6 +143,8 @@
     renderizarBotao,
     renderizarBotaoVoltarMenu,
     renderizarBotaoAdicionarAmostra,
+    renderizarBotaoEnviar,
+    renderizarBotaoLimpar,
     renderizarSidebar,
     renderizarRodape,
     renderizarCabecalhoFormulario,

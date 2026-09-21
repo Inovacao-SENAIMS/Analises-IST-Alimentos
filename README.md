@@ -13,7 +13,7 @@ Aplicativo estático em HTML, CSS e JavaScript puro para coletar solicitações 
 
 As páginas HTML ficam organizadas em `pages/`, usam pontos de montagem `data-componente` e carregam `components/componentes.js`. O `index.html` da raiz funciona como entrada compatível com o GitHub Pages e redireciona para `pages/index.html`. Assim, alterações de navegação, rodapé, cabeçalho ou ícones SVG são feitas em um único lugar.
 
-O menu possui quatro serviços: análise de sementes, análise microbiológica, amostras fiscais de alimentos e análise de sementes R.08. Cada fluxo possui suas próprias abas de gravação para preservar o histórico e facilitar futuras revisões.
+O menu possui quatro serviços: análise de sementes, análise microbiológica, amostras fiscais de alimentos e análise de sementes R.08. Cada fluxo possui suas próprias abas de gravação para preservar o histórico e facilitar futuras revisões. A rota `pages/historico-solicitacoes.html` consolida as solicitações enviadas e permite consultar detalhes públicos.
 
 ## 1. Criar a planilha
 
@@ -124,6 +124,8 @@ As três últimas colunas são reservadas ao laboratório e não aparecem na pá
 O cadastro público está em `pages/cadastro.html`; após o sucesso, o usuário volta para `pages/index.html`. O menu autenticado possui a sidebar com Serviços, Dados pessoais e Sair. A página `pages/dados-pessoais.html` mostra o grupo retornado pelo servidor, sem permitir edição de permissões.
 
 O segredo usado para assinar tokens é criado automaticamente em Script Properties na primeira execução. O token expira em 8 horas e é validado em `listarOpcoes` e `salvarSolicitacao`.
+
+O histórico usa as ações protegidas `listarHistoricoSolicitacoes` e `obterDetalhesSolicitacao`. `Client_User` visualiza apenas solicitações vinculadas ao próprio e-mail; `Manager_User` e `Administrator_User` visualizam o histórico operacional. Campos reservados ao laboratório não são retornados nessa consulta.
 
 ## 3. Publicar no GitHub Pages
 

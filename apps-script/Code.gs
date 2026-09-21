@@ -15,6 +15,13 @@ const ABAS = {
   AMOSTRAS_R08: 'AmostrasSementesR08'
 };
 
+const FONTES_HISTORICO = [
+  { tipo: 'analise-sementes', titulo: 'Análise de Sementes', solicitacoes: ABAS.SOLICITACOES, amostras: ABAS.AMOSTRAS },
+  { tipo: 'analise-microbiologica', titulo: 'Análise Microbiológica', solicitacoes: ABAS.SOLICITACOES_MICRO, ensaios: ABAS.ENSAIOS_MICRO },
+  { tipo: 'amostras-fiscais', titulo: 'Amostras Fiscais - Alimentos', solicitacoes: ABAS.SOLICITACOES_FISCAIS, amostras: ABAS.AMOSTRAS_FISCAIS },
+  { tipo: 'analise-sementes-r08', titulo: 'Análise de Sementes R.08', solicitacoes: ABAS.SOLICITACOES_R08, amostras: ABAS.AMOSTRAS_R08 }
+];
+
 const GRUPOS = {
   CLIENTE: 'Client_User',
   GESTOR: 'Manager_User',
@@ -38,6 +45,10 @@ function doPost(e) {
         return responder_(listarUsuariosAdmin(entrada.token));
       case 'atualizarUsuarioAdmin':
         return responder_(atualizarUsuarioAdmin(entrada.dados, entrada.token));
+      case 'listarHistoricoSolicitacoes':
+        return responder_(listarHistoricoSolicitacoes(entrada.token));
+      case 'obterDetalhesSolicitacao':
+        return responder_(obterDetalhesSolicitacao(entrada.dados, entrada.token));
       case 'listarOpcoes':
         return responder_(listarOpcoes(entrada.token));
       case 'salvarSolicitacao':
@@ -309,6 +320,148 @@ function atualizarUsuarioAdmin(dados, token) {
   tabela.aba.getRange(indice + 2, grupoColuna + 1).setValue(grupo);
 
   return sucesso_('UsuÃ¡rio atualizado.', { email: email, ativo: ativo, grupo: grupo });
+}
+
+function valorLinha_(tabela, linha, nome, padrao) {
+  const indice = coluna_(tabela.cabecalho, nome);
+  return indice >= 0 && linha[indice] !== undefined && linha[indice] !== ''
+    ? linha[indice]
+    : (padrao === undefined ? '' : padrao);
+}
+
+function usuarioPodeVerSolicitacao_(usuario, linha, tabela) {
+  if (usuario.grupo === GRUPOS.GESTOR || usuario.grupo === GRUPOS.ADMIN) return true;
+  return String(valorLinha_(tabela, linha, 'usuario')).toLowerCase().trim() === usuario.email.toLowerCase().trim();
+}
+
+function listarHistoricoSolicitacoes(token) {
+  const usuario = validarToken_(token);
+  if (!usuario) return falha_('SessÃ£o expirada. FaÃ§a login novamente.');
+
+  const historico = [];
+  FONTES_HISTORICO.forEach(function (fonte) {
+    const tabela = valoresComCabecalho_(fonte.solicitacoes);
+    tabela.linhas.forEach(function (linha) {
+      if (!usuarioPodeVerSolicitacao_(usuario, linha, tabela)) return;
+
+      historico.push({
+        solicitacaoId: String(valorLinha_(tabela, linha, 'solicitacao_id')),
+        tipo: fonte.tipo,
+        titulo: fonte.titulo,
+        dataEnvio: valorLinha_(tabela, linha, 'data_hora_envio', null),
+        usuario: String(valorLinha_(tabela, linha, 'usuario')),
+        status: String(valorLinha_(tabela, linha, 'status', 'Enviada') || 'Enviada')
+      });
+    });
+  });
+
+  historico.sort(function (a, b) {
+    return new Date(b.dataEnvio || 0).getTime() - new Date(a.dataEnvio || 0).getTime();
+  });
+
+  return sucesso_('HistÃ³rico carregado.', { solicitacoes: historico });
+}
+
+function fonteHistorico_(tipo) {
+  return FONTES_HISTORICO.find(function (fonte) {
+    return fonte.tipo === tipo;
+  });
+}
+
+function camposPublicos_(fonte, tabela, linha) {
+  const grupos = {
+    'analise-sementes': [
+      ['Requerente', 'requerente'], ['RENASEM (Requerente)', 'renasem_requerente'], ['Pagante', 'pagante'],
+      ['CPF/CNPJ', 'cpf_cnpj'], ['Finalidade', 'finalidade'], ['Observações', 'observacoes']
+    ],
+    'analise-sementes-r08': [
+      ['Requerente', 'requerente'], ['RENASEM (Requerente)', 'renasem_requerente'], ['Pagante', 'pagante'],
+      ['CPF/CNPJ', 'cpf_cnpj'], ['Finalidade', 'finalidade'], ['Observações', 'observacoes']
+    ],
+    'analise-microbiologica': [
+      ['Razão Social', 'razao_social'], ['CNPJ/CPF', 'cpf_cnpj'], ['Responsável', 'responsavel'],
+      ['Tipo de amostra', 'tipo_amostra'], ['Lote', 'lote'], ['Finalidade', 'finalidade']
+    ],
+    'amostras-fiscais': [
+      ['Razão Social', 'razao_social'], ['CNPJ/CPF', 'cpf_cnpj'], ['Nome Fantasia', 'nome_fantasia'],
+      ['Produto', 'produto'], ['Objetivo', 'objetivo'], ['Órgão de registro', 'registro_orgao']
+    ]
+  };
+
+  return (grupos[fonte.tipo] || []).map(function (campo) {
+    return { rotulo: campo[0], valor: String(valorLinha_(tabela, linha, campo[1])) };
+  }).filter(function (campo) {
+    return campo.valor;
+  });
+}
+
+function detalhesRelacionados_(fonte, id) {
+  if (fonte.amostras) {
+    const tabela = valoresComCabecalho_(fonte.amostras);
+    const amostras = tabela.linhas.filter(function (linha) {
+      return String(valorLinha_(tabela, linha, 'solicitacao_id')) === id;
+    });
+
+    return amostras.map(function (linha) {
+      return {
+        numero: valorLinha_(tabela, linha, 'numero'),
+        campos: [
+          ['Espécie', 'especie'], ['Cultivar', 'cultivar'], ['Safra', 'safra'], ['Peneira', 'peneira'],
+          ['Lote', 'lote'], ['Representatividade', 'representatividade'], ['Categoria', 'categoria'],
+          ['Tratamento', 'tratamento'], ['Produto do tratamento', 'trat_produto'],
+          ['Princípio ativo', 'trat_principio_ativo'], ['Dosagem', 'trat_dosagem'],
+          ['Produto', 'produto'], ['Marca', 'marca'], ['Quantidade', 'quantidade'], ['Data de fabricação', 'data_fabricacao'],
+          ['Data de validade', 'data_validade'], ['Responsável pela coleta', 'coletor_nome'], ['Data da coleta', 'data_coleta']
+        ].map(function (campo) {
+          return { rotulo: campo[0], valor: String(valorLinha_(tabela, linha, campo[1])) };
+        }).filter(function (campo) { return campo.valor; })
+      };
+    });
+  }
+
+  if (fonte.ensaios) {
+    const tabela = valoresComCabecalho_(fonte.ensaios);
+    return tabela.linhas.filter(function (linha) {
+      return String(valorLinha_(tabela, linha, 'solicitacao_id')) === id;
+    }).map(function (linha) {
+      return {
+        numero: valorLinha_(tabela, linha, 'numero'),
+        campos: [['Grupo', 'grupo'], ['Código', 'codigo'], ['Ensaio', 'ensaio']].map(function (campo) {
+          return { rotulo: campo[0], valor: String(valorLinha_(tabela, linha, campo[1])) };
+        }).filter(function (campo) { return campo.valor; })
+      };
+    });
+  }
+
+  return [];
+}
+
+function obterDetalhesSolicitacao(dados, token) {
+  const usuario = validarToken_(token);
+  if (!usuario) return falha_('SessÃ£o expirada. FaÃ§a login novamente.');
+
+  const fonte = fonteHistorico_(String(dados && dados.tipo || ''));
+  const id = String(dados && dados.solicitacaoId || '').trim();
+  if (!fonte || !id) return falha_('SolicitaÃ§Ã£o nÃ£o encontrada.');
+
+  const tabela = valoresComCabecalho_(fonte.solicitacoes);
+  const indice = tabela.linhas.findIndex(function (linha) {
+    return String(valorLinha_(tabela, linha, 'solicitacao_id')) === id;
+  });
+  if (indice < 0 || !usuarioPodeVerSolicitacao_(usuario, tabela.linhas[indice], tabela)) {
+    return falha_('SolicitaÃ§Ã£o nÃ£o encontrada.');
+  }
+
+  const linha = tabela.linhas[indice];
+  return sucesso_('Detalhes carregados.', {
+    solicitacaoId: id,
+    tipo: fonte.tipo,
+    titulo: fonte.titulo,
+    dataEnvio: valorLinha_(tabela, linha, 'data_hora_envio', null),
+    status: String(valorLinha_(tabela, linha, 'status', 'Enviada') || 'Enviada'),
+    campos: camposPublicos_(fonte, tabela, linha),
+    relacionados: detalhesRelacionados_(fonte, id)
+  });
 }
 
 function listarOpcoes(token) {

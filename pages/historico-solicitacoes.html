@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Histórico de solicitações | SENAI FIEMS</title>
+    <link rel="stylesheet" href="../css/style.css">
+  </head>
+  <body class="app-layout">
+    <div class="app-frame">
+      <div data-componente="sidebar" data-pagina-ativa="historico"></div>
+
+      <main class="content-area">
+        <div class="mobile-topbar">
+          <button class="mobile-menu-button" data-sidebar-toggle type="button" aria-label="Abrir menu">☰</button>
+          <img class="senai-logo" src="../design/brand/logo_senai_fiems.png" alt="SENAI FIEMS">
+        </div>
+
+        <div class="content-inner">
+          <p class="eyebrow">Solicitações</p>
+          <h1 class="page-heading">Histórico de solicitações</h1>
+          <p class="page-lead">Consulte os formulários enviados e visualize os dados públicos de cada solicitação.</p>
+          <div id="history-status" class="status" role="alert"></div>
+
+          <section class="card history-card">
+            <div class="history-toolbar">
+              <label class="history-search">
+                <span>Pesquisar</span>
+                <input id="history-search" type="search" placeholder="Número, tipo ou usuário">
+              </label>
+              <button id="history-refresh" class="button secondary" type="button">Atualizar</button>
+            </div>
+            <div class="history-table-wrap">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th>Solicitação</th>
+                    <th>Tipo</th>
+                    <th>Data de envio</th>
+                    <th>Usuário</th>
+                    <th>Status</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+              </table>
+              <p id="history-empty" class="history-empty" hidden>Nenhuma solicitação encontrada.</p>
+            </div>
+          </section>
+
+          <section id="history-detail" class="card history-detail" hidden>
+            <div class="history-detail-heading">
+              <div>
+                <p class="eyebrow">Detalhes públicos</p>
+                <h2 id="history-detail-title" class="section-title"></h2>
+              </div>
+              <button id="history-detail-close" class="button secondary" type="button">Fechar</button>
+            </div>
+            <div id="history-detail-meta" class="history-meta"></div>
+            <div id="history-detail-fields" class="history-fields"></div>
+            <div id="history-detail-related" class="history-related"></div>
+          </section>
+
+          <div data-componente="footer"></div>
+        </div>
+      </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../components/componentes.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/historico-solicitacoes.js"></script>
+  </body>
+</html>
