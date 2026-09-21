@@ -127,6 +127,12 @@ O segredo usado para assinar tokens é criado automaticamente em Script Properti
 
 O histórico usa as ações protegidas `listarHistoricoSolicitacoes` e `obterDetalhesSolicitacao`. `Client_User` visualiza apenas solicitações vinculadas ao próprio e-mail; `Manager_User` e `Administrator_User` visualizam o histórico operacional. Campos reservados ao laboratório não são retornados nessa consulta.
 
+## Exportação em PDF
+
+Após o envio de qualquer análise, o usuário pode baixar um comprovante em PDF. No histórico, é possível exportar o relatório resumido das solicitações filtradas e o relatório individual após abrir seus detalhes.
+
+Os documentos são gerados localmente no navegador com jsPDF. Eles não são enviados ou gravados no Google Sheets, não exigem novas abas e contêm somente dados públicos do solicitante. Para gerar PDFs, o navegador deve conseguir acessar o CDN da biblioteca.
+
 ## 3. Publicar no GitHub Pages
 
 1. Crie um repositório e envie os arquivos deste diretório para a branch principal.

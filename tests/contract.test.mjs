@@ -228,3 +228,10 @@ test('formulários liberam comprovante PDF somente após envio bem-sucedido', ()
     assert.match(script, /botaoPdf\.hidden = false/);
   }
 });
+
+test('README documenta a geração local de PDFs', () => {
+  const readme = readFileSync(join(root, 'README.md'), 'utf8');
+  assert.match(readme, /PDF/);
+  assert.match(readme, /jsPDF/);
+  assert.match(readme, /não são enviados ou gravados no Google Sheets/i);
+});
