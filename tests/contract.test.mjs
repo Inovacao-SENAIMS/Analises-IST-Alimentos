@@ -104,8 +104,10 @@ test('administração de usuários possui rota protegida e não expõe senhas', 
   assert.match(script, /listarUsuariosAdmin/);
   assert.match(script, /atualizarUsuarioAdmin/);
   assert.doesNotMatch(script, /senha/);
-  assert.match(componentes, /data-admin-only/);
+  assert.match(componentes, /data-admin-only hidden/);
   assert.match(auth, /Administrator_User/);
+  assert.match(pagina, /admin-refresh-button/);
+  assert.match(readFileSync(join(root, 'css/style.css'), 'utf8'), /\.admin-refresh-button/);
 });
 
 test('páginas organizadas e entrada do GitHub Pages preservada', () => {
@@ -139,4 +141,13 @@ test('formulário de sementes mantém contraste e ações visuais do cabeçalho'
     const pagina = readFileSync(join(root, file), 'utf8');
     assert.match(pagina, /data-componente="botao-voltar-menu"/);
   }
+});
+
+test('footer compartilhado permanece no rodapé sem sobrepor conteúdo', () => {
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(css, /\.content-area \{[^}]*display: flex/);
+  assert.match(css, /\.content-inner \{[^}]*display: flex/);
+  assert.match(css, /\.content-inner > \.app-footer \{[^}]*margin-top: auto/);
+  assert.match(css, /\.page > \.app-footer \{[^}]*margin-top: auto/);
+  assert.doesNotMatch(css, /\.app-footer\s*\{[^}]*position:\s*fixed/);
 });
