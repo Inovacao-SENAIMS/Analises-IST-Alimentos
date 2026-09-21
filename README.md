@@ -2,6 +2,17 @@
 
 Aplicativo estático em HTML, CSS e JavaScript puro para coletar solicitações de análise de sementes. O frontend pode ser publicado no GitHub Pages; o Google Sheets funciona como banco e o Google Apps Script como Web App/API.
 
+## Organização do projeto
+
+- `components/`: componentes visuais reutilizáveis, como sidebar, rodapé, cabeçalhos, botões e ícones.
+- `css/`: estilos globais e responsivos.
+- `js/`: configuração, autenticação, validações e comportamentos específicos das páginas.
+- `design/brand/`: tokens oficiais, tipografia, paleta e arquivos de marca SENAI/FIEMS.
+- `apps-script/`: código da API vinculada à planilha.
+- `tests/`: verificações de contrato e validações reutilizáveis.
+
+As páginas HTML usam pontos de montagem `data-componente` e carregam `components/componentes.js`. Assim, alterações de navegação, rodapé ou cabeçalho são feitas em um único lugar.
+
 ## 1. Criar a planilha
 
 Crie uma planilha Google e quatro abas com estes nomes e cabeçalhos na primeira linha.

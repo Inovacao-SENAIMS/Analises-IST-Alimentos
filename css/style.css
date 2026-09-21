@@ -26,10 +26,11 @@ button { cursor: pointer; }
 a { color: inherit; }
 .app-shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
 .eyebrow { margin: 0 0 8px; color: var(--brand-accent); font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-.senai-logo { display: block; width: 176px; height: auto; object-fit: contain; }
+.senai-logo { display: block; width: 176px; height: auto; object-fit: contain; mix-blend-mode: multiply; }
 .login-logo { width: min(260px, 100%); margin: 0 auto 28px; }
 .form-footer { margin: 18px 0 0; color: var(--cinza-700); text-align: center; font-size: .88rem; }
 .form-footer a { color: var(--azul-700); font-weight: 800; }
+.component-icon { display: inline-flex; width: 1.15rem; justify-content: center; align-items: center; line-height: 1; }
 .app-header { background: var(--azul-900); color: var(--branco); box-shadow: 0 4px 20px rgba(0,0,0,.12); }
 .header-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
@@ -100,22 +101,22 @@ input:focus, select:focus, textarea:focus { border-color: var(--azul-500); box-s
 .desktop-table-header { display: none; }
 .app-layout { background: var(--bg); }
 .app-frame { min-height: 100vh; display: grid; grid-template-columns: 254px minmax(0, 1fr); }
-.sidebar { display: flex; flex-direction: column; min-height: 100vh; padding: 28px 18px 20px; color: #fff; background: var(--brand-primary); }
-.sidebar-brand { display: flex; flex-direction: column; gap: 13px; padding: 0 12px 30px; color: #fff; text-decoration: none; font-size: .76rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
-.sidebar-brand .senai-logo { width: 186px; padding: 8px; background: #fff; border-radius: 6px; }
+.sidebar { display: flex; flex-direction: column; min-height: 100vh; padding: 28px 18px 20px; color: var(--brand-primary); background: var(--bg); border-right: 1px solid var(--border); box-shadow: 4px 0 18px rgba(30,42,56,.04); }
+.sidebar-brand { display: flex; flex-direction: column; gap: 13px; padding: 0 12px 30px; color: var(--brand-primary); text-decoration: none; font-size: .76rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.sidebar-brand .senai-logo { width: 186px; padding: 0; background: transparent; border-radius: 0; }
 .sidebar-nav { display: grid; gap: 7px; }
-.sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 9px; color: #dbe9f6; text-decoration: none; font-size: .92rem; font-weight: 700; }
-.sidebar-nav a:hover, .sidebar-nav a.active { color: #fff; background: rgba(255,255,255,.13); }
-.sidebar-nav a.active { box-shadow: inset 3px 0 0 var(--brand-accent); }
-.sidebar-footer { display: grid; gap: 18px; margin-top: auto; padding: 18px 10px 0; border-top: 1px solid rgba(255,255,255,.2); }
+.sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-left: 3px solid transparent; color: var(--brand-primary); text-decoration: none; font-size: .92rem; font-weight: 700; transition: color .2s ease, background-color .2s ease, border-color .2s ease; }
+.sidebar-nav a:hover { color: var(--brand-primary-600); background: rgba(0,56,118,.06); }
+.sidebar-nav a.active { color: var(--brand-primary); background: rgba(0,56,118,.08); border-left-color: var(--brand-accent); }
+.sidebar-footer { display: grid; gap: 18px; margin-top: auto; padding: 18px 10px 0; border-top: 1px solid var(--border); }
 .sidebar-user { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .sidebar-user strong, .sidebar-user small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sidebar-user strong { max-width: 132px; font-size: .86rem; }
-.sidebar-user small { margin-top: 3px; color: #b8d0e4; font-size: .7rem; }
+.sidebar-user small { margin-top: 3px; color: var(--muted); font-size: .7rem; }
 .avatar, .profile-avatar { display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; color: var(--brand-primary); background: #fff; font-weight: 800; }
 .avatar { width: 34px; height: 34px; font-size: .85rem; }
-.sidebar-logout { border: 0; padding: 8px 0; color: #fff; background: transparent; text-align: left; font-weight: 800; }
-.sidebar-logout:hover { color: #ffc6b3; }
+.sidebar-logout { width: 100%; min-height: 0; border: 0; border-radius: 0; padding: 8px 0; color: var(--brand-primary); background: transparent; text-align: left; font-weight: 800; transition: color .2s ease; }
+.sidebar-logout:hover { color: var(--brand-accent-dark); }
 .content-area { min-width: 0; }
 .content-inner { width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 52px 0 72px; }
 .mobile-topbar { display: none; }
@@ -126,6 +127,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--azul-500); box-s
 .profile-fields span { color: var(--cinza-700); font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
 .profile-fields strong { color: var(--azul-900); font-size: 1.05rem; }
 .role-pill { display: inline-flex; width: fit-content; padding: 6px 10px; border-radius: 999px; color: var(--brand-accent-dark) !important; background: var(--brand-accent-soft); font-size: .82rem !important; }
+.app-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 42px; padding-top: 18px; border-top: 1px solid var(--border); color: var(--muted); font-size: .75rem; }
+.login-page > .app-footer { width: min(460px, calc(100% - 48px)); margin: -8px auto 0; border-top: 0; }
 @media (min-width: 640px) {
   .user-name { display: inline; }
   .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

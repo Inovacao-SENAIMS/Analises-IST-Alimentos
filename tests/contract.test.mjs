@@ -9,6 +9,7 @@ const requiredFiles = [
   'cadastro.html', 'dados-pessoais.html',
   'css/style.css', 'js/config.js', 'js/auth.js', 'js/menu.js',
   'js/validacoes.js', 'js/form-analise-sementes.js', 'js/cadastro.js', 'js/perfil.js',
+  'components/componentes.js',
   'apps-script/Code.gs', 'README.md'
 ];
 
@@ -39,10 +40,23 @@ test('cadastro e navegação usam logo, sidebar e grupos', () => {
   const cadastro = readFileSync(join(root, 'cadastro.html'), 'utf8');
   const cadastroScript = readFileSync(join(root, 'js/cadastro.js'), 'utf8');
   const menu = readFileSync(join(root, 'menu.html'), 'utf8');
+  const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
   const perfil = readFileSync(join(root, 'dados-pessoais.html'), 'utf8');
   assert.match(cadastroScript, /cadastrarUsuario/);
   assert.match(cadastro, /logo_senai_fiems\.png/);
   assert.match(menu, /sidebar/);
-  assert.match(menu, /dados-pessoais\.html/);
+  assert.match(componentes, /dados-pessoais\.html/);
   assert.match(perfil, /data-perfil-grupo/);
+});
+
+test('páginas usam pontos de montagem dos componentes reutilizáveis', () => {
+  const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
+  for (const nome of ['renderizarSidebar', 'renderizarRodape', 'renderizarCabecalhoFormulario', 'renderizarBotao', 'renderizarIcone']) {
+    assert.match(componentes, new RegExp(nome));
+  }
+  for (const file of ['menu.html', 'dados-pessoais.html', 'formulario-analise-sementes.html']) {
+    const html = readFileSync(join(root, file), 'utf8');
+    assert.match(html, /data-componente/);
+    assert.match(html, /components\/componentes\.js/);
+  }
 });

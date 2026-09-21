@@ -1,16 +1,381 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Solicitação de Análise de Sementes | IST Alimentos</title><link rel="stylesheet" href="css/style.css"></head>
-<body><header class="app-header"><div class="app-shell header-inner"><a class="brand" href="menu.html"><img class="senai-logo" src="design/brand/logo_senai_fiems.png" alt="SENAI FIEMS"><span class="brand-subtitle">Portal de serviços</span></a><div class="user-actions"><span class="user-name">Olá, <strong data-usuario-nome></strong></span><button class="button secondary" data-logout type="button">Sair</button></div></div></header>
-<main class="app-shell page"><a class="back-link" href="menu.html">← Voltar ao menu</a><h1 class="page-heading">Solicitação de Análise de Sementes</h1><p class="page-lead">Preencha os dados para solicitar ensaios de análise de sementes.</p><div id="form-status" class="status" role="alert"></div>
-<form id="seed-form" novalidate>
-<section class="form-section"><div class="section-heading"><span class="section-number">1</span><div><h2 class="section-title">Dados do Cliente/Empresa</h2><p class="section-description">Informe os dados da solicitação e da amostragem.</p></div></div><div class="field-grid">
-<div class="field"><label for="requerente">Requerente <span>*</span></label><input id="requerente" name="requerente" required><small class="error-message"></small></div><div class="field"><label for="renasem-requerente">RENASEM (Requerente) <span>*</span></label><input id="renasem-requerente" name="renasemRequerente" required><small class="error-message"></small></div><div class="field"><label for="pagante">Pagante <span>*</span></label><input id="pagante" name="pagante" required><small class="error-message"></small></div><div class="field"><label for="cpf-cnpj">CPF/CNPJ <span>*</span></label><input id="cpf-cnpj" name="cpfCnpj" inputmode="numeric" required><small class="error-message"></small></div><div class="field full"><label for="endereco">Endereço <span>*</span></label><input id="endereco" name="endereco" required><small class="error-message"></small></div><div class="field"><label for="data-amostragem">Data de amostragem <span>*</span></label><input id="data-amostragem" name="dataAmostragem" type="date" required><small class="error-message"></small></div><div class="field"><label for="procedencia">Procedência <span>*</span></label><input id="procedencia" name="procedencia" required><small class="error-message"></small></div><div class="field"><label for="amostrador">Amostrador <span>*</span></label><input id="amostrador" name="amostrador" required><small class="error-message"></small></div><div class="field"><label for="renasem-amostrador">RENASEM (Amostrador) <span>*</span></label><input id="renasem-amostrador" name="renasemAmostrador" required><small class="error-message"></small></div><div class="field"><label for="num-proposta">N° Proposta</label><input id="num-proposta" name="numProposta"><small class="error-message"></small></div>
-<fieldset class="field full" style="border:0;padding:0;margin:0"><legend class="legend-label">Finalidade <span style="color:var(--erro)">*</span></legend><div class="radio-group"><label class="choice"><input type="radio" name="finalidade" value="Controle de Qualidade" required>Controle de Qualidade</label><label class="choice"><input type="radio" name="finalidade" value="Emissão de BAS">Emissão de BAS</label><label class="choice"><input type="radio" name="finalidade" value="Outros">Outros</label></div><div id="finalidade-outros-wrap" class="field" hidden style="margin-top:10px"><label for="finalidade-outros">Especifique <span>*</span></label><input id="finalidade-outros" name="finalidadeOutros"><small class="error-message"></small></div></fieldset>
-</div></section>
-<section class="form-section"><div class="section-heading"><span class="section-number">2</span><div><h2 class="section-title">Amostras</h2><p class="section-description">Inclua de 1 a 8 amostras. Os campos do laboratório não são exibidos aqui.</p></div></div><div class="desktop-table-header" aria-hidden="true"><span>Espécie</span><span>Cultivar</span><span>Safra</span><span>Peneira</span><span>Lote</span><span>Represent.</span><span>Categoria</span><span>Tratamento</span><span>Detalhes</span><span></span></div><div id="sample-list" class="sample-list"></div><div class="sample-actions"><button id="add-sample" class="button secondary" type="button">+ Adicionar amostra</button><span id="sample-count">1 de 8</span></div></section>
-<section class="form-section"><div class="section-heading"><span class="section-number">3</span><div><h2 class="section-title">Ensaios Requeridos</h2><p class="section-description">Selecione pelo menos um ensaio.</p></div></div><div id="bas-notice" class="notice warning" hidden>Para emissão de BAS devem ser solicitados os ensaios definitivos e todos os campos do formulário devem estar preenchidos</div><fieldset style="border:0;padding:0;margin:18px 0 0"><legend class="legend-label">Ensaios definitivos (emissão de BAS)</legend><div class="check-grid"><label class="choice"><input type="checkbox" name="ensaios" value="pureza" data-definitivo>Pureza</label><label class="choice"><input type="checkbox" name="ensaios" value="pms" data-definitivo>Peso de mil sementes</label><label class="choice"><input type="checkbox" name="ensaios" value="outrasSementes" data-definitivo>Determinação de outras sementes</label><label class="choice"><input type="checkbox" name="ensaios" value="infestadas" data-definitivo>Sementes infestadas</label><label class="choice"><input type="checkbox" name="ensaios" value="germinacao" data-definitivo>Germinação</label></div></fieldset><fieldset style="border:0;padding:0;margin:18px 0 0"><legend class="legend-label">Ensaios de qualidade</legend><div class="check-grid"><label class="choice"><input type="checkbox" name="ensaios" value="vigorEa">Vigor Envelhecimento Acelerado</label><label class="choice"><input type="checkbox" name="ensaios" value="tetrazolio">Vigor em Tetrazólio</label><label class="choice"><input type="checkbox" name="ensaios" value="frio">Vigor a Frio</label><label class="choice"><input type="checkbox" name="ensaios" value="emergencia">Emergência em Areia</label></div></fieldset><small id="ensaios-error" class="error-message"></small></section>
-<section class="form-section"><div class="section-heading"><span class="section-number">4</span><div><h2 class="section-title">Observações</h2><p class="section-description">Acrescente informações úteis ao laboratório, se necessário.</p></div></div><div class="field"><label for="observacoes">Observações</label><textarea id="observacoes" name="observacoes"></textarea><small class="error-message"></small></div></section>
-<section class="form-section"><div class="section-heading"><span class="section-number">5</span><div><h2 class="section-title">Declaração</h2><p class="section-description">Confirme a veracidade das informações.</p></div></div><label class="choice"><input id="declaracao" type="checkbox" name="declaracao" required>Declaro que as informações prestadas são verdadeiras e autorizo a análise das amostras descritas.</label><small id="declaracao-error" class="error-message"></small></section>
-<div class="form-actions"><button id="submit-button" class="button primary" type="submit">Enviar Solicitação</button><button id="clear-button" class="button secondary" type="button">Limpar</button><a class="button secondary" href="menu.html">Voltar ao menu</a></div>
-</form></main><script src="js/config.js"></script><script src="js/auth.js"></script><script src="js/validacoes.js"></script><script src="js/form-analise-sementes.js"></script></body></html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      Solicitação de Análise de Sementes | IST Alimentos
+    </title>
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <div data-componente="form-header">
+    </div>
+    <main class="app-shell page">
+      <a class="back-link" href="menu.html">
+        ← Voltar ao menu
+      </a>
+      <h1 class="page-heading">
+        Solicitação de Análise de Sementes
+      </h1>
+      <p class="page-lead">
+        Preencha os dados para solicitar ensaios de análise de sementes.
+      </p>
+      <div id="form-status" class="status" role="alert">
+      </div>
+      <form id="seed-form" novalidate>
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">
+              1
+            </span>
+            <div>
+              <h2 class="section-title">
+                Dados do Cliente/Empresa
+              </h2>
+              <p class="section-description">
+                Informe os dados da solicitação e da amostragem.
+              </p>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="requerente">
+                Requerente
+                <span>
+                  *
+                </span>
+              </label>
+              <input id="requerente" name="requerente" required>
+              <small class="error-message">
+              </small>
+            </div>
+            <div class="field">
+              <label for="renasem-requerente">
+                RENASEM (Requerente)
+                <span>
+                  *
+                </span>
+              </label>
+              <input id="renasem-requerente" name="renasemRequerente" required>
+              <small class="error-message">
+              </small>
+            </div>
+            <div class="field">
+              <label for="pagante">
+                Pagante
+                <span>
+                  *
+                </span>
+              </label>
+              <input id="pagante" name="pagante" required>
+              <small class="error-message">
+              </small>
+            </div>
+            <div class="field">
+              <label for="cpf-cnpj">
+                CPF/CNPJ
+                <span>
+                  *
+                </span>
+              </label>
+              <input id="cpf-cnpj" name="cpfCnpj" inputmode="numeric" required>
+              <small class="error-message">
+              </small>
+            </div>
+            <div class="field full">
+              <label for="endereco">
+                Endereço
+                <span>
+                  *
+                </span>
+              </label>
+              <input id="endereco" name="endereco" required>
+              <small class="error-message">
+              </small>
+            </div>
+            <div class="field">
+              <label for="data-amostragem">
+                Data de amostragem
+                <span>
+                  *
+                </span>
+              </label>
+              <input id="data-amostragem" name="dataAmostragem" type="date" required>
+              <small class="error-message">
+              </small>
+            </div>
+            <div class="field">
+              <label for="procedencia">
+                Procedência
+                <span>
+                  *
+                </span>
+              </label>
+              <input id="procedencia" name="procedencia" required>
+              <small class="error-message">
+              </small>
+            </div>
+            <div class="field">
+              <label for="amostrador">
+                Amostrador
+                <span>
+                  *
+                </span>
+              </label>
+              <input id="amostrador" name="amostrador" required>
+              <small class="error-message">
+              </small>
+            </div>
+            <div class="field">
+              <label for="renasem-amostrador">
+                RENASEM (Amostrador)
+                <span>
+                  *
+                </span>
+              </label>
+              <input id="renasem-amostrador" name="renasemAmostrador" required>
+              <small class="error-message">
+              </small>
+            </div>
+            <div class="field">
+              <label for="num-proposta">
+                N° Proposta
+              </label>
+              <input id="num-proposta" name="numProposta">
+              <small class="error-message">
+              </small>
+            </div>
+            <fieldset class="field full" style="border:0;padding:0;margin:0">
+              <legend class="legend-label">
+                Finalidade
+                <span style="color:var(--erro)">
+                  *
+                </span>
+              </legend>
+              <div class="radio-group">
+                <label class="choice">
+                  <input type="radio" name="finalidade" value="Controle de Qualidade" required>
+                  Controle de Qualidade
+                </label>
+                <label class="choice">
+                  <input type="radio" name="finalidade" value="Emissão de BAS">
+                  Emissão de BAS
+                </label>
+                <label class="choice">
+                  <input type="radio" name="finalidade" value="Outros">
+                  Outros
+                </label>
+              </div>
+              <div id="finalidade-outros-wrap" class="field" hidden style="margin-top:10px">
+                <label for="finalidade-outros">
+                  Especifique
+                  <span>
+                    *
+                  </span>
+                </label>
+                <input id="finalidade-outros" name="finalidadeOutros">
+                <small class="error-message">
+                </small>
+              </div>
+            </fieldset>
+          </div>
+        </section>
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">
+              2
+            </span>
+            <div>
+              <h2 class="section-title">
+                Amostras
+              </h2>
+              <p class="section-description">
+                Inclua de 1 a 8 amostras. Os campos do laboratório não são exibidos aqui.
+              </p>
+            </div>
+          </div>
+          <div class="desktop-table-header" aria-hidden="true">
+            <span>
+              Espécie
+            </span>
+            <span>
+              Cultivar
+            </span>
+            <span>
+              Safra
+            </span>
+            <span>
+              Peneira
+            </span>
+            <span>
+              Lote
+            </span>
+            <span>
+              Represent.
+            </span>
+            <span>
+              Categoria
+            </span>
+            <span>
+              Tratamento
+            </span>
+            <span>
+              Detalhes
+            </span>
+            <span>
+            </span>
+          </div>
+          <div id="sample-list" class="sample-list">
+          </div>
+          <div class="sample-actions">
+            <button id="add-sample" class="button secondary" type="button">
+              + Adicionar amostra
+            </button>
+            <span id="sample-count">
+              1 de 8
+            </span>
+          </div>
+        </section>
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">
+              3
+            </span>
+            <div>
+              <h2 class="section-title">
+                Ensaios Requeridos
+              </h2>
+              <p class="section-description">
+                Selecione pelo menos um ensaio.
+              </p>
+            </div>
+          </div>
+          <div id="bas-notice" class="notice warning" hidden>
+            Para emissão de BAS devem ser solicitados os ensaios definitivos e todos os campos do formulário devem estar preenchidos
+          </div>
+          <fieldset style="border:0;padding:0;margin:18px 0 0">
+            <legend class="legend-label">
+              Ensaios definitivos (emissão de BAS)
+            </legend>
+            <div class="check-grid">
+              <label class="choice">
+                <input type="checkbox" name="ensaios" value="pureza" data-definitivo>
+                Pureza
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="ensaios" value="pms" data-definitivo>
+                Peso de mil sementes
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="ensaios" value="outrasSementes" data-definitivo>
+                Determinação de outras sementes
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="ensaios" value="infestadas" data-definitivo>
+                Sementes infestadas
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="ensaios" value="germinacao" data-definitivo>
+                Germinação
+              </label>
+            </div>
+          </fieldset>
+          <fieldset style="border:0;padding:0;margin:18px 0 0">
+            <legend class="legend-label">
+              Ensaios de qualidade
+            </legend>
+            <div class="check-grid">
+              <label class="choice">
+                <input type="checkbox" name="ensaios" value="vigorEa">
+                Vigor Envelhecimento Acelerado
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="ensaios" value="tetrazolio">
+                Vigor em Tetrazólio
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="ensaios" value="frio">
+                Vigor a Frio
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="ensaios" value="emergencia">
+                Emergência em Areia
+              </label>
+            </div>
+          </fieldset>
+          <small id="ensaios-error" class="error-message">
+          </small>
+        </section>
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">
+              4
+            </span>
+            <div>
+              <h2 class="section-title">
+                Observações
+              </h2>
+              <p class="section-description">
+                Acrescente informações úteis ao laboratório, se necessário.
+              </p>
+            </div>
+          </div>
+          <div class="field">
+            <label for="observacoes">
+              Observações
+            </label>
+            <textarea id="observacoes" name="observacoes">
+            </textarea>
+            <small class="error-message">
+            </small>
+          </div>
+        </section>
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="section-number">
+              5
+            </span>
+            <div>
+              <h2 class="section-title">
+                Declaração
+              </h2>
+              <p class="section-description">
+                Confirme a veracidade das informações.
+              </p>
+            </div>
+          </div>
+          <label class="choice">
+            <input id="declaracao" type="checkbox" name="declaracao" required>
+            Declaro que as informações prestadas são verdadeiras e autorizo a análise das amostras descritas.
+          </label>
+          <small id="declaracao-error" class="error-message">
+          </small>
+        </section>
+        <div class="form-actions">
+          <button id="submit-button" class="button primary" type="submit">
+            Enviar Solicitação
+          </button>
+          <button id="clear-button" class="button secondary" type="button">
+            Limpar
+          </button>
+          <a class="button secondary" href="menu.html">
+            Voltar ao menu
+          </a>
+        </div>
+      </form>
+      <div data-componente="footer">
+      </div>
+    </main>
+    <script src="js/config.js">
+    </script>
+    <script src="components/componentes.js">
+    </script>
+    <script src="js/auth.js">
+    </script>
+    <script src="js/validacoes.js">
+    </script>
+    <script src="js/form-analise-sementes.js">
+    </script>
+  </body>
+</html>
