@@ -9,7 +9,10 @@
   const vazio = document.querySelector('#history-empty');
   const busca = document.querySelector('#history-search');
   const detalhe = document.querySelector('#history-detail');
+  const botaoResumo = document.querySelector('#history-export-summary');
+  const botaoIndividual = document.querySelector('#history-export-individual');
   let solicitacoes = [];
+  let detalhesAtuais = null;
 
   function escapar(valor) {
     return String(valor ?? '').replace(/[&<>"']/g, (caractere) => ({
@@ -28,11 +31,15 @@
     status.className = `status show ${tipo}`;
   }
 
-  function renderizarTabela() {
+  function solicitacoesFiltradas() {
     const filtro = busca.value.trim().toLowerCase();
-    const filtradas = solicitacoes.filter((item) => [
+    return solicitacoes.filter((item) => [
       item.solicitacaoId, item.titulo, item.tipo, item.usuario, item.status
     ].some((valor) => String(valor || '').toLowerCase().includes(filtro)));
+  }
+
+  function renderizarTabela() {
+    const filtradas = solicitacoesFiltradas();
 
     corpo.innerHTML = filtradas.map((item) => `
       <tr>
@@ -52,6 +59,7 @@
   }
 
   function renderizarDetalhes(dados) {
+    detalhesAtuais = dados;
     document.querySelector('#history-detail-title').textContent = `${dados.titulo} - ${dados.solicitacaoId}`;
     document.querySelector('#history-detail-meta').innerHTML = `
       <span><strong>Data:</strong> ${escapar(dataFormatada(dados.dataEnvio))}</span>
@@ -65,6 +73,7 @@
       `).join('')}`
       : '';
     detalhe.hidden = false;
+    botaoIndividual.hidden = false;
     detalhe.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -95,8 +104,29 @@
 
   busca.addEventListener('input', renderizarTabela);
   document.querySelector('#history-refresh').addEventListener('click', carregarHistorico);
+  botaoResumo.addEventListener('click', () => {
+    const filtradas = solicitacoesFiltradas();
+    if (!filtradas.length) {
+      mostrarStatus('Não há solicitações para exportar com o filtro atual.', 'error');
+      return;
+    }
+    try {
+      RelatoriosPdf.baixarResumo(filtradas, { termoBusca: busca.value.trim() || 'Todos os registros' });
+    } catch (erro) {
+      mostrarStatus(erro.message, 'error');
+    }
+  });
+  botaoIndividual.addEventListener('click', () => {
+    if (!detalhesAtuais) return;
+    try {
+      RelatoriosPdf.baixarIndividual(detalhesAtuais);
+    } catch (erro) {
+      mostrarStatus(erro.message, 'error');
+    }
+  });
   document.querySelector('#history-detail-close').addEventListener('click', () => {
     detalhe.hidden = true;
+    botaoIndividual.hidden = true;
   });
   carregarHistorico();
 })();

@@ -133,6 +133,14 @@ test('histórico possui rota, filtro protegido e detalhes públicos', () => {
   assert.doesNotMatch(script, /data_recebimento|peso_amostra_g|senha/);
 });
 
+test('histórico exporta relatórios resumido e individual com dados públicos', () => {
+  const script = readFileSync(join(root, 'js/historico-solicitacoes.js'), 'utf8');
+  for (const token of ['RelatoriosPdf.baixarResumo', 'RelatoriosPdf.baixarIndividual', 'history-export-summary', 'history-export-individual']) {
+    assert.match(script, new RegExp(token.replace('.', '\\.')));
+  }
+  assert.doesNotMatch(script, /data_recebimento|peso_amostra_g|senha/);
+});
+
 test('páginas organizadas e entrada do GitHub Pages preservada', () => {
   const entrada = readFileSync(join(root, 'index.html'), 'utf8');
   assert.match(entrada, /pages\/index\.html/);
