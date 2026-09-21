@@ -1,14 +1,18 @@
 /* Componentes visuais compartilhados entre as páginas estáticas do aplicativo. */
 (function () {
+  // Ícones SVG inspirados em bibliotecas React (Lucide/React Icons),
+  // renderizados inline para preservar o projeto vanilla e evitar dependências.
   const icones = {
-    servicos: '▦',
-    perfil: '◎',
-    sair: '↪',
-    menu: '☰'
+    servicos: '<svg viewBox="0 0 24 24" focusable="false"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>',
+    perfil: '<svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.9-3.2 3.2-5 7-5s6.1 1.8 7 5"/></svg>',
+    sair: '<svg viewBox="0 0 24 24" focusable="false"><path d="M10 5H5v14h5"/><path d="m14 8 4 4-4 4"/><path d="M18 12H9"/></svg>',
+    menu: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg>',
+    seedling: '<svg viewBox="0 0 24 24" focusable="false"><path d="M12 20V9"/><path d="M12 13c-4.5 0-7-2.5-7-7 4.5 0 7 2.5 7 7Z"/><path d="M12 10c0-4.5 2.5-7 7-7 0 4.5-2.5 7-7 7Z"/></svg>',
+    flask: '<svg viewBox="0 0 24 24" focusable="false"><path d="M9 3h6M10 3v6l-5.5 9.2A1.2 1.2 0 0 0 5.5 20h13a1.2 1.2 0 0 0 1-1.8L14 9V3"/><path d="M8 15h8"/></svg>'
   };
 
   function renderizarIcone(nome) {
-    return `<span class="component-icon" aria-hidden="true">${icones[nome] || '•'}</span>`;
+    return `<span class="component-icon" aria-hidden="true">${icones[nome] || icones.menu}</span>`;
   }
 
   function renderizarBotao(texto, classe = 'secondary', atributos = '') {
@@ -19,7 +23,7 @@
     return `
       <aside class="sidebar">
         <a class="sidebar-brand" href="menu.html">
-          <img class="senai-logo" src="design/brand/logo_senai_fiems.png" alt="SENAI FIEMS">
+          <img class="senai-logo" src="${window.APP_CONFIG?.assetBase || ''}design/brand/logo_senai_fiems.png" alt="SENAI FIEMS">
           <span>Portal de serviços</span>
         </a>
         <nav class="sidebar-nav" aria-label="Navegação principal">
@@ -56,7 +60,7 @@
       <header class="app-header">
         <div class="app-shell header-inner">
           <a class="brand" href="menu.html">
-            <img class="senai-logo" src="design/brand/logo_senai_fiems.png" alt="SENAI FIEMS">
+            <img class="senai-logo" src="${window.APP_CONFIG?.assetBase || ''}design/brand/logo_senai_fiems.png" alt="SENAI FIEMS">
             <span class="brand-subtitle">Portal de serviços</span>
           </a>
           <div class="user-actions">

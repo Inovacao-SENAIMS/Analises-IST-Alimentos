@@ -11,7 +11,7 @@ Aplicativo estático em HTML, CSS e JavaScript puro para coletar solicitações 
 - `apps-script/`: código da API vinculada à planilha.
 - `tests/`: verificações de contrato e validações reutilizáveis.
 
-As páginas HTML usam pontos de montagem `data-componente` e carregam `components/componentes.js`. Assim, alterações de navegação, rodapé ou cabeçalho são feitas em um único lugar.
+As páginas HTML ficam organizadas em `pages/`, usam pontos de montagem `data-componente` e carregam `components/componentes.js`. O `index.html` da raiz funciona como entrada compatível com o GitHub Pages e redireciona para `pages/index.html`. Assim, alterações de navegação, rodapé, cabeçalho ou ícones SVG são feitas em um único lugar.
 
 O menu possui dois serviços: análise de sementes e análise microbiológica. A segunda análise usa as abas `SolicitacoesMicrobiologicas` e `EnsaiosMicrobiologicos`.
 
@@ -89,7 +89,7 @@ As duas últimas colunas são reservadas ao laboratório. Os ensaios exibidos ao
 6. Cole essa URL em `js/config.js`, no campo `apiUrl`.
 7. Se o código do Apps Script mudar depois da implantação, use **Gerenciar implantações → Editar → Nova versão → Implantar**. Editar o arquivo local não atualiza o Web App hospedado.
 
-O cadastro público está em `cadastro.html`; após o sucesso, o usuário volta para `index.html`. O menu autenticado possui a sidebar com Serviços, Dados pessoais e Sair. A página `dados-pessoais.html` mostra o grupo retornado pelo servidor, sem permitir edição de permissões.
+O cadastro público está em `pages/cadastro.html`; após o sucesso, o usuário volta para `pages/index.html`. O menu autenticado possui a sidebar com Serviços, Dados pessoais e Sair. A página `pages/dados-pessoais.html` mostra o grupo retornado pelo servidor, sem permitir edição de permissões.
 
 O segredo usado para assinar tokens é criado automaticamente em Script Properties na primeira execução. O token expira em 8 horas e é validado em `listarOpcoes` e `salvarSolicitacao`.
 

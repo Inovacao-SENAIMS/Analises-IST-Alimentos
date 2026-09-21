@@ -1,5 +1,7 @@
 /* Configuração pública: substitua apenas a URL pelo Web App implantado. */
 window.APP_CONFIG = {
+  // As páginas ficam em /pages; os recursos compartilhados permanecem na raiz.
+  assetBase: '../',
   apiUrl: 'https://script.google.com/macros/s/AKfycbwH_94kvA7DDv9alK4qs-JF_cnDdU7ib-BUP3WxvVNXmQ3qcjntjrDywnrneN8bMhjX/exec',
   sessionStorageKey: 'ist_alimentos_sessao',
   sessionHours: 8,
@@ -8,14 +10,14 @@ window.APP_CONFIG = {
       id: 'analise-sementes',
       titulo: 'Solicitação de Análise de Sementes',
       descricao: 'Solicitação de ensaios de análise de sementes para Controle de Qualidade ou emissão de BAS',
-      icone: '🌱',
+      icone: 'seedling',
       caminho: 'formulario-analise-sementes.html'
     },
     {
       id: 'analise-microbiologica',
       titulo: 'Solicitação de Análise Microbiológica',
       descricao: 'Solicitação de ensaios microbiológicos para água, gelo, alimentos e bebidas',
-      icone: '🧫',
+      icone: 'flask',
       caminho: 'formulario-analise-microbiologica.html'
     }
   ],

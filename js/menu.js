@@ -20,7 +20,7 @@
 
   alvo.innerHTML = APP_CONFIG.formularios.map((formulario) => `
     <a class="card form-card" href="${formulario.caminho}" aria-label="Abrir ${formulario.titulo}">
-      <span class="form-icon" aria-hidden="true">${formulario.icone}</span>
+      ${AppComponents.renderizarIcone(formulario.icone)}
       <h2>${formulario.titulo}</h2>
       <p>${formulario.descricao}</p>
       <span class="button primary">Abrir formulário →</span>
