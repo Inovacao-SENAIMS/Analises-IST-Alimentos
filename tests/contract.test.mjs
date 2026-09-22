@@ -49,6 +49,14 @@ test('análise físico-química possui catálogo, página, ação e abas própri
   for (const token of ['salvarSolicitacaoFisicoQuimica', 'SolicitacoesFisicoQuimicas', 'EnsaiosFisicoQuimicos', 'FQ-']) assert.match(api, new RegExp(token));
 });
 
+test('origem físico-química oferece somente os três canais definidos', () => {
+  const html = readFileSync(join(root, 'pages/formulario-analise-fisico-quimica.html'), 'utf8');
+  assert.match(html, /name="origem" value="WhatsApp"/);
+  assert.match(html, /name="origem" value="QR Code \(Recepção\)"/);
+  assert.match(html, /name="origem" value="E-mail"/);
+  assert.doesNotMatch(html, /name="origem" value="Outros"/);
+});
+
 test('contrato contém as ações e abas do fluxo', () => {
   const source = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
   for (const token of ['doPost', 'login', 'cadastrarUsuario', 'obterPerfil', 'listarUsuariosAdmin', 'atualizarUsuarioAdmin', 'listarHistoricoSolicitacoes', 'obterDetalhesSolicitacao', 'salvarSolicitacao', 'salvarSolicitacaoSementesR08', 'salvarSolicitacaoMicrobiologica', 'salvarSolicitacaoAmostrasFiscais', 'listarOpcoes', 'Usuarios', 'Solicitacoes', 'Amostras', 'SolicitacoesMicrobiologicas', 'EnsaiosMicrobiologicos', 'SolicitacoesAmostrasFiscais', 'AmostrasFiscais', 'SolicitacoesSementesR08', 'AmostrasSementesR08', 'Client_User', 'Manager_User', 'Administrator_User']) {
@@ -87,6 +95,11 @@ test('catálogo centralizado expõe os quatro serviços de análise', () => {
   assert.match(config, /analise-microbiologica/);
   assert.match(config, /amostras-fiscais/);
   assert.match(config, /analise-sementes-r08/);
+});
+
+test('catálogo de cards não contém texto com encoding corrompido', () => {
+  const config = readFileSync(join(root, 'js/config.js'), 'utf8');
+  assert.doesNotMatch(config, /[\u00C3\u00C2][\u0080-\u00BF]/);
 });
 
 test('páginas usam pontos de montagem dos componentes reutilizáveis', () => {
