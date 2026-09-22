@@ -38,7 +38,7 @@
     return `<button id="${id}" class="button secondary form-clear-button" type="button">Limpar</button>`;
   }
 
-  function renderizarBotaoBaixarPdf(id = 'download-pdf', texto = 'Baixar comprovante em PDF') {
+  function renderizarBotaoBaixarPdf(id = 'download-pdf', texto = 'Baixar PDF') {
     return `<button id="${id}" class="button pdf-download-button" type="button" hidden>${texto}</button>`;
   }
 
@@ -134,7 +134,7 @@
     });
 
     document.querySelectorAll('[data-componente="botao-baixar-pdf"]').forEach((alvo) => {
-      alvo.outerHTML = renderizarBotaoBaixarPdf(alvo.dataset.id || 'download-pdf', alvo.dataset.texto || 'Baixar comprovante em PDF');
+      alvo.outerHTML = renderizarBotaoBaixarPdf(alvo.dataset.id || 'download-pdf', alvo.dataset.texto || 'Baixar PDF');
     });
 
     document.querySelectorAll('[data-componente="botao-exportar-resumo"]').forEach((alvo) => {

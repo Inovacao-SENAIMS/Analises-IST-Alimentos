@@ -29,6 +29,17 @@ test('módulo compartilhado expõe relatórios PDF sem dados laboratoriais', () 
   assert.doesNotMatch(pdf, /data_recebimento|peso_amostra_g|observacoes_laboratorio/);
 });
 
+test('somente o botão de PDF usa a paleta vermelha', () => {
+  const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(componentes, /texto = 'Baixar PDF'/);
+  assert.match(css, /\.pdf-download-button[^}]*var\(--botao-vermelho/);
+  assert.match(css, /\.pdf-download-button:hover[^}]*var\(--botao-vermelho-hover/);
+  for (const seletor of ['.button.primary', '.button.secondary', '.form-clear-button', '.pdf-summary-button', '.form-menu-button', '.sample-add-button', '.logout-button', '.admin-refresh-button']) {
+    assert.doesNotMatch(css, new RegExp(`${seletor.replace(/\./g, '\\.')}[^}]*var\\(--botao-vermelho`));
+  }
+});
+
 test('contrato contém as ações e abas do fluxo', () => {
   const source = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
   for (const token of ['doPost', 'login', 'cadastrarUsuario', 'obterPerfil', 'listarUsuariosAdmin', 'atualizarUsuarioAdmin', 'listarHistoricoSolicitacoes', 'obterDetalhesSolicitacao', 'salvarSolicitacao', 'salvarSolicitacaoSementesR08', 'salvarSolicitacaoMicrobiologica', 'salvarSolicitacaoAmostrasFiscais', 'listarOpcoes', 'Usuarios', 'Solicitacoes', 'Amostras', 'SolicitacoesMicrobiologicas', 'EnsaiosMicrobiologicos', 'SolicitacoesAmostrasFiscais', 'AmostrasFiscais', 'SolicitacoesSementesR08', 'AmostrasSementesR08', 'Client_User', 'Manager_User', 'Administrator_User']) {

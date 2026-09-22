@@ -12,6 +12,8 @@
   --cinza-100: var(--bg);
   --branco: #fff;
   --erro: #b42318;
+  --botao-vermelho: #c8102e;
+  --botao-vermelho-hover: #a20d25;
   --sucesso: #267345;
   --sombra: 0 14px 40px rgba(18, 48, 71, .10);
   font-family: var(--font-body);
@@ -92,8 +94,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--azul-500); box-s
 .button.secondary { color: var(--azul-700); background: var(--branco); border-color: var(--cinza-300); }
 .form-clear-button { color: var(--azul-700); background: #eef3f8; border-color: #c6d4e2; }
 .form-clear-button:hover { color: var(--azul-900); background: #e1eaf2; }
-.pdf-download-button { color: #fff; background: var(--azul-700); border-color: transparent; }
-.pdf-download-button:hover { color: #fff; background: var(--azul-900); }
+.pdf-download-button { color: #fff; background: var(--botao-vermelho); border-color: transparent; }
+.pdf-download-button:hover { color: #fff; background: var(--botao-vermelho-hover); }
 .pdf-summary-button { color: #fff; background: linear-gradient(135deg, #238b57, #17663f); border-color: transparent; }
 .pdf-summary-button:hover { color: #fff; background: linear-gradient(135deg, #2cae6b, #238b57); }
 .form-menu-button { color: #fff; background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-dark)); border-color: transparent; box-shadow: 0 8px 18px rgba(232,73,16,.2); }
