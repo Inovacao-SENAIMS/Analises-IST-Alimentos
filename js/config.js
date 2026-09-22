@@ -20,6 +20,7 @@ window.APP_CONFIG = {
       icone: 'flask',
       caminho: 'formulario-analise-microbiologica.html'
     },
+    { id: 'analise-fisico-quimica', titulo: 'Solicitação de Análise Físico-Química', descricao: 'Ensaios físico-químicos para alimentos, bebidas e matérias-primas.', icone: 'flask', caminho: 'formulario-analise-fisico-quimica.html' },
     {
       id: 'amostras-fiscais',
       titulo: 'Amostras Fiscais - Alimentos',
@@ -68,6 +69,13 @@ window.APP_CONFIG = {
       { codigo: '', nome: 'Detecção de Salmonella typhimurium e Salmonella enteritidis' },
       { codigo: '', nome: 'Detecção de Enterotoxina Estafilocócica' }
     ]
+  },
+  ensaiosFisicoQuimicos: {
+    aguaGelo: [{ codigo: 'FQ076', nome: 'Alcalinidade' }, { codigo: 'FQ064', nome: 'Cor aparente' }, { codigo: 'FQ085', nome: 'Cloreto' }, { codigo: 'FQ067', nome: 'pH' }, { codigo: 'FQ065', nome: 'Turbidez' }],
+    carnesPescados: [{ codigo: 'FQ076', nome: 'Alcalinidade' }, { codigo: 'FQ064', nome: 'Cor aparente' }, { codigo: 'FQ085', nome: 'Cloreto' }, { codigo: '', nome: 'Subcontratado - Metais pesados' }],
+    leiteOvos: [{ codigo: 'FFQ001', nome: 'Acidez (ácido láctico - g/100 g ou mL)' }, { codigo: 'FQ088', nome: 'Antibiótico' }, { codigo: 'FQ058', nome: 'Matéria Gorda/ Lipídios' }, { codigo: 'FQ071', nome: 'pH' }, { codigo: 'FQ090', nome: 'Umidade' }],
+    melApicolas: [{ codigo: 'FQ004', nome: 'Acidez' }, { codigo: 'FQ010', nome: 'Açúcares Redutores' }, { codigo: 'FQ048', nome: 'Hidroximetilfurfural (HMF)' }, { codigo: 'FQ083', nome: 'Umidade' }],
+    alimentosBebidas: [{ codigo: 'FQ001', nome: 'Acidez' }, { codigo: 'FQ034', nome: 'Atividade de Água' }, { codigo: 'FQ033', nome: 'Carboidrato Total' }, { codigo: 'FQ039', nome: 'pH' }, { codigo: 'FQ046', nome: 'Umidade' }, { codigo: '', nome: 'Subcontratado - Fibra Alimentar' }]
   },
   opcoesPadrao: {
     peneiras: ['Não se aplica', 'Peneira 1', 'Peneira 2', 'Peneira 3'],

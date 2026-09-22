@@ -29,6 +29,15 @@ test('módulo compartilhado expõe relatórios PDF sem dados laboratoriais', () 
   assert.doesNotMatch(pdf, /data_recebimento|peso_amostra_g|observacoes_laboratorio/);
 });
 
+test('análise físico-química possui catálogo, página, ação e abas próprias', () => {
+  const config = readFileSync(join(root, 'js/config.js'), 'utf8');
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  assert.equal(existsSync(join(root, 'pages/formulario-analise-fisico-quimica.html')), true);
+  assert.match(config, /analise-fisico-quimica/);
+  assert.match(config, /ensaiosFisicoQuimicos/);
+  for (const token of ['salvarSolicitacaoFisicoQuimica', 'SolicitacoesFisicoQuimicas', 'EnsaiosFisicoQuimicos', 'FQ-']) assert.match(api, new RegExp(token));
+});
+
 test('contrato contém as ações e abas do fluxo', () => {
   const source = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
   for (const token of ['doPost', 'login', 'cadastrarUsuario', 'obterPerfil', 'listarUsuariosAdmin', 'atualizarUsuarioAdmin', 'listarHistoricoSolicitacoes', 'obterDetalhesSolicitacao', 'salvarSolicitacao', 'salvarSolicitacaoSementesR08', 'salvarSolicitacaoMicrobiologica', 'salvarSolicitacaoAmostrasFiscais', 'listarOpcoes', 'Usuarios', 'Solicitacoes', 'Amostras', 'SolicitacoesMicrobiologicas', 'EnsaiosMicrobiologicos', 'SolicitacoesAmostrasFiscais', 'AmostrasFiscais', 'SolicitacoesSementesR08', 'AmostrasSementesR08', 'Client_User', 'Manager_User', 'Administrator_User']) {
