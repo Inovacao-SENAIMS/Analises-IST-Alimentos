@@ -9,6 +9,8 @@ const ABAS = {
   AMOSTRAS: 'Amostras',
   SOLICITACOES_MICRO: 'SolicitacoesMicrobiologicas',
   ENSAIOS_MICRO: 'EnsaiosMicrobiologicos',
+  SOLICITACOES_FISICO_QUIMICAS: 'SolicitacoesFisicoQuimicas',
+  ENSAIOS_FISICO_QUIMICOS: 'EnsaiosFisicoQuimicos',
   SOLICITACOES_FISCAIS: 'SolicitacoesAmostrasFiscais',
   AMOSTRAS_FISCAIS: 'AmostrasFiscais',
   SOLICITACOES_R08: 'SolicitacoesSementesR08',
@@ -18,6 +20,7 @@ const ABAS = {
 const FONTES_HISTORICO = [
   { tipo: 'analise-sementes', titulo: 'Análise de Sementes', solicitacoes: ABAS.SOLICITACOES, amostras: ABAS.AMOSTRAS },
   { tipo: 'analise-microbiologica', titulo: 'Análise Microbiológica', solicitacoes: ABAS.SOLICITACOES_MICRO, ensaios: ABAS.ENSAIOS_MICRO },
+  { tipo: 'analise-fisico-quimica', titulo: 'Análise Físico-Química', solicitacoes: ABAS.SOLICITACOES_FISICO_QUIMICAS, ensaios: ABAS.ENSAIOS_FISICO_QUIMICOS },
   { tipo: 'amostras-fiscais', titulo: 'Amostras Fiscais - Alimentos', solicitacoes: ABAS.SOLICITACOES_FISCAIS, amostras: ABAS.AMOSTRAS_FISCAIS },
   { tipo: 'analise-sementes-r08', titulo: 'Análise de Sementes R.08', solicitacoes: ABAS.SOLICITACOES_R08, amostras: ABAS.AMOSTRAS_R08 }
 ];
@@ -55,6 +58,8 @@ function doPost(e) {
         return responder_(salvarSolicitacao(entrada.dados, entrada.token));
       case 'salvarSolicitacaoMicrobiologica':
         return responder_(salvarSolicitacaoMicrobiologica(entrada.dados, entrada.token));
+      case 'salvarSolicitacaoFisicoQuimica':
+        return responder_(salvarSolicitacaoFisicoQuimica(entrada.dados, entrada.token));
       case 'salvarSolicitacaoAmostrasFiscais':
         return responder_(salvarSolicitacaoAmostrasFiscais(entrada.dados, entrada.token));
       case 'salvarSolicitacaoSementesR08':
@@ -382,6 +387,9 @@ function camposPublicos_(fonte, tabela, linha) {
       ['Razão Social', 'razao_social'], ['CNPJ/CPF', 'cpf_cnpj'], ['Responsável', 'responsavel'],
       ['Tipo de amostra', 'tipo_amostra'], ['Lote', 'lote'], ['Finalidade', 'finalidade']
     ],
+    'analise-fisico-quimica': [
+      ['Razão Social', 'razao_social'], ['CNPJ/CPF', 'cpf_cnpj'], ['Tipo de amostra', 'tipo_amostra'], ['Finalidade', 'finalidade'], ['SEBRAETEC', 'sebraetec'], ['Matriz', 'matriz']
+    ],
     'amostras-fiscais': [
       ['Razão Social', 'razao_social'], ['CNPJ/CPF', 'cpf_cnpj'], ['Nome Fantasia', 'nome_fantasia'],
       ['Produto', 'produto'], ['Objetivo', 'objetivo'], ['Órgão de registro', 'registro_orgao']
@@ -695,4 +703,18 @@ function salvarSolicitacaoMicrobiologica(dados, token) {
   });
 
   return sucesso_('Solicitação microbiológica salva.', { solicitacaoId: id });
+}
+
+function salvarSolicitacaoFisicoQuimica(dados, token) {
+  const usuario = validarToken_(token);
+  if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
+  if (!dados || !dados.razaoSocial || !dados.cpfCnpj || !dados.email || !dados.telefone || !dados.matriz || !dados.confirmacao || !dados.autorizacoes || dados.autorizacoes.tempo === undefined || dados.autorizacoes.temperatura === undefined || (dados.matriz !== 'Outros' && !dados.ensaios?.length)) return falha_('Preencha os campos obrigatórios antes de enviar.');
+  const agora = new Date();
+  const id = 'FQ-' + Utilities.formatDate(agora, Session.getScriptTimeZone() || 'America/Cuiaba', 'yyyyMMdd-HHmmss') + '-' + Utilities.getUuid().slice(0, 6).toUpperCase();
+  const solicitacoes = valoresComCabecalho_(ABAS.SOLICITACOES_FISICO_QUIMICAS);
+  const registro = Object.assign({ solicitacao_id: id, data_hora_envio: agora, usuario: usuario.email }, dados, { origem_outros: dados.origemOutros, finalidade_outros: dados.finalidadeOutros, matriz_outros: dados.matrizOutros, razao_social: dados.razaoSocial, cpf_cnpj: dados.cpfCnpj, tipo_amostra: dados.tipoAmostra, autoriza_tempo: dados.autorizacoes.tempo, autoriza_temperatura: dados.autorizacoes.temperatura });
+  solicitacoes.aba.appendRow(solicitacoes.cabecalho.map(function (coluna) { return registro[coluna] === undefined ? '' : registro[coluna]; }));
+  const ensaios = valoresComCabecalho_(ABAS.ENSAIOS_FISICO_QUIMICOS);
+  (dados.ensaios || []).forEach(function (ensaio, indice) { ensaios.aba.appendRow(ensaios.cabecalho.map(function (coluna) { return ({ solicitacao_id: id, numero: indice + 1, grupo: ensaio.grupo, codigo: ensaio.codigo, ensaio: ensaio.ensaio })[coluna] || ''; })); });
+  return sucesso_('Solicitação físico-química salva.', { solicitacaoId: id });
 }
