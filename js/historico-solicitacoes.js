@@ -48,13 +48,13 @@
         <td data-label="Data de envio">${escapar(dataFormatada(item.dataEnvio))}</td>
         <td data-label="Usuário">${escapar(item.usuario)}</td>
         <td data-label="Status"><span class="history-status-pill">${escapar(item.status)}</span></td>
-        <td data-label="Ação"><button class="button primary history-detail-button" data-tipo="${escapar(item.tipo)}" data-id="${escapar(item.solicitacaoId)}" type="button">Visualizar</button></td>
+        <td data-label="Ação"><button class="button primary history-detail-button" data-tipo="${escapar(item.tipo)}" data-id="${escapar(item.solicitacaoId)}" type="button">Baixar PDF</button></td>
       </tr>
     `).join('');
     vazio.hidden = filtradas.length > 0;
 
     corpo.querySelectorAll('.history-detail-button').forEach((botao) => {
-      botao.addEventListener('click', () => carregarDetalhes(botao.dataset.tipo, botao.dataset.id));
+      botao.addEventListener('click', () => baixarRelatorio(botao.dataset.tipo, botao.dataset.id));
     });
   }
 
@@ -75,6 +75,17 @@
     detalhe.hidden = false;
     botaoIndividual.hidden = false;
     detalhe.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  async function baixarRelatorio(tipo, solicitacaoId) {
+    mostrarStatus('Preparando download…');
+    try {
+      const resultado = await AppAuth.requisitarApi('obterDetalhesSolicitacao', { dados: { tipo, solicitacaoId } });
+      RelatoriosPdf.baixarIndividual(resultado.dados);
+      mostrarStatus('Download iniciado.', 'success');
+    } catch (erro) {
+      mostrarStatus(erro.message, 'error');
+    }
   }
 
   async function carregarDetalhes(tipo, solicitacaoId) {

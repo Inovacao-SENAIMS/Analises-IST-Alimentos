@@ -174,6 +174,13 @@ test('histórico exporta relatórios resumido e individual com dados públicos',
   assert.doesNotMatch(script, /data_recebimento|peso_amostra_g|senha/);
 });
 
+test('botão da tabela baixa o relatório individual da solicitação', () => {
+  const script = readFileSync(join(root, 'js/historico-solicitacoes.js'), 'utf8');
+  assert.match(script, />Baixar PDF<\/button>/);
+  assert.match(script, /baixarRelatorio[\s\S]*RelatoriosPdf\.baixarIndividual/);
+  assert.doesNotMatch(script, /carregarDetalhes\(botao\.dataset\.tipo, botao\.dataset\.id\)/);
+});
+
 test('páginas organizadas e entrada do GitHub Pages preservada', () => {
   const entrada = readFileSync(join(root, 'index.html'), 'utf8');
   assert.match(entrada, /pages\/index\.html/);
