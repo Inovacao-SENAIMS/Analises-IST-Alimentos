@@ -142,14 +142,16 @@ test('administração de usuários possui rota protegida e não expõe senhas', 
   const script = readFileSync(join(root, 'js/admin-usuarios.js'), 'utf8');
   const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
   const auth = readFileSync(join(root, 'js/auth.js'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
   assert.match(pagina, /data-pagina-ativa="administracao"/);
   assert.match(script, /listarUsuariosAdmin/);
   assert.match(script, /atualizarUsuarioAdmin/);
   assert.doesNotMatch(script, /senha/);
   assert.match(componentes, /data-admin-only hidden/);
   assert.match(auth, /Administrator_User/);
+  assert.match(css, /sidebar-nav a\[data-admin-only\]\[hidden\][^}]*display: none/);
   assert.match(pagina, /admin-refresh-button/);
-  assert.match(readFileSync(join(root, 'css/style.css'), 'utf8'), /\.admin-refresh-button/);
+  assert.match(css, /\.admin-refresh-button/);
 });
 
 test('histórico possui rota, filtro protegido e detalhes públicos', () => {
