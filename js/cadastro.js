@@ -61,6 +61,9 @@
   if (!form || !blocoCliente || !lista) return;
   const camposCliente = ['razaoSocial', 'nomeFantasia', 'endereco', 'cidade', 'estado', 'cep', 'telefone', 'cpfCnpj', 'inscricaoEstadualRg', 'ramoAtividade', 'numeroFuncionarios'];
   const cidadesBrasil = document.querySelector('#cidades-brasil');
+  const cidade = form.elements.cidade;
+  const estado = form.elements.estado;
+  let municipios = [];
   let cidadesCarregadas = false;
   let carregandoCidades = false;
 
@@ -91,21 +94,43 @@
     if (!campo) return;
     campo.addEventListener('input', () => { campo.value = mascara(campo.value); });
   }
+  function siglaUf(municipio) {
+    return municipio.microrregiao?.mesorregiao?.UF?.sigla || municipio['regiao-imediata']?.['regiao-intermediaria']?.UF?.sigla || '';
+  }
+  function normalizarTexto(valor) { return valor.trim().toLocaleLowerCase('pt-BR'); }
+  function opcaoCidade(municipio, ufSelecionada) {
+    return ufSelecionada ? municipio.nome : `${municipio.nome} — ${siglaUf(municipio)}`;
+  }
+  function renderizarCidades(uf) {
+    if (!cidadesBrasil || !cidadesCarregadas) return;
+    const opcoes = document.createDocumentFragment();
+    municipios.filter((municipio) => !uf || siglaUf(municipio) === uf).forEach((municipio) => {
+      const opcao = document.createElement('option');
+      opcao.value = opcaoCidade(municipio, uf);
+      opcoes.appendChild(opcao);
+    });
+    cidadesBrasil.replaceChildren(opcoes);
+  }
+  function municipiosComNome(valor) {
+    const [nome] = valor.split(' — ');
+    return municipios.filter((municipio) => normalizarTexto(municipio.nome) === normalizarTexto(nome));
+  }
+  function encontrarMunicipio(valor) {
+    const [nome, ufDaOpcao] = valor.split(' — ');
+    const opcoes = municipiosComNome(nome);
+    if (ufDaOpcao) return opcoes.find((municipio) => siglaUf(municipio) === ufDaOpcao) || null;
+    if (estado.value) return opcoes.find((municipio) => siglaUf(municipio) === estado.value) || null;
+    return opcoes.length === 1 ? opcoes[0] : null;
+  }
   async function carregarCidades() {
     if (cidadesCarregadas || carregandoCidades || !cidadesBrasil) return;
     carregandoCidades = true;
     try {
       const resposta = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/municipios');
       if (!resposta.ok) throw new Error('Não foi possível carregar as cidades.');
-      const municipios = await resposta.json();
-      const opcoes = document.createDocumentFragment();
-      municipios.forEach(({ nome }) => {
-        const opcao = document.createElement('option');
-        opcao.value = nome;
-        opcoes.appendChild(opcao);
-      });
-      cidadesBrasil.appendChild(opcoes);
+      municipios = await resposta.json();
       cidadesCarregadas = true;
+      renderizarCidades(estado.value);
     } catch (_) {
       // A cidade permanece um campo livre quando a lista oficial não estiver disponível.
     } finally {
@@ -117,7 +142,21 @@
   aplicarMascara(form.elements.cpfCnpj, mascararCpfCnpj);
   aplicarMascara(form.elements.inscricaoEstadualRg, mascararInscricaoEstadualRg);
   aplicarMascara(form.elements.telefone, mascararTelefone);
-  form.elements.cidade.addEventListener('focus', carregarCidades);
+  cidade.addEventListener('focus', carregarCidades);
+  estado.addEventListener('change', async () => {
+    await carregarCidades();
+    const opcoesAtuais = municipiosComNome(cidade.value);
+    if (opcoesAtuais.length && !opcoesAtuais.some((municipio) => siglaUf(municipio) === estado.value)) cidade.value = '';
+    renderizarCidades(estado.value);
+  });
+  cidade.addEventListener('change', async () => {
+    await carregarCidades();
+    const municipio = encontrarMunicipio(cidade.value);
+    if (!municipio) return;
+    estado.value = siglaUf(municipio);
+    cidade.value = municipio.nome;
+    renderizarCidades(estado.value);
+  });
 
   function adicionarContato() {
     const item = document.createElement('fieldset');

@@ -252,6 +252,17 @@ test('dados da empresa organizam linhas, sugestões e máscaras brasileiras', ()
   assert.match(css, /\.cadastro-cliente-linha/);
 });
 
+test('cidade e estado ficam sincronizados e o seletor de perfil não tem contorno', () => {
+  const script = readFileSync(join(root, 'js/cadastro.js'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(script, /function renderizarCidades\(uf/);
+  assert.match(script, /estado\.addEventListener\('change'/);
+  assert.match(script, /cidade\.addEventListener\('change'/);
+  assert.match(script, /cidade\.value = municipio\.nome/);
+  assert.match(css, /\.profile-selector[^}]*border:\s*0/);
+  assert.match(css, /\.profile-choice[^}]*border:\s*0/);
+});
+
 test('colaborador nao grava solicitacoes e recebe bloqueio visual', () => {
   const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
   const auth = readFileSync(join(root, 'js/auth.js'), 'utf8');

@@ -91,14 +91,15 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
 .choice { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 9px 11px; border: 1px solid var(--cinza-300); border-radius: 11px; background: var(--branco); }
 .choice input { width: auto; accent-color: var(--azul-700); }
 .choice:has(input:checked) { border-color: var(--azul-500); background: #f0fafb; }
+.profile-selector { margin: 0; padding: 0; border: 0; }
 .radio-group.profile-selector-options { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
-.profile-choice { min-height: 68px; align-items: flex-start; padding: 14px; cursor: pointer; border-radius: 10px; transition: border-color .16s ease, background-color .16s ease; }
+.profile-choice { min-height: 68px; align-items: flex-start; padding: 14px; cursor: pointer; border: 0; border-radius: 10px; background: transparent; transition: background-color .16s ease; }
 .profile-choice span { display: grid; gap: 3px; }
 .profile-choice strong { color: var(--azul-900); font-size: .94rem; }
 .profile-choice small { color: var(--cinza-700); font-size: .8rem; line-height: 1.35; }
-.profile-choice:hover { border-color: var(--azul-500); background: #fafcfc; }
+.profile-choice:hover { border: 0; background: #fafcfc; }
 .profile-choice:focus-within { outline: 2px solid rgba(45,139,159,.26); outline-offset: 2px; }
-.profile-choice:has(input:checked) { border-color: var(--azul-500); background: #f4fafb; }
+.profile-choice:has(input:checked) { border: 0; background: #f4fafb; }
 .contact-purpose, .contact-purpose:has(input:checked) { border: 0; background: transparent; box-shadow: none; }
 .notice { padding: 13px 15px; border-left: 4px solid var(--azul-500); border-radius: 9px; color: var(--azul-900); background: #edf9fa; font-size: .9rem; line-height: 1.5; }
 .notice.warning { border-color: #d49427; background: #fff8e8; }
