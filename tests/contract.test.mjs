@@ -181,6 +181,21 @@ test('administrador exclui definitivamente o usuário e mantém o histórico', (
   assert.match(css, /\.admin-row-actions/);
 });
 
+test('solicitações gravadas disparam aviso aos contatos do laboratório', () => {
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  assert.match(api, /function notificarNovaSolicitacao_/);
+  assert.match(api, /atendimentolabalimentos@ms\.senai\.br/);
+  assert.match(api, /larissa\.romao@ms\.senai\.br/);
+  assert.match(api, /MailApp\.sendEmail/);
+  assert.match(api, /Logger\.log/);
+  assert.match(api, /notificarNovaSolicitacao_\(id, tipoSolicitacao/);
+  assert.match(api, /'IST', 'Análise de Sementes'/);
+  assert.match(api, /'SEMR08', 'Análise de Sementes R\.08'/);
+  for (const tipo of ['Amostras Fiscais - Alimentos', 'Análise Microbiológica', 'Análise Físico-Química']) {
+    assert.match(api, new RegExp(`notificarNovaSolicitacao_\\(id, '${tipo}'`));
+  }
+});
+
 test('histórico possui rota, filtro protegido e detalhes públicos', () => {
   const pagina = readFileSync(join(root, 'pages/historico-solicitacoes.html'), 'utf8');
   const script = readFileSync(join(root, 'js/historico-solicitacoes.js'), 'utf8');

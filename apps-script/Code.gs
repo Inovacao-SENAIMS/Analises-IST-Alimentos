@@ -35,6 +35,27 @@ const GRUPOS = {
 };
 
 const EXPIRACAO_MS = 8 * 60 * 60 * 1000;
+const DESTINATARIOS_NOVAS_SOLICITACOES = [
+  'atendimentolabalimentos@ms.senai.br',
+  'larissa.romao@ms.senai.br'
+];
+
+function notificarNovaSolicitacao_(id, tipo, usuarioEmail, dataEnvio) {
+  const assunto = 'Nova solicitação: ' + id;
+  const corpo = [
+    'Uma nova solicitação foi registrada no Portal IST Alimentos.',
+    '',
+    'Tipo: ' + tipo,
+    'ID: ' + id,
+    'Solicitante: ' + usuarioEmail,
+    'Data/hora: ' + Utilities.formatDate(dataEnvio, Session.getScriptTimeZone() || 'America/Cuiaba', 'dd/MM/yyyy HH:mm')
+  ].join('\n');
+  try {
+    MailApp.sendEmail({ to: DESTINATARIOS_NOVAS_SOLICITACOES.join(','), subject: assunto, body: corpo });
+  } catch (erro) {
+    Logger.log('Falha ao notificar a solicitação ' + id + ': ' + erro);
+  }
+}
 
 function doPost(e) {
   try {
@@ -654,14 +675,14 @@ function listarOpcoes(token) {
 }
 
 function salvarSolicitacao(dados, token) {
-  return salvarSolicitacaoSementes_(dados, token, ABAS.SOLICITACOES, ABAS.AMOSTRAS, 'IST');
+  return salvarSolicitacaoSementes_(dados, token, ABAS.SOLICITACOES, ABAS.AMOSTRAS, 'IST', 'Análise de Sementes');
 }
 
 function salvarSolicitacaoSementesR08(dados, token) {
-  return salvarSolicitacaoSementes_(dados, token, ABAS.SOLICITACOES_R08, ABAS.AMOSTRAS_R08, 'SEMR08');
+  return salvarSolicitacaoSementes_(dados, token, ABAS.SOLICITACOES_R08, ABAS.AMOSTRAS_R08, 'SEMR08', 'Análise de Sementes R.08');
 }
 
-function salvarSolicitacaoSementes_(dados, token, nomeAbaSolicitacoes, nomeAbaAmostras, prefixo) {
+function salvarSolicitacaoSementes_(dados, token, nomeAbaSolicitacoes, nomeAbaAmostras, prefixo, tipoSolicitacao) {
   const usuario = validarToken_(token);
   const permissao = podeCriarSolicitacao_(usuario);
   if (permissao) return permissao;
@@ -735,6 +756,7 @@ function salvarSolicitacaoSementes_(dados, token, nomeAbaSolicitacoes, nomeAbaAm
     }));
   });
 
+  notificarNovaSolicitacao_(id, tipoSolicitacao, usuario.email, agora);
   return sucesso_('Solicitação salva.', { solicitacaoId: id });
 }
 
@@ -806,6 +828,7 @@ function salvarSolicitacaoAmostrasFiscais(dados, token) {
     return dadosAmostra[coluna] === undefined ? '' : dadosAmostra[coluna];
   }));
 
+  notificarNovaSolicitacao_(id, 'Amostras Fiscais - Alimentos', usuario.email, agora);
   return sucesso_('SolicitaÃ§Ã£o fiscal salva.', { solicitacaoId: id });
 }
 
@@ -870,6 +893,7 @@ function salvarSolicitacaoMicrobiologica(dados, token) {
     }));
   });
 
+  notificarNovaSolicitacao_(id, 'Análise Microbiológica', usuario.email, agora);
   return sucesso_('Solicitação microbiológica salva.', { solicitacaoId: id });
 }
 
@@ -886,5 +910,6 @@ function salvarSolicitacaoFisicoQuimica(dados, token) {
   solicitacoes.aba.appendRow(solicitacoes.cabecalho.map(function (coluna) { return registro[coluna] === undefined ? '' : registro[coluna]; }));
   const ensaios = valoresComCabecalho_(ABAS.ENSAIOS_FISICO_QUIMICOS);
   (dados.ensaios || []).forEach(function (ensaio, indice) { ensaios.aba.appendRow(ensaios.cabecalho.map(function (coluna) { return ({ solicitacao_id: id, numero: indice + 1, grupo: ensaio.grupo, codigo: ensaio.codigo, ensaio: ensaio.ensaio })[coluna] || ''; })); });
+  notificarNovaSolicitacao_(id, 'Análise Físico-Química', usuario.email, agora);
   return sucesso_('Solicitação físico-química salva.', { solicitacaoId: id });
 }
