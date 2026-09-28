@@ -263,6 +263,14 @@ test('cidade e estado ficam sincronizados e o seletor de perfil não tem contorn
   assert.match(css, /\.profile-choice[^}]*border:\s*0/);
 });
 
+test('estados e cidades são apresentados em ordem alfabética', () => {
+  const pagina = readFileSync(join(root, 'pages/cadastro.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/cadastro.js'), 'utf8');
+  const estados = Array.from(pagina.matchAll(/<option value="[A-Z]{2}">([^<]+)<\/option>/g), ([, nome]) => nome);
+  assert.deepEqual(estados, [...estados].sort((a, b) => a.localeCompare(b, 'pt-BR')));
+  assert.match(script, /sort\(\(a, b\) => a\.nome\.localeCompare\(b\.nome, 'pt-BR'\)\)/);
+});
+
 test('colaborador nao grava solicitacoes e recebe bloqueio visual', () => {
   const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
   const auth = readFileSync(join(root, 'js/auth.js'), 'utf8');

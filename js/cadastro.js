@@ -104,7 +104,7 @@
   function renderizarCidades(uf) {
     if (!cidadesBrasil || !cidadesCarregadas) return;
     const opcoes = document.createDocumentFragment();
-    municipios.filter((municipio) => !uf || siglaUf(municipio) === uf).forEach((municipio) => {
+    municipios.filter((municipio) => !uf || siglaUf(municipio) === uf).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')).forEach((municipio) => {
       const opcao = document.createElement('option');
       opcao.value = opcaoCidade(municipio, uf);
       opcoes.appendChild(opcao);
