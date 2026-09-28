@@ -4,6 +4,7 @@
 
   const form = document.querySelector('#seed-form');
   if (!form) return;
+  if (AppAuth.bloquearEntradasSolicitacao(form)) return;
 
   const apiAction = form.dataset.apiAction || 'salvarSolicitacao';
 

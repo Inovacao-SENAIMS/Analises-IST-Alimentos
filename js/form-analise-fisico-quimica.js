@@ -4,6 +4,7 @@
   const form = document.querySelector('#fisico-quimico-form');
 
   if (!form) return;
+  if (AppAuth.bloquearEntradasSolicitacao(form)) return;
 
   const status          = document.querySelector('#fq-status');
   const alvo            = document.querySelector('#fisico-quimico-ensaios');

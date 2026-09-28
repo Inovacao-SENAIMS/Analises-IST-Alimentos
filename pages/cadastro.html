@@ -17,11 +17,38 @@
       <div id="cadastro-status" class="status" role="alert"></div>
 
       <form id="cadastro-form" novalidate>
+        <fieldset class="field">
+          <legend>Tipo de usuário <span>*</span></legend>
+          <div class="radio-group">
+            <label class="choice"><input type="radio" name="tipoUsuario" value="COLABORADOR_SENAI" required> Colaborador SENAI</label>
+            <label class="choice"><input type="radio" name="tipoUsuario" value="CLIENTE"> Cliente</label>
+          </div>
+        </fieldset>
         <div class="field">
           <label for="nome">Nome completo <span>*</span></label>
           <input id="nome" name="nome" autocomplete="name" required>
           <small class="error-message"></small>
         </div>
+        <section id="cliente-cadastro" hidden>
+          <h2 class="section-title">Dados da empresa</h2>
+          <div class="field-grid">
+            <div class="field"><label>Razão Social <span>*</span></label><input name="razaoSocial"></div>
+            <div class="field"><label>Nome Fantasia <span>*</span></label><input name="nomeFantasia"></div>
+            <div class="field"><label>RENASEM</label><input name="renasem"><small>Aplicável a ensaios de sementes.</small></div>
+            <div class="field"><label>Endereço <span>*</span></label><input name="endereco"></div>
+            <div class="field"><label>Cidade <span>*</span></label><input name="cidade"></div>
+            <div class="field"><label>Estado <span>*</span></label><input name="estado"></div>
+            <div class="field"><label>CEP <span>*</span></label><input name="cep"></div>
+            <div class="field"><label>Telefone <span>*</span></label><input name="telefone"></div>
+            <div class="field"><label>CNPJ / CPF <span>*</span></label><input name="cpfCnpj"></div>
+            <div class="field"><label>Inscrição Estadual / RG <span>*</span></label><input name="inscricaoEstadualRg"></div>
+            <div class="field"><label>Ramo de Atividade <span>*</span></label><input name="ramoAtividade"></div>
+            <div class="field"><label>Número de Funcionários <span>*</span></label><input name="numeroFuncionarios" type="number" min="1"></div>
+          </div>
+          <h2 class="section-title">Contatos</h2>
+          <div id="contatos-cliente"></div>
+          <button class="button secondary" id="adicionar-contato" type="button">Adicionar contato</button>
+        </section>
         <div class="field">
           <label for="email">E-mail <span>*</span></label>
           <input id="email" name="email" type="email" autocomplete="email" required>

@@ -71,6 +71,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--azul-500); box-s
 .invalid { border-color: var(--erro) !important; box-shadow: 0 0 0 3px rgba(180,35,24,.10) !important; }
 .error-message { min-height: 18px; color: var(--erro); font-size: .78rem; }
 .radio-group, .check-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.contact-card { margin: 14px 0; padding: 14px; border: 1px solid var(--cinza-300); border-radius: 11px; }
+.user-permission-notice { margin-bottom: 18px; }
+form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62; }
 .choice { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 9px 11px; border: 1px solid var(--cinza-300); border-radius: 11px; background: var(--branco); }
 .choice input { width: auto; accent-color: var(--azul-700); }
 .choice:has(input:checked) { border-color: var(--azul-500); background: #f0fafb; }

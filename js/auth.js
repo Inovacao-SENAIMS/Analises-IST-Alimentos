@@ -97,9 +97,24 @@
     return resultado.dados;
   }
 
-  async function cadastrarUsuario(nome, email, senha) {
-    const resultado = await requisitarApi('cadastrarUsuario', { nome, email, senha }, false);
+  async function cadastrarUsuario(dados) {
+    const resultado = await requisitarApi('cadastrarUsuario', { dados }, false);
     return resultado.dados;
+  }
+
+  function bloquearEntradasSolicitacao(form) {
+    if (!form || obterSessao()?.grupo !== 'IST_Colaborators') return false;
+    let aviso = form.querySelector('[data-sem-permissao]');
+    if (!aviso) {
+      aviso = document.createElement('div');
+      aviso.dataset.semPermissao = 'true';
+      aviso.className = 'status show error user-permission-notice';
+      aviso.setAttribute('role', 'alert');
+      form.prepend(aviso);
+    }
+    aviso.textContent = 'Usuário Sem Permissão';
+    form.querySelectorAll('input, select, textarea, button').forEach((campo) => { campo.disabled = true; });
+    return true;
   }
 
   function configurarCabecalho() {
@@ -130,6 +145,7 @@
     requisitarApi,
     fazerLogin,
     cadastrarUsuario,
+    bloquearEntradasSolicitacao,
     configurarCabecalho
   };
 })();

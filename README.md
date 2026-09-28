@@ -133,6 +133,19 @@ Após o envio de qualquer análise, o usuário pode baixar um comprovante em PDF
 
 Os documentos são gerados localmente no navegador com jsPDF. Eles não são enviados ou gravados no Google Sheets, não exigem novas abas e contêm somente dados públicos do solicitante. Para gerar PDFs, o navegador deve conseguir acessar o CDN da biblioteca.
 
+### Cadastro de clientes e colaboradores
+
+O cadastro agora exige escolher `COLABORADOR_SENAI` ou `CLIENTE`. Colaboradores recebem automaticamente o grupo `IST_Colaborators`: podem autenticar e navegar, mas nao podem preencher ou enviar solicitacoes. O Apps Script tambem bloqueia cada gravacao, portanto a restricao nao depende do navegador.
+
+Clientes recebem `Client_User` e gravam uma linha em `Clientes` e uma ou mais em `ContatosClientes`:
+
+```text
+Clientes: usuario_email | razao_social | nome_fantasia | renasem | endereco | cidade | estado | cep | telefone | cpf_cnpj | inscricao_estadual_rg | ramo_atividade | numero_funcionarios | data_cadastro
+ContatosClientes: usuario_email | nome | cpf | email | telefone | cargo | departamento | recebe_nota_fiscal_boleto | recebe_proposta | recebe_relatorio | data_cadastro
+```
+
+Todos os campos empresariais sao obrigatorios, exceto RENASEM, aplicavel a ensaios de sementes. Cada contato precisa ter ao menos uma finalidade. As abas sao criadas pelo Apps Script no primeiro cadastro de Cliente; apos copiar o novo `Code.gs`, publique uma nova versao do Web App `/exec` para que a alteracao entre em vigor.
+
 ## 3. Publicar no GitHub Pages
 
 1. Crie um repositório e envie os arquivos deste diretório para a branch principal.

@@ -4,6 +4,7 @@
 
   const form = document.querySelector('#micro-form');
   if (!form) return;
+  if (AppAuth.bloquearEntradasSolicitacao(form)) return;
 
   const status = document.querySelector('#micro-status');
   const ensaiosAlvo = document.querySelector('#micro-ensaios');

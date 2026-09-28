@@ -179,6 +179,33 @@ test('histórico possui rota, filtro protegido e detalhes públicos', () => {
   assert.doesNotMatch(script, /data_recebimento|peso_amostra_g|senha/);
 });
 
+test('cadastro separa cliente de colaborador e persiste perfil relacional', () => {
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  const pagina = readFileSync(join(root, 'pages/cadastro.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/cadastro.js'), 'utf8');
+  for (const token of ['IST_Colaborators', 'Clientes', 'ContatosClientes', 'COLABORADOR_SENAI', 'CLIENTE', 'recebe_nota_fiscal_boleto', 'recebe_proposta', 'recebe_relatorio']) {
+    assert.match(api, new RegExp(token));
+  }
+  assert.match(pagina, /name="tipoUsuario"/);
+  assert.match(pagina, /RENASA?EM/);
+  assert.match(script, /tipoUsuario/);
+  assert.match(script, /cliente/);
+  assert.match(script, /contatos/);
+});
+
+test('colaborador nao grava solicitacoes e recebe bloqueio visual', () => {
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  const auth = readFileSync(join(root, 'js/auth.js'), 'utf8');
+  for (const nome of ['salvarSolicitacaoSementes_', 'salvarSolicitacaoAmostrasFiscais', 'salvarSolicitacaoMicrobiologica', 'salvarSolicitacaoFisicoQuimica']) {
+    assert.match(api, new RegExp(`function ${nome}[\\s\\S]*podeCriarSolicitacao_`));
+  }
+  assert.match(auth, /bloquearEntradasSolicitacao/);
+  assert.match(auth, /Usuário Sem Permissão/);
+  for (const file of ['js/form-analise-sementes.js', 'js/form-analise-microbiologica.js', 'js/form-analise-fisico-quimica.js', 'js/form-amostras-fiscais.js']) {
+    assert.match(readFileSync(join(root, file), 'utf8'), /bloquearEntradasSolicitacao/);
+  }
+});
+
 test('histórico permite exclusão permanente apenas ao administrador', () => {
   const pagina = readFileSync(join(root, 'pages/historico-solicitacoes.html'), 'utf8');
   const script = readFileSync(join(root, 'js/historico-solicitacoes.js'), 'utf8');

@@ -4,6 +4,7 @@
 
   const form = document.querySelector('#fiscal-form');
   if (!form) return;
+  if (AppAuth.bloquearEntradasSolicitacao(form)) return;
 
   const status = document.querySelector('#fiscal-status');
   const botaoPdf = document.querySelector('#fiscal-pdf');

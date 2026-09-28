@@ -37,6 +37,7 @@
         <td data-label="Grupo">
           <select class="admin-group" aria-label="Grupo de ${escapar(usuario.nome)}">
             <option value="Client_User" ${usuario.grupo === 'Client_User' ? 'selected' : ''}>Client_User</option>
+            <option value="IST_Colaborators" ${usuario.grupo === 'IST_Colaborators' ? 'selected' : ''}>IST_Colaborators</option>
             <option value="Manager_User" ${usuario.grupo === 'Manager_User' ? 'selected' : ''}>Manager_User</option>
             <option value="Administrator_User" ${usuario.grupo === 'Administrator_User' ? 'selected' : ''}>Administrator_User</option>
           </select>

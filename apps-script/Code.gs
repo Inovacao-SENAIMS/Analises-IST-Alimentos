@@ -14,7 +14,9 @@ const ABAS = {
   SOLICITACOES_FISCAIS: 'SolicitacoesAmostrasFiscais',
   AMOSTRAS_FISCAIS: 'AmostrasFiscais',
   SOLICITACOES_R08: 'SolicitacoesSementesR08',
-  AMOSTRAS_R08: 'AmostrasSementesR08'
+  AMOSTRAS_R08: 'AmostrasSementesR08',
+  CLIENTES: 'Clientes',
+  CONTATOS_CLIENTES: 'ContatosClientes'
 };
 
 const FONTES_HISTORICO = [
@@ -27,6 +29,7 @@ const FONTES_HISTORICO = [
 
 const GRUPOS = {
   CLIENTE: 'Client_User',
+  COLABORADOR: 'IST_Colaborators',
   GESTOR: 'Manager_User',
   ADMIN: 'Administrator_User'
 };
@@ -41,7 +44,7 @@ function doPost(e) {
       case 'login':
         return responder_(login(entrada.email, entrada.senha));
       case 'cadastrarUsuario':
-        return responder_(cadastrarUsuario(entrada.nome, entrada.email, entrada.senha));
+        return responder_(cadastrarUsuario(entrada.dados));
       case 'obterPerfil':
         return responder_(obterPerfil(entrada.token));
       case 'listarUsuariosAdmin':
@@ -108,13 +111,22 @@ function coluna_(cabecalho, nome) {
   return cabecalho.indexOf(nome);
 }
 
+function garantirAba_(nomeAba, cabecalhoEsperado) {
+  let aba = planilha_().getSheetByName(nomeAba);
+  if (!aba) {
+    aba = planilha_().insertSheet(nomeAba);
+    aba.getRange(1, 1, 1, cabecalhoEsperado.length).setValues([cabecalhoEsperado]);
+  }
+  return aba;
+}
+
 function ativo_(valor) {
   const normalizado = String(valor).toLowerCase().trim();
   return normalizado !== 'false' && normalizado !== 'não' && normalizado !== 'nao' && normalizado !== '0';
 }
 
 function grupoValido_(grupo) {
-  return [GRUPOS.CLIENTE, GRUPOS.GESTOR, GRUPOS.ADMIN].indexOf(grupo) >= 0;
+  return [GRUPOS.CLIENTE, GRUPOS.COLABORADOR, GRUPOS.GESTOR, GRUPOS.ADMIN].indexOf(grupo) >= 0;
 }
 
 function usuarioPorEmail_(email) {
@@ -159,7 +171,11 @@ function login(email, senha) {
   });
 }
 
-function cadastrarUsuario(nome, email, senha) {
+function cadastrarUsuario(dados) {
+  return cadastrarUsuarioNovo_(dados);
+}
+
+function cadastrarUsuarioLegado_(nome, email, senha) {
   nome = String(nome || '').trim();
   email = String(email || '').trim().toLowerCase();
   senha = String(senha || '');
@@ -200,6 +216,52 @@ function cadastrarUsuario(nome, email, senha) {
     email: email,
     grupo: GRUPOS.CLIENTE
   });
+}
+
+function camposPreenchidos_(dados, campos) {
+  return campos.every(function (campo) { return String(dados && dados[campo] || '').trim(); });
+}
+
+function contatoValido_(contato) {
+  return camposPreenchidos_(contato, ['nome', 'cpf', 'email', 'telefone', 'cargo', 'departamento']) &&
+    (contato.recebeNotaFiscalBoleto || contato.recebeProposta || contato.recebeRelatorio);
+}
+
+function cadastrarUsuarioNovo_(dados) {
+  dados = dados || {};
+  const nome = String(dados.nome || '').trim();
+  const email = String(dados.email || '').trim().toLowerCase();
+  const senha = String(dados.senha || '');
+  const tipoUsuario = String(dados.tipoUsuario || '').trim();
+  if (nome.length < 2 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || senha.length < 8) return falha_('Informe nome, e-mail valido e senha com pelo menos 8 caracteres.');
+  if (['COLABORADOR_SENAI', 'CLIENTE'].indexOf(tipoUsuario) < 0) return falha_('Selecione o tipo de usuario.');
+  const cliente = dados.cliente;
+  const contatos = dados.contatos;
+  const camposCliente = ['razaoSocial', 'nomeFantasia', 'endereco', 'cidade', 'estado', 'cep', 'telefone', 'cpfCnpj', 'inscricaoEstadualRg', 'ramoAtividade', 'numeroFuncionarios'];
+  if (tipoUsuario === 'CLIENTE' && (!camposPreenchidos_(cliente, camposCliente) || !Array.isArray(contatos) || !contatos.length || !contatos.every(contatoValido_))) return falha_('Preencha os dados obrigatorios da empresa e ao menos um contato com finalidade.');
+  const lock = LockService.getDocumentLock();
+  lock.waitLock(30000);
+  try {
+    if (usuarioPorEmail_(email)) return falha_('Ja existe um cadastro com este e-mail.');
+    const tabela = valoresComCabecalho_(ABAS.USUARIOS);
+    const cabecalho = tabela.cabecalho;
+    ['grupo', 'data_cadastro'].forEach(function (coluna) { if (coluna_(cabecalho, coluna) < 0) { tabela.aba.getRange(1, cabecalho.length + 1).setValue(coluna); cabecalho.push(coluna); } });
+    const grupo = tipoUsuario === 'COLABORADOR_SENAI' ? GRUPOS.COLABORADOR : GRUPOS.CLIENTE;
+    const agora = new Date();
+    const usuario = { email: email, senha: senha, nome: nome, ativo: true, grupo: grupo, data_cadastro: agora };
+    tabela.aba.appendRow(cabecalho.map(function (coluna) { return usuario[coluna] === undefined ? '' : usuario[coluna]; }));
+    if (tipoUsuario === 'CLIENTE') {
+      const clientes = garantirAba_(ABAS.CLIENTES, ['usuario_email', 'razao_social', 'nome_fantasia', 'renasem', 'endereco', 'cidade', 'estado', 'cep', 'telefone', 'cpf_cnpj', 'inscricao_estadual_rg', 'ramo_atividade', 'numero_funcionarios', 'data_cadastro']);
+      const contatosAba = garantirAba_(ABAS.CONTATOS_CLIENTES, ['usuario_email', 'nome', 'cpf', 'email', 'telefone', 'cargo', 'departamento', 'recebe_nota_fiscal_boleto', 'recebe_proposta', 'recebe_relatorio', 'data_cadastro']);
+      clientes.appendRow([email, cliente.razaoSocial, cliente.nomeFantasia, cliente.renasem || '', cliente.endereco, cliente.cidade, cliente.estado, cliente.cep, cliente.telefone, cliente.cpfCnpj, cliente.inscricaoEstadualRg, cliente.ramoAtividade, cliente.numeroFuncionarios, agora]);
+      contatos.forEach(function (contato) { contatosAba.appendRow([email, contato.nome, contato.cpf, contato.email, contato.telefone, contato.cargo, contato.departamento, Boolean(contato.recebeNotaFiscalBoleto), Boolean(contato.recebeProposta), Boolean(contato.recebeRelatorio), agora]); });
+    }
+    return sucesso_('Cadastro realizado.', { email: email, grupo: grupo });
+  } finally { lock.releaseLock(); }
+}
+
+function podeCriarSolicitacao_(usuario) {
+  return usuario && usuario.grupo === GRUPOS.COLABORADOR ? falha_('Usuário Sem Permissão') : null;
 }
 
 function segredo_() {
@@ -554,6 +616,8 @@ function salvarSolicitacaoSementesR08(dados, token) {
 
 function salvarSolicitacaoSementes_(dados, token, nomeAbaSolicitacoes, nomeAbaAmostras, prefixo) {
   const usuario = validarToken_(token);
+  const permissao = podeCriarSolicitacao_(usuario);
+  if (permissao) return permissao;
   if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
 
   if (!dados || !dados.requerente || !dados.finalidade || !dados.amostras || !dados.amostras.length) {
@@ -629,6 +693,8 @@ function salvarSolicitacaoSementes_(dados, token, nomeAbaSolicitacoes, nomeAbaAm
 
 function salvarSolicitacaoAmostrasFiscais(dados, token) {
   const usuario = validarToken_(token);
+  const permissao = podeCriarSolicitacao_(usuario);
+  if (permissao) return permissao;
   if (!usuario) return falha_('SessÃ£o expirada. FaÃ§a login novamente.');
 
   if (!dados || !dados.razaoSocial || !dados.cpfCnpj || !dados.produto || !dados.objetivo || !dados.analises || !dados.analises.length) {
@@ -698,6 +764,8 @@ function salvarSolicitacaoAmostrasFiscais(dados, token) {
 
 function salvarSolicitacaoMicrobiologica(dados, token) {
   const usuario = validarToken_(token);
+  const permissao = podeCriarSolicitacao_(usuario);
+  if (permissao) return permissao;
   if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
 
   if (!dados || !dados.razaoSocial || !dados.tipoAmostra || !dados.finalidade || !dados.ensaios || !dados.ensaios.length) {
@@ -760,6 +828,8 @@ function salvarSolicitacaoMicrobiologica(dados, token) {
 
 function salvarSolicitacaoFisicoQuimica(dados, token) {
   const usuario = validarToken_(token);
+  const permissao = podeCriarSolicitacao_(usuario);
+  if (permissao) return permissao;
   if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
   if (!dados || !dados.razaoSocial || !dados.cpfCnpj || !dados.email || !dados.telefone || !dados.matriz || !dados.confirmacao || !dados.autorizacoes || dados.autorizacoes.tempo === undefined || dados.autorizacoes.temperatura === undefined || (dados.matriz !== 'Outros' && !dados.ensaios?.length)) return falha_('Preencha os campos obrigatórios antes de enviar.');
   const agora = new Date();
