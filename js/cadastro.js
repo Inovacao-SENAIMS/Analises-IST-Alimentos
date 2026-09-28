@@ -72,6 +72,7 @@
   function alternarCliente() {
     const cliente = form.tipoUsuario.value === 'CLIENTE';
     blocoCliente.hidden = !cliente;
+    form.closest('.cadastro-card').classList.toggle('cadastro-card--cliente', cliente);
     blocoCliente.querySelectorAll('input').forEach((campo) => { campo.disabled = !cliente; campo.required = cliente && camposCliente.includes(campo.name); });
     if (cliente && !lista.children.length) adicionarContato();
   }

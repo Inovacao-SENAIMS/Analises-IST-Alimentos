@@ -72,6 +72,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--azul-500); box-s
 .error-message { min-height: 18px; color: var(--erro); font-size: .78rem; }
 .radio-group, .check-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
 .contact-card { margin: 14px 0; padding: 14px; border: 1px solid var(--cinza-300); border-radius: 11px; }
+.cadastro-card--cliente { width: min(100%, 1080px); max-width: calc(100vw - 32px); }
+.cadastro-cliente-grid { align-items: end; }
+.cadastro-cliente-grid .field--wide { grid-column: span 1; }
+.contact-card .check-grid { margin: 12px 0; }
 .user-permission-notice { margin-bottom: 18px; }
 form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62; }
 .choice { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 9px 11px; border: 1px solid var(--cinza-300); border-radius: 11px; background: var(--branco); }
@@ -139,6 +143,7 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
 .status.loading { color: var(--azul-700); background: #eef9fb; border: 1px solid #b9dfe6; }
 .login-page { min-height: 100vh; display: grid; grid-template-rows: 1fr auto; place-items: center; padding: 24px; background: radial-gradient(circle at 15% 10%, #dbeef0, transparent 38%), linear-gradient(145deg, #f7fbfc, #eaf4ec); }
 .login-card { width: min(460px, 100%); padding: 30px; }
+.login-card.cadastro-card--cliente { width: min(1080px, 100%); }
 .login-card .brand { margin-bottom: 30px; }
 .login-card .page-heading { font-size: 1.8rem; }
 .login-help { margin: 16px 0 0; color: var(--cinza-700); font-size: .85rem; line-height: 1.5; }
@@ -250,6 +255,16 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
   .sample-fields .field { min-width: 0; }
   .sample-card { overflow: visible; border-bottom: 1px solid var(--cinza-300); }
   .sample-card:last-child { border-bottom: 0; }
+}
+@media (min-width: 1024px) {
+  .cadastro-cliente-grid, .contact-card .field-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cadastro-cliente-grid .field--wide { grid-column: span 2; }
+  .contact-card .check-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 639px) {
+  .cadastro-card--cliente { width: min(100%, calc(100vw - 24px)); }
+  .cadastro-card--cliente .field-grid { grid-template-columns: 1fr; }
+  .contact-card { padding: 12px; }
 }
 @media (max-width: 720px) {
   .fisico-quimico-cliente { grid-template-columns: 1fr; gap: 16px; }

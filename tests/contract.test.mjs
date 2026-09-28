@@ -193,6 +193,19 @@ test('cadastro separa cliente de colaborador e persiste perfil relacional', () =
   assert.match(script, /contatos/);
 });
 
+test('cadastro de cliente usa grade ampla e responsiva sem alterar o fluxo', () => {
+  const pagina = readFileSync(join(root, 'pages/cadastro.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/cadastro.js'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(pagina, /cadastro-cliente-grid/);
+  assert.match(script, /cadastro-card--cliente/);
+  assert.match(css, /\.cadastro-card--cliente/);
+  assert.match(css, /\.login-card\.cadastro-card--cliente/);
+  assert.match(css, /\.cadastro-cliente-grid/);
+  assert.match(css, /@media \(min-width: 1024px\)[\s\S]*cadastro-cliente-grid/);
+  assert.match(css, /@media \(max-width: 639px\)[\s\S]*cadastro-card--cliente/);
+});
+
 test('colaborador nao grava solicitacoes e recebe bloqueio visual', () => {
   const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
   const auth = readFileSync(join(root, 'js/auth.js'), 'utf8');
