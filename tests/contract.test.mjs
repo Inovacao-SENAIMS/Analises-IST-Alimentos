@@ -165,6 +165,22 @@ test('administração de usuários possui rota protegida e não expõe senhas', 
   assert.match(css, /\.admin-refresh-button/);
 });
 
+test('administrador exclui definitivamente o usuário e mantém o histórico', () => {
+  const script = readFileSync(join(root, 'js/admin-usuarios.js'), 'utf8');
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(script, /admin-delete/);
+  assert.match(script, /excluirUsuarioAdmin/);
+  assert.match(script, /confirm\(/);
+  assert.match(api, /case 'excluirUsuarioAdmin'/);
+  assert.match(api, /function excluirUsuarioAdmin[\s\S]*administrador_\(token\)/);
+  assert.match(api, /n[aã]o pode excluir a pr[oó]pria conta/i);
+  assert.match(api, /apagarLinhasPorEmail_\(ABAS\.CLIENTES/);
+  assert.match(api, /apagarLinhasPorEmail_\(ABAS\.CONTATOS_CLIENTES/);
+  assert.match(api, /apagarLinhasPorEmail_\(ABAS\.USUARIOS/);
+  assert.match(css, /\.admin-row-actions/);
+});
+
 test('histórico possui rota, filtro protegido e detalhes públicos', () => {
   const pagina = readFileSync(join(root, 'pages/historico-solicitacoes.html'), 'utf8');
   const script = readFileSync(join(root, 'js/historico-solicitacoes.js'), 'utf8');

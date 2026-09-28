@@ -46,12 +46,15 @@
           <label class="admin-active"><input class="admin-active-control" type="checkbox" ${usuario.ativo ? 'checked' : ''}> Ativo</label>
         </td>
         <td data-label="Data de cadastro">${escapar(formatarData(usuario.dataCadastro))}</td>
-        <td data-label="Ação"><button class="button primary admin-save" type="button">Salvar</button></td>
+        <td data-label="Ação"><div class="admin-row-actions"><button class="button primary admin-save" type="button">Salvar</button><button class="button danger admin-delete" type="button">Excluir definitivamente</button></div></td>
       </tr>
     `).join('');
 
     corpo.querySelectorAll('.admin-save').forEach((botao) => {
       botao.addEventListener('click', () => atualizarUsuario(botao));
+    });
+    corpo.querySelectorAll('.admin-delete').forEach((botao) => {
+      botao.addEventListener('click', () => excluirUsuario(botao));
     });
   }
 
@@ -79,6 +82,22 @@
     try {
       await AppAuth.requisitarApi('atualizarUsuarioAdmin', { dados: { email, grupo, ativo } });
       mostrarStatus(`Usuário ${email} atualizado.`);
+    } catch (erro) {
+      mostrarStatus(erro.message, 'error');
+    } finally {
+      botao.disabled = false;
+    }
+  }
+
+  async function excluirUsuario(botao) {
+    const linha = botao.closest('tr');
+    const email = linha.dataset.email;
+    if (!window.confirm(`Excluir definitivamente o usuário ${email}? O acesso e o cadastro de cliente serão removidos, mas as solicitações permanecerão no histórico.`)) return;
+    botao.disabled = true;
+    try {
+      const resultado = await AppAuth.requisitarApi('excluirUsuarioAdmin', { dados: { email } });
+      await carregar();
+      mostrarStatus(resultado.mensagem);
     } catch (erro) {
       mostrarStatus(erro.message, 'error');
     } finally {

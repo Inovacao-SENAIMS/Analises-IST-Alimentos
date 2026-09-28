@@ -51,6 +51,8 @@ function doPost(e) {
         return responder_(listarUsuariosAdmin(entrada.token));
       case 'atualizarUsuarioAdmin':
         return responder_(atualizarUsuarioAdmin(entrada.dados, entrada.token));
+      case 'excluirUsuarioAdmin':
+        return responder_(excluirUsuarioAdmin(entrada.dados, entrada.token));
       case 'listarHistoricoSolicitacoes':
         return responder_(listarHistoricoSolicitacoes(entrada.token));
       case 'obterDetalhesSolicitacao':
@@ -389,6 +391,51 @@ function atualizarUsuarioAdmin(dados, token) {
   tabela.aba.getRange(indice + 2, grupoColuna + 1).setValue(grupo);
 
   return sucesso_('UsuÃ¡rio atualizado.', { email: email, ativo: ativo, grupo: grupo });
+}
+
+function apagarLinhasPorEmail_(nomeAba, email, nomeColuna) {
+  const aba = planilha_().getSheetByName(nomeAba);
+  if (!aba) return 0;
+  const tabela = valoresComCabecalho_(nomeAba);
+  const colunaEmail = coluna_(tabela.cabecalho, nomeColuna || 'email');
+  if (colunaEmail < 0) throw new Error('A aba ' + nomeAba + ' precisa da coluna de e-mail.');
+
+  const linhas = tabela.linhas.reduce(function (resultado, linha, indice) {
+    if (String(linha[colunaEmail] || '').trim().toLowerCase() === email) resultado.push(indice + 2);
+    return resultado;
+  }, []);
+  linhas.reverse().forEach(function (linha) { tabela.aba.deleteRow(linha); });
+  return linhas.length;
+}
+
+function excluirUsuarioAdmin(dados, token) {
+  const acesso = administrador_(token);
+  if (acesso.erro) return acesso.erro;
+
+  const email = String(dados && dados.email || '').trim().toLowerCase();
+  if (!email) return falha_('Informe o e-mail do usuário a excluir.');
+  if (email === String(acesso.usuario.email || '').trim().toLowerCase()) {
+    return falha_('O administrador atual não pode excluir a própria conta.');
+  }
+
+  const usuarios = valoresComCabecalho_(ABAS.USUARIOS);
+  const colunaEmail = coluna_(usuarios.cabecalho, 'email');
+  if (colunaEmail < 0) return falha_('A aba Usuarios precisa da coluna email.');
+  const existe = usuarios.linhas.some(function (linha) {
+    return String(linha[colunaEmail] || '').trim().toLowerCase() === email;
+  });
+  if (!existe) return falha_('Usuário não encontrado.');
+
+  const lock = LockService.getDocumentLock();
+  lock.waitLock(30000);
+  try {
+    const clientes = apagarLinhasPorEmail_(ABAS.CLIENTES, email, 'usuario_email');
+    const contatos = apagarLinhasPorEmail_(ABAS.CONTATOS_CLIENTES, email, 'usuario_email');
+    apagarLinhasPorEmail_(ABAS.USUARIOS, email, 'email');
+    return sucesso_('Usuário excluído definitivamente. As solicitações foram preservadas no histórico.', { email: email, clientes: clientes, contatos: contatos });
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function valorLinha_(tabela, linha, nome, padrao) {

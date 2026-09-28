@@ -223,6 +223,7 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
 .admin-table th, .admin-table td { padding: 13px 12px; border-bottom: 1px solid var(--cinza-300); text-align: left; vertical-align: middle; }
 .admin-table th { color: var(--azul-900); background: #f4f7fa; font-size: .76rem; letter-spacing: .04em; text-transform: uppercase; }
 .admin-table td .button { min-height: 36px; padding: 8px 12px; font-size: .8rem; }
+.admin-row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .admin-group { min-width: 170px; padding: 8px 10px; border-radius: 8px; }
 .admin-active { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; font-weight: 700; }
 .admin-active input { width: auto; accent-color: var(--brand-accent); }
