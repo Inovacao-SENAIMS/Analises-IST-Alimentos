@@ -232,6 +232,11 @@ test('contatos possuem ações com ícones e finalidades sem contorno', () => {
   assert.match(css, /\.contact-purpose[^}]*border:\s*0/);
 });
 
+test('bloco de contatos mantém respiro antes dos dados de acesso', () => {
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(css, /#cliente-cadastro[^}]*margin-bottom/);
+});
+
 test('colaborador nao grava solicitacoes e recebe bloqueio visual', () => {
   const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
   const auth = readFileSync(join(root, 'js/auth.js'), 'utf8');

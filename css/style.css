@@ -73,6 +73,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--azul-500); box-s
 .radio-group, .check-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
 .contact-card { margin: 14px 0; padding: 14px; border: 1px solid var(--cinza-300); border-radius: 11px; }
 .cadastro-card--cliente { width: min(100%, 1080px); max-width: calc(100vw - 32px); }
+#cliente-cadastro { margin-bottom: 32px; }
 .cadastro-cliente-grid { align-items: end; }
 .cadastro-cliente-grid .field--wide { grid-column: span 1; }
 .contact-card .check-grid { margin: 12px 0; }
