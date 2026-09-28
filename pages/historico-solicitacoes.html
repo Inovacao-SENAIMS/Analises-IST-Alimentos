@@ -31,11 +31,15 @@
               </label>
               <button id="history-refresh" class="button secondary" type="button">Atualizar</button>
               <div data-componente="botao-exportar-resumo" data-id="history-export-summary"></div>
+              <div id="history-selection" class="history-selection" hidden>
+                <button id="history-delete-selected" class="button danger" type="button" disabled>Excluir selecionadas (0)</button>
+              </div>
             </div>
             <div class="history-table-wrap">
               <table class="history-table">
                 <thead>
                   <tr>
+                    <th id="history-select-column" class="history-select-column" hidden><input id="history-select-all" type="checkbox" aria-label="Selecionar solicitações filtradas"></th>
                     <th>Solicitação</th>
                     <th>Tipo</th>
                     <th>Data de envio</th>

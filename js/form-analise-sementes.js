@@ -81,10 +81,10 @@
       <article class="sample-card" data-amostra="${indice}">
         <div class="sample-header">
           <h3 class="sample-title">Amostra ${indice + 1}</h3>
-          <button class="link-button remove-sample" type="button" ${amostras.length === 1 ? 'disabled' : ''}>Remover</button>
+          <button class="link-button remove-sample" type="button" aria-label="Remover amostra" ${amostras.length === 1 ? 'disabled' : ''}><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg>Remover</button>
         </div>
         <div class="sample-body">
-          <div class="field-grid">
+          <div class="sample-fields sample-fields--principal">
             <div class="field">
               <label>Espécie <span>*</span></label>
               <input data-campo="especie" value="${escapeHtml(amostra.especie)}" required>
@@ -100,9 +100,11 @@
               <input data-campo="safra" placeholder="2023/24" value="${escapeHtml(amostra.safra)}" required>
               <small class="error-message"></small>
             </div>
-            <div class="field">
-              <label>Peneira <span>*</span></label>
-              <select data-campo="peneira" required>${opcoesHtml(opcoes.peneiras, amostra.peneira)}</select>
+          </div>
+          <div class="sample-fields sample-fields--tratamento">
+            <div class="field" data-treatment-fields ${tratamentoAtivo ? '' : 'hidden'}>
+              <label>Produto <span>*</span></label>
+              <input data-campo="tratProduto" value="${escapeHtml(amostra.tratProduto)}">
               <small class="error-message"></small>
             </div>
             <div class="field">
@@ -110,6 +112,18 @@
               <input data-campo="lote" value="${escapeHtml(amostra.lote)}" required>
               <small class="error-message"></small>
             </div>
+            <div class="field">
+              <label>Peneira <span>*</span></label>
+              <select data-campo="peneira" required>${opcoesHtml(opcoes.peneiras, amostra.peneira)}</select>
+              <small class="error-message"></small>
+            </div>
+            <div class="field" data-treatment-fields ${tratamentoAtivo ? '' : 'hidden'}>
+              <label>Princípio ativo <span>*</span></label>
+              <input data-campo="tratPrincipioAtivo" value="${escapeHtml(amostra.tratPrincipioAtivo)}">
+              <small class="error-message"></small>
+            </div>
+          </div>
+          <div class="sample-fields sample-fields--complementar">
             <div class="field">
               <label>Representatividade <span>*</span></label>
               <input data-campo="representatividade" value="${escapeHtml(amostra.representatividade)}" required>
@@ -120,6 +134,11 @@
               <select data-campo="categoria" required>${opcoesHtml(opcoes.categorias, amostra.categoria)}</select>
               <small class="error-message"></small>
             </div>
+            <div class="field" data-treatment-fields ${tratamentoAtivo ? '' : 'hidden'}>
+              <label>Dosagem <span>*</span></label>
+              <input data-campo="tratDosagem" value="${escapeHtml(amostra.tratDosagem)}">
+              <small class="error-message"></small>
+            </div>
             <div class="field">
               <label>Tratamento? <span>*</span></label>
               <div class="radio-group" style="grid-template-columns:1fr 1fr">
@@ -127,25 +146,6 @@
                 <label class="choice"><input type="radio" data-campo="tratamento" name="tratamento-${indice}" value="Não" ${!tratamentoAtivo ? 'checked' : ''}>Não</label>
               </div>
               <small class="error-message"></small>
-            </div>
-            <div class="field treatment-fields" data-treatment-fields ${tratamentoAtivo ? '' : 'hidden'}>
-              <div class="field-grid">
-                <div class="field">
-                  <label>Produto <span>*</span></label>
-                  <input data-campo="tratProduto" value="${escapeHtml(amostra.tratProduto)}">
-                  <small class="error-message"></small>
-                </div>
-                <div class="field">
-                  <label>Princípio ativo <span>*</span></label>
-                  <input data-campo="tratPrincipioAtivo" value="${escapeHtml(amostra.tratPrincipioAtivo)}">
-                  <small class="error-message"></small>
-                </div>
-                <div class="field">
-                  <label>Dosagem <span>*</span></label>
-                  <input data-campo="tratDosagem" value="${escapeHtml(amostra.tratDosagem)}">
-                  <small class="error-message"></small>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -180,8 +180,9 @@
   function atualizarTratamento(evento) {
     atualizarRegistro(evento);
     const card = evento.target.closest('[data-amostra]');
-    const bloco = card.querySelector('[data-treatment-fields]');
-    bloco.hidden = evento.target.value !== 'Sim';
+    card.querySelectorAll('[data-treatment-fields]').forEach((bloco) => {
+      bloco.hidden = evento.target.value !== 'Sim';
+    });
   }
 
   function removerAmostra(evento) {

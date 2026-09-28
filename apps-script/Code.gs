@@ -52,6 +52,8 @@ function doPost(e) {
         return responder_(listarHistoricoSolicitacoes(entrada.token));
       case 'obterDetalhesSolicitacao':
         return responder_(obterDetalhesSolicitacao(entrada.dados, entrada.token));
+      case 'excluirSolicitacoes':
+        return responder_(excluirSolicitacoes(entrada.dados, entrada.token));
       case 'listarOpcoes':
         return responder_(listarOpcoes(entrada.token));
       case 'salvarSolicitacao':
@@ -470,6 +472,57 @@ function obterDetalhesSolicitacao(dados, token) {
     campos: camposPublicos_(fonte, tabela, linha),
     relacionados: detalhesRelacionados_(fonte, id)
   });
+}
+
+function apagarLinhasPorSolicitacao_(nomeAba, id) {
+  const tabela = valoresComCabecalho_(nomeAba);
+  const colunaId = coluna_(tabela.cabecalho, 'solicitacao_id');
+  if (colunaId < 0) throw new Error('A aba precisa da coluna solicitacao_id.');
+
+  const linhas = tabela.linhas.reduce(function (resultado, linha, indice) {
+    if (String(linha[colunaId]) === id) resultado.push(indice + 2);
+    return resultado;
+  }, []);
+
+  linhas.reverse().forEach(function (linha) {
+    tabela.aba.deleteRow(linha);
+  });
+  return linhas.length;
+}
+
+function excluirSolicitacoes(dados, token) {
+  const acesso = administrador_(token);
+  if (acesso.erro) return acesso.erro;
+
+  const recebidas = dados && Array.isArray(dados.solicitacoes) ? dados.solicitacoes : [];
+  const vistos = {};
+  const alvos = [];
+  for (let indice = 0; indice < recebidas.length; indice += 1) {
+    const tipo = String(recebidas[indice] && recebidas[indice].tipo || '');
+    const solicitacaoId = String(recebidas[indice] && recebidas[indice].solicitacaoId || '').trim();
+    const chave = tipo + ':' + solicitacaoId;
+    const fonte = fonteHistorico_(tipo);
+    if (!fonte || !solicitacaoId) return falha_('Solicitação inválida para exclusão.');
+    if (!vistos[chave]) {
+      const tabela = valoresComCabecalho_(fonte.solicitacoes);
+      const existe = tabela.linhas.some(function (linha) {
+        return String(valorLinha_(tabela, linha, 'solicitacao_id')) === solicitacaoId;
+      });
+      if (!existe) return falha_('Solicitação não encontrada para exclusão.');
+      vistos[chave] = true;
+      alvos.push({ fonte: fonte, solicitacaoId: solicitacaoId });
+    }
+  }
+  if (!alvos.length) return falha_('Selecione ao menos uma solicitação.');
+
+  let relacionados = 0;
+  alvos.forEach(function (alvo) {
+    const abaRelacionada = alvo.fonte.amostras || alvo.fonte.ensaios;
+    if (abaRelacionada) relacionados += apagarLinhasPorSolicitacao_(abaRelacionada, alvo.solicitacaoId);
+    apagarLinhasPorSolicitacao_(alvo.fonte.solicitacoes, alvo.solicitacaoId);
+  });
+
+  return sucesso_('Solicitação(ões) excluída(s) permanentemente.', { excluidas: alvos.length, relacionados: relacionados });
 }
 
 function listarOpcoes(token) {

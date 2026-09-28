@@ -57,6 +57,17 @@ test('origem físico-química oferece somente os três canais definidos', () => 
   assert.doesNotMatch(html, /name="origem" value="Outros"/);
 });
 
+test('físico-química condiciona campos Outros e inclui retorno nas ações', () => {
+  const html = readFileSync(join(root, 'pages/formulario-analise-fisico-quimica.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/form-analise-fisico-quimica.js'), 'utf8');
+
+  assert.match(html, /id="finalidade-outros-wrap" class="field" hidden/);
+  assert.match(html, /id="matriz-outros-wrap" class="field" hidden/);
+  assert.match(script, /w\.hidden = v !== 'Outros'/);
+  assert.match(script, /w\.querySelector\('input'\)\.required = v === 'Outros'/);
+  assert.match(html, /class="form-actions">[\s\S]*data-id="fq-submit"[\s\S]*data-componente="botao-voltar-menu"/);
+});
+
 test('contrato contém as ações e abas do fluxo', () => {
   const source = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
   for (const token of ['doPost', 'login', 'cadastrarUsuario', 'obterPerfil', 'listarUsuariosAdmin', 'atualizarUsuarioAdmin', 'listarHistoricoSolicitacoes', 'obterDetalhesSolicitacao', 'salvarSolicitacao', 'salvarSolicitacaoSementesR08', 'salvarSolicitacaoMicrobiologica', 'salvarSolicitacaoAmostrasFiscais', 'listarOpcoes', 'Usuarios', 'Solicitacoes', 'Amostras', 'SolicitacoesMicrobiologicas', 'EnsaiosMicrobiologicos', 'SolicitacoesAmostrasFiscais', 'AmostrasFiscais', 'SolicitacoesSementesR08', 'AmostrasSementesR08', 'Client_User', 'Manager_User', 'Administrator_User']) {
@@ -168,6 +179,23 @@ test('histórico possui rota, filtro protegido e detalhes públicos', () => {
   assert.doesNotMatch(script, /data_recebimento|peso_amostra_g|senha/);
 });
 
+test('histórico permite exclusão permanente apenas ao administrador', () => {
+  const pagina = readFileSync(join(root, 'pages/historico-solicitacoes.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/historico-solicitacoes.js'), 'utf8');
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+
+  assert.match(pagina, /id="history-select-all"/);
+  assert.match(pagina, /id="history-selection"[^>]*hidden[\s\S]*id="history-delete-selected"/);
+  assert.match(script, /Administrator_User/);
+  assert.match(script, /excluirSolicitacoes/);
+  assert.match(script, /confirm\(/);
+  assert.match(api, /case 'excluirSolicitacoes'/);
+  assert.match(api, /function excluirSolicitacoes[\s\S]*administrador_\(token\)/);
+  assert.match(api, /deleteRow/);
+  assert.match(css, /\.history-selection/);
+});
+
 test('histórico exporta relatórios resumido e individual com dados públicos', () => {
   const script = readFileSync(join(root, 'js/historico-solicitacoes.js'), 'utf8');
   for (const token of ['RelatoriosPdf.baixarResumo', 'RelatoriosPdf.baixarIndividual', 'history-export-summary', 'history-export-individual']) {
@@ -214,6 +242,21 @@ test('formulário de sementes mantém contraste e ações visuais do cabeçalho'
     const pagina = readFileSync(join(root, file), 'utf8');
     assert.match(pagina, /data-componente="botao-voltar-menu"/);
   }
+});
+
+test('amostras de sementes usam o layout em três linhas e remoção com lixeira', () => {
+  const html = readFileSync(join(root, 'pages/formulario-analise-sementes.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/form-analise-sementes.js'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+
+  assert.doesNotMatch(html, /desktop-table-header/);
+  assert.match(script, /sample-fields sample-fields--principal/);
+  assert.match(script, /sample-fields sample-fields--tratamento/);
+  assert.match(script, /sample-fields sample-fields--complementar/);
+  assert.match(script, /remove-sample[\s\S]*aria-label="Remover amostra"[\s\S]*<svg/);
+  assert.match(css, /\.sample-fields--principal[^}]*grid-template-columns: minmax\(0, 1\.5fr\) minmax\(0, 1\.5fr\) minmax\(120px, 1fr\)/);
+  assert.match(css, /\.sample-fields--tratamento[^}]*grid-template-columns: minmax\(0, 1\.5fr\) repeat\(3, minmax\(0, 1fr\)\)/);
+  assert.match(css, /\.sample-fields--complementar[^}]*grid-template-columns: repeat\(4, minmax\(0, 1fr\)\)/);
 });
 
 test('footer compartilhado permanece no rodapé sem sobrepor conteúdo', () => {
