@@ -17,11 +17,17 @@
       <div id="cadastro-status" class="status" role="alert"></div>
 
       <form id="cadastro-form" novalidate>
-        <fieldset class="field">
+        <fieldset class="field profile-selector">
           <legend>Tipo de usuário <span>*</span></legend>
-          <div class="radio-group">
-            <label class="choice"><input type="radio" name="tipoUsuario" value="COLABORADOR_SENAI" required> Colaborador SENAI</label>
-            <label class="choice"><input type="radio" name="tipoUsuario" value="CLIENTE"> Cliente</label>
+          <div class="radio-group profile-selector-options">
+            <label class="choice profile-choice profile-choice--colaborador">
+              <input type="radio" name="tipoUsuario" value="COLABORADOR_SENAI" required>
+              <span><strong>Colaborador SENAI</strong><small>Navegue e consulte os serviços.</small></span>
+            </label>
+            <label class="choice profile-choice profile-choice--cliente">
+              <input type="radio" name="tipoUsuario" value="CLIENTE">
+              <span><strong>Cliente</strong><small>Envie solicitações e cadastre sua empresa.</small></span>
+            </label>
           </div>
         </fieldset>
         <div class="field">

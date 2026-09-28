@@ -193,6 +193,18 @@ test('cadastro separa cliente de colaborador e persiste perfil relacional', () =
   assert.match(script, /contatos/);
 });
 
+test('seletor de perfil oferece cartões acessíveis para os dois fluxos', () => {
+  const pagina = readFileSync(join(root, 'pages/cadastro.html'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(pagina, /profile-selector/);
+  assert.match(pagina, /profile-choice--colaborador/);
+  assert.match(pagina, /profile-choice--cliente/);
+  assert.match(pagina, /Navegue e consulte/);
+  assert.match(pagina, /Envie solicitações/);
+  assert.match(css, /\.profile-choice:has\(input:checked\)/);
+  assert.match(css, /\.profile-choice:focus-within/);
+});
+
 test('cadastro de cliente usa grade ampla e responsiva sem alterar o fluxo', () => {
   const pagina = readFileSync(join(root, 'pages/cadastro.html'), 'utf8');
   const script = readFileSync(join(root, 'js/cadastro.js'), 'utf8');
