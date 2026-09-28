@@ -216,7 +216,7 @@ test('cadastro de cliente usa grade ampla e responsiva sem alterar o fluxo', () 
   assert.match(css, /\.cadastro-card--cliente/);
   assert.match(css, /\.login-card\.cadastro-card--cliente/);
   assert.match(css, /\.cadastro-cliente-grid/);
-  assert.match(css, /@media \(min-width: 1024px\)[\s\S]*cadastro-cliente-grid/);
+  assert.match(css, /@media \(min-width: 640px\)[\s\S]*cadastro-cliente-linha--tripla/);
   assert.match(css, /@media \(max-width: 639px\)[\s\S]*cadastro-card--cliente/);
 });
 
@@ -235,6 +235,21 @@ test('contatos possuem ações com ícones e finalidades sem contorno', () => {
 test('bloco de contatos mantém respiro antes dos dados de acesso', () => {
   const css = readFileSync(join(root, 'css/style.css'), 'utf8');
   assert.match(css, /#cliente-cadastro[^}]*margin-bottom/);
+});
+
+test('dados da empresa organizam linhas, sugestões e máscaras brasileiras', () => {
+  const pagina = readFileSync(join(root, 'pages/cadastro.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/cadastro.js'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(pagina, /cadastro-cliente-linha cadastro-cliente-linha--razao/);
+  assert.match(pagina, /name="cidade"[^>]*list="cidades-brasil"/);
+  assert.match(pagina, /<datalist id="cidades-brasil">/);
+  assert.match(pagina, /<select[^>]*name="estado"/);
+  assert.match(script, /servicodados\.ibge\.gov\.br\/api\/v1\/localidades\/municipios/);
+  assert.match(script, /mascararCep/);
+  assert.match(script, /mascararCpfCnpj/);
+  assert.match(script, /mascararTelefone/);
+  assert.match(css, /\.cadastro-cliente-linha/);
 });
 
 test('colaborador nao grava solicitacoes e recebe bloqueio visual', () => {

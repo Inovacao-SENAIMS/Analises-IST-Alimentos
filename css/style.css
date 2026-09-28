@@ -74,8 +74,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--azul-500); box-s
 .contact-card { margin: 14px 0; padding: 14px; border: 1px solid var(--cinza-300); border-radius: 11px; }
 .cadastro-card--cliente { width: min(100%, 1080px); max-width: calc(100vw - 32px); }
 #cliente-cadastro { margin-bottom: 32px; }
-.cadastro-cliente-grid { align-items: end; }
-.cadastro-cliente-grid .field--wide { grid-column: span 1; }
+.cadastro-cliente-grid { display: grid; gap: 22px; }
+.cadastro-cliente-linha { display: grid; grid-template-columns: 1fr; gap: 18px; }
+.cadastro-cliente-linha .field { min-width: 0; }
+.cadastro-cliente-linha small { margin-top: 1px; }
 .contact-card .check-grid { margin: 12px 0; }
 .contact-add-button { color: #fff; background: var(--verde-500); border-color: var(--verde-500); }
 .contact-add-button:hover { color: #fff; background: var(--brand-accent-dark); }
@@ -258,6 +260,7 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
   .radio-group, .check-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .login-card { padding: 40px; }
+  .cadastro-cliente-linha--tripla { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (min-width: 900px) {
   .page { padding-top: 52px; }
@@ -274,8 +277,7 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
   .sample-card:last-child { border-bottom: 0; }
 }
 @media (min-width: 1024px) {
-  .cadastro-cliente-grid, .contact-card .field-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .cadastro-cliente-grid .field--wide { grid-column: span 2; }
+  .contact-card .field-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .contact-card .check-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 639px) {

@@ -60,6 +60,64 @@
   const lista = document.querySelector('#contatos-cliente');
   if (!form || !blocoCliente || !lista) return;
   const camposCliente = ['razaoSocial', 'nomeFantasia', 'endereco', 'cidade', 'estado', 'cep', 'telefone', 'cpfCnpj', 'inscricaoEstadualRg', 'ramoAtividade', 'numeroFuncionarios'];
+  const cidadesBrasil = document.querySelector('#cidades-brasil');
+  let cidadesCarregadas = false;
+  let carregandoCidades = false;
+
+  function somenteNumeros(valor) { return valor.replace(/\D/g, ''); }
+  function mascararCep(valor) {
+    const numeros = somenteNumeros(valor).slice(0, 8);
+    return numeros.replace(/^(\d{2})(\d{3})(\d{0,3})$/, (_, a, b, c) => `${a}.${b}${c ? `-${c}` : ''}`);
+  }
+  function mascararCpfCnpj(valor) {
+    const numeros = somenteNumeros(valor).slice(0, 14);
+    if (numeros.length <= 11) {
+      return [numeros.slice(0, 3), numeros.slice(3, 6), numeros.slice(6, 9)].filter(Boolean).join('.') + (numeros.length > 9 ? `-${numeros.slice(9)}` : '');
+    }
+    return `${numeros.slice(0, 2)}.${numeros.slice(2, 5)}.${numeros.slice(5, 8)}/${numeros.slice(8, 12)}${numeros.length > 12 ? `-${numeros.slice(12)}` : ''}`;
+  }
+  function mascararTelefone(valor) {
+    const numeros = somenteNumeros(valor).slice(0, 11);
+    if (numeros.length < 3) return numeros ? `(${numeros}` : '';
+    const corpo = numeros.slice(2);
+    return `(${numeros.slice(0, 2)}) ${corpo.replace(/^(\d{4,5})(\d{0,4})$/, (_, a, b) => `${a}${b ? `-${b}` : ''}`)}`;
+  }
+  function mascararInscricaoEstadualRg(valor) {
+    const documento = valor.toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 14);
+    if (!/^\d{1,9}$/.test(documento)) return documento;
+    return `${documento.slice(0, 2)}${documento.length > 2 ? `.${documento.slice(2, 5)}` : ''}${documento.length > 5 ? `.${documento.slice(5, 8)}` : ''}${documento.length > 8 ? `-${documento.slice(8)}` : ''}`;
+  }
+  function aplicarMascara(campo, mascara) {
+    if (!campo) return;
+    campo.addEventListener('input', () => { campo.value = mascara(campo.value); });
+  }
+  async function carregarCidades() {
+    if (cidadesCarregadas || carregandoCidades || !cidadesBrasil) return;
+    carregandoCidades = true;
+    try {
+      const resposta = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/municipios');
+      if (!resposta.ok) throw new Error('Não foi possível carregar as cidades.');
+      const municipios = await resposta.json();
+      const opcoes = document.createDocumentFragment();
+      municipios.forEach(({ nome }) => {
+        const opcao = document.createElement('option');
+        opcao.value = nome;
+        opcoes.appendChild(opcao);
+      });
+      cidadesBrasil.appendChild(opcoes);
+      cidadesCarregadas = true;
+    } catch (_) {
+      // A cidade permanece um campo livre quando a lista oficial não estiver disponível.
+    } finally {
+      carregandoCidades = false;
+    }
+  }
+
+  aplicarMascara(form.elements.cep, mascararCep);
+  aplicarMascara(form.elements.cpfCnpj, mascararCpfCnpj);
+  aplicarMascara(form.elements.inscricaoEstadualRg, mascararInscricaoEstadualRg);
+  aplicarMascara(form.elements.telefone, mascararTelefone);
+  form.elements.cidade.addEventListener('focus', carregarCidades);
 
   function adicionarContato() {
     const item = document.createElement('fieldset');
@@ -70,6 +128,8 @@
     remover.classList.add('contact-remove-button');
     remover.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Remover contato';
     remover.addEventListener('click', () => { if (lista.children.length > 1) item.remove(); });
+    aplicarMascara(item.querySelector('[name="contatoCpf"]'), mascararCpfCnpj);
+    aplicarMascara(item.querySelector('[name="contatoTelefone"]'), mascararTelefone);
     lista.appendChild(item);
   }
 
@@ -77,7 +137,7 @@
     const cliente = form.tipoUsuario.value === 'CLIENTE';
     blocoCliente.hidden = !cliente;
     form.closest('.cadastro-card').classList.toggle('cadastro-card--cliente', cliente);
-    blocoCliente.querySelectorAll('input').forEach((campo) => { campo.disabled = !cliente; campo.required = cliente && camposCliente.includes(campo.name); });
+    blocoCliente.querySelectorAll('input, select').forEach((campo) => { campo.disabled = !cliente; campo.required = cliente && camposCliente.includes(campo.name); });
     if (cliente && !lista.children.length) adicionarContato();
   }
 

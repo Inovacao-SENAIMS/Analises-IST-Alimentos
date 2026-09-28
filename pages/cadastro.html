@@ -37,20 +37,27 @@
         </div>
         <section id="cliente-cadastro" hidden>
           <h2 class="section-title">Dados da empresa</h2>
-          <div class="field-grid cadastro-cliente-grid">
-            <div class="field field--wide"><label>Razão Social <span>*</span></label><input name="razaoSocial"></div>
-            <div class="field"><label>Nome Fantasia <span>*</span></label><input name="nomeFantasia"></div>
-            <div class="field"><label>RENASEM</label><input name="renasem"><small>Aplicável a ensaios de sementes.</small></div>
-            <div class="field field--wide"><label>Endereço <span>*</span></label><input name="endereco"></div>
-            <div class="field"><label>Cidade <span>*</span></label><input name="cidade"></div>
-            <div class="field"><label>Estado <span>*</span></label><input name="estado"></div>
-            <div class="field"><label>CEP <span>*</span></label><input name="cep"></div>
-            <div class="field"><label>Telefone <span>*</span></label><input name="telefone"></div>
-            <div class="field"><label>CNPJ / CPF <span>*</span></label><input name="cpfCnpj"></div>
-            <div class="field"><label>Inscrição Estadual / RG <span>*</span></label><input name="inscricaoEstadualRg"></div>
-            <div class="field field--wide"><label>Ramo de Atividade <span>*</span></label><input name="ramoAtividade"></div>
-            <div class="field"><label>Número de Funcionários <span>*</span></label><input name="numeroFuncionarios" type="number" min="1"></div>
+          <div class="cadastro-cliente-grid">
+            <div class="cadastro-cliente-linha cadastro-cliente-linha--razao"><div class="field"><label>Razão Social <span>*</span></label><input name="razaoSocial" autocomplete="organization"></div></div>
+            <div class="cadastro-cliente-linha"><div class="field"><label>Nome Fantasia <span>*</span></label><input name="nomeFantasia"></div></div>
+            <div class="cadastro-cliente-linha"><div class="field"><label>Endereço <span>*</span></label><input name="endereco" autocomplete="street-address"></div></div>
+            <div class="cadastro-cliente-linha cadastro-cliente-linha--tripla">
+              <div class="field"><label for="cidade">Cidade <span>*</span></label><input id="cidade" name="cidade" list="cidades-brasil" autocomplete="address-level2"><small>Selecione uma sugestão ou digite a cidade.</small></div>
+              <div class="field"><label for="estado">Estado <span>*</span></label><select id="estado" name="estado" autocomplete="address-level1"><option value="">Selecione</option><option value="AC">Acre</option><option value="AL">Alagoas</option><option value="AP">Amapá</option><option value="AM">Amazonas</option><option value="BA">Bahia</option><option value="CE">Ceará</option><option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option><option value="GO">Goiás</option><option value="MA">Maranhão</option><option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option><option value="MG">Minas Gerais</option><option value="PA">Pará</option><option value="PB">Paraíba</option><option value="PR">Paraná</option><option value="PE">Pernambuco</option><option value="PI">Piauí</option><option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option><option value="RS">Rio Grande do Sul</option><option value="RO">Rondônia</option><option value="RR">Roraima</option><option value="SC">Santa Catarina</option><option value="SP">São Paulo</option><option value="SE">Sergipe</option><option value="TO">Tocantins</option></select></div>
+              <div class="field"><label for="cep">CEP <span>*</span></label><input id="cep" name="cep" inputmode="numeric" autocomplete="postal-code" placeholder="00.000-000"></div>
+            </div>
+            <div class="cadastro-cliente-linha cadastro-cliente-linha--tripla">
+              <div class="field"><label for="cpf-cnpj">CPF / CNPJ <span>*</span></label><input id="cpf-cnpj" name="cpfCnpj" inputmode="numeric" placeholder="000.000.000-00"></div>
+              <div class="field"><label for="inscricao-estadual-rg">Inscrição Estadual / RG <span>*</span></label><input id="inscricao-estadual-rg" name="inscricaoEstadualRg" placeholder="00.000.000-0"></div>
+              <div class="field"><label for="renasem">RENASEM</label><input id="renasem" name="renasem"><small>Aplicável a ensaios de sementes.</small></div>
+            </div>
+            <div class="cadastro-cliente-linha cadastro-cliente-linha--tripla">
+              <div class="field"><label>Ramo de Atividade <span>*</span></label><input name="ramoAtividade"></div>
+              <div class="field"><label>Número de Funcionários <span>*</span></label><input name="numeroFuncionarios" type="number" min="1"></div>
+              <div class="field"><label for="telefone">Telefone <span>*</span></label><input id="telefone" name="telefone" inputmode="tel" autocomplete="tel" placeholder="(00) 00000-0000"></div>
+            </div>
           </div>
+          <datalist id="cidades-brasil"></datalist>
           <h2 class="section-title">Contatos</h2>
           <div id="contatos-cliente"></div>
           <button class="button contact-add-button" id="adicionar-contato" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Adicionar contato</button>
