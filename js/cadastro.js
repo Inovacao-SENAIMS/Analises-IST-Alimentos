@@ -65,7 +65,11 @@
     const item = document.createElement('fieldset');
     item.className = 'contact-card';
     item.innerHTML = `<legend>Contato</legend><div class="field-grid"><div class="field"><label>Nome *</label><input name="contatoNome"></div><div class="field"><label>CPF *</label><input name="contatoCpf"></div><div class="field"><label>E-mail *</label><input name="contatoEmail" type="email"></div><div class="field"><label>Telefone *</label><input name="contatoTelefone"></div><div class="field"><label>Cargo *</label><input name="contatoCargo"></div><div class="field"><label>Departamento *</label><input name="contatoDepartamento"></div></div><div class="check-grid"><label class="choice"><input type="checkbox" name="recebeNotaFiscalBoleto"> Envio de nota fiscal e boleto</label><label class="choice"><input type="checkbox" name="recebeProposta"> Envio de proposta</label><label class="choice"><input type="checkbox" name="recebeRelatorio"> Envio de relatório</label></div><button class="button secondary remover-contato" type="button">Remover contato</button>`;
-    item.querySelector('.remover-contato').addEventListener('click', () => { if (lista.children.length > 1) item.remove(); });
+    item.querySelectorAll('.check-grid .choice').forEach((opcao) => opcao.classList.add('contact-purpose'));
+    const remover = item.querySelector('.remover-contato');
+    remover.classList.add('contact-remove-button');
+    remover.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Remover contato';
+    remover.addEventListener('click', () => { if (lista.children.length > 1) item.remove(); });
     lista.appendChild(item);
   }
 

@@ -220,6 +220,18 @@ test('cadastro de cliente usa grade ampla e responsiva sem alterar o fluxo', () 
   assert.match(css, /@media \(max-width: 639px\)[\s\S]*cadastro-card--cliente/);
 });
 
+test('contatos possuem ações com ícones e finalidades sem contorno', () => {
+  const pagina = readFileSync(join(root, 'pages/cadastro.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/cadastro.js'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(pagina, /contact-add-button/);
+  assert.match(script, /contact-remove-button/);
+  assert.match(script, /contact-purpose/);
+  assert.match(css, /\.contact-add-button/);
+  assert.match(css, /\.contact-remove-button/);
+  assert.match(css, /\.contact-purpose[^}]*border:\s*0/);
+});
+
 test('colaborador nao grava solicitacoes e recebe bloqueio visual', () => {
   const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
   const auth = readFileSync(join(root, 'js/auth.js'), 'utf8');
