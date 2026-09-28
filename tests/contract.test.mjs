@@ -203,6 +203,8 @@ test('seletor de perfil oferece cartões acessíveis para os dois fluxos', () =>
   assert.match(pagina, /Envie solicitações/);
   assert.match(css, /\.profile-choice:has\(input:checked\)/);
   assert.match(css, /\.profile-choice:focus-within/);
+  assert.match(css, /\.radio-group\.profile-selector-options[^}]*auto-fit/);
+  assert.doesNotMatch(css, /\.profile-choice:has\(input:checked\)::after/);
 });
 
 test('cadastro de cliente usa grade ampla e responsiva sem alterar o fluxo', () => {

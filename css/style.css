@@ -81,15 +81,14 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
 .choice { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 9px 11px; border: 1px solid var(--cinza-300); border-radius: 11px; background: var(--branco); }
 .choice input { width: auto; accent-color: var(--azul-700); }
 .choice:has(input:checked) { border-color: var(--azul-500); background: #f0fafb; }
-.profile-selector-options { gap: 12px; }
-.profile-choice { min-height: 76px; align-items: flex-start; padding: 15px; cursor: pointer; transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease, transform .18s ease; }
-.profile-choice span { display: grid; gap: 4px; }
-.profile-choice strong { color: var(--azul-900); }
-.profile-choice small { color: var(--cinza-700); line-height: 1.35; }
-.profile-choice:hover { border-color: var(--azul-500); transform: translateY(-1px); }
-.profile-choice:focus-within { outline: 3px solid rgba(45,139,159,.22); outline-offset: 2px; }
-.profile-choice:has(input:checked) { border-color: var(--azul-500); background: linear-gradient(135deg, #eef9fb, #f8fcfd); box-shadow: 0 8px 18px rgba(18,48,71,.09); }
-.profile-choice:has(input:checked)::after { content: 'Selecionado'; margin-left: auto; color: var(--azul-700); font-size: .75rem; font-weight: 800; }
+.radio-group.profile-selector-options { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.profile-choice { min-height: 68px; align-items: flex-start; padding: 14px; cursor: pointer; border-radius: 10px; transition: border-color .16s ease, background-color .16s ease; }
+.profile-choice span { display: grid; gap: 3px; }
+.profile-choice strong { color: var(--azul-900); font-size: .94rem; }
+.profile-choice small { color: var(--cinza-700); font-size: .8rem; line-height: 1.35; }
+.profile-choice:hover { border-color: var(--azul-500); background: #fafcfc; }
+.profile-choice:focus-within { outline: 2px solid rgba(45,139,159,.26); outline-offset: 2px; }
+.profile-choice:has(input:checked) { border-color: var(--azul-500); background: #f4fafb; }
 .notice { padding: 13px 15px; border-left: 4px solid var(--azul-500); border-radius: 9px; color: var(--azul-900); background: #edf9fa; font-size: .9rem; line-height: 1.5; }
 .notice.warning { border-color: #d49427; background: #fff8e8; }
 .micro-assay-groups { display: grid; gap: 22px; margin-top: 20px; }
