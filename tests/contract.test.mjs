@@ -211,7 +211,7 @@ test('histórico possui rota, filtro protegido e detalhes públicos', () => {
 });
 
 test('cadastro separa cliente de colaborador e persiste perfil relacional', () => {
-  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8') + readFileSync(join(root, 'apps-script/Documentos.gs'), 'utf8');
   const pagina = readFileSync(join(root, 'pages/cadastro.html'), 'utf8');
   const script = readFileSync(join(root, 'js/cadastro.js'), 'utf8');
   for (const token of ['IST_Colaborators', 'Clientes', 'ContatosClientes', 'COLABORADOR_SENAI', 'CLIENTE', 'recebe_nota_fiscal_boleto', 'recebe_proposta', 'recebe_relatorio']) {

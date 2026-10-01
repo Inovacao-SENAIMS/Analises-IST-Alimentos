@@ -1,65 +1,34 @@
-/* Fluxo público de cadastro: todo novo usuário nasce como Client_User no servidor. */
-(function () {
-  const form = document.querySelector('#cadastro-form');
-  if (!form) return;
-
-  const status = document.querySelector('#cadastro-status');
-
-  function mostrarStatus(mensagem, tipo) {
-    status.textContent = mensagem;
-    status.className = `status show ${tipo}`;
-  }
-
-  form.addEventListener('legacy-submit', async (evento) => {
-    evento.preventDefault();
-
-    const nome = form.nome.value.trim();
-    const email = form.email.value.trim();
-    const senha = form.senha.value;
-    const confirmarSenha = form.confirmarSenha.value;
-    const botao = form.querySelector('button');
-
-    form.querySelectorAll('.invalid').forEach((campo) => campo.classList.remove('invalid'));
-
-    if (!nome || !email || !senha || !confirmarSenha) {
-      mostrarStatus('Preencha todos os campos obrigatórios.', 'error');
-      return;
-    }
-
-    if (senha.length < 8) {
-      form.senha.classList.add('invalid');
-      mostrarStatus('A senha deve ter pelo menos 8 caracteres.', 'error');
-      return;
-    }
-
-    if (senha !== confirmarSenha) {
-      form.confirmarSenha.classList.add('invalid');
-      mostrarStatus('As senhas não conferem.', 'error');
-      return;
-    }
-
-    botao.disabled = true;
-    mostrarStatus('Criando seu acesso…', 'loading');
-
-    try {
-      await AppAuth.cadastrarUsuario(nome, email, senha);
-      mostrarStatus('Cadastro realizado. Redirecionando para o login…', 'success');
-      setTimeout(() => {
-        window.location.href = 'index.html?cadastro=sucesso';
-      }, 900);
-    } catch (erro) {
-      mostrarStatus(erro.message, 'error');
-      botao.disabled = false;
-    }
-  });
-})();
-
+/* Cadastro publico com documentos obrigatorios para clientes PF/PJ. */
 (function () {
   const form = document.querySelector('#cadastro-form');
   const blocoCliente = document.querySelector('#cliente-cadastro');
   const lista = document.querySelector('#contatos-cliente');
   if (!form || !blocoCliente || !lista) return;
   const camposCliente = ['razaoSocial', 'nomeFantasia', 'endereco', 'cidade', 'estado', 'cep', 'telefone', 'cpfCnpj', 'inscricaoEstadualRg', 'ramoAtividade', 'numeroFuncionarios'];
+  const camposEmpresa = ['razaoSocial', 'nomeFantasia', 'ramoAtividade', 'numeroFuncionarios'];
+  const documentos = UploadDocumentos.criar(document.querySelector('#documentos-cadastro'));
+  const status = document.querySelector('#cadastro-status');
+  let enviando = false;
+  let tentativa = null;
+
+  function mostrarStatus(mensagem, tipo = 'error') {
+    status.textContent = mensagem;
+    status.className = `status show ${tipo}`;
+    if (tipo === 'error') status.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function identificadorTentativa(email) {
+    const chave = 'ist_documentos_cadastro_tentativa';
+    if (!tentativa) {
+      try { tentativa = JSON.parse(sessionStorage.getItem(chave) || 'null'); } catch (_) { tentativa = null; }
+    }
+    if (!tentativa || tentativa.email !== email || !/^[a-f0-9-]{36}$/i.test(tentativa.id || '')) {
+      tentativa = { email, id: crypto.randomUUID() };
+      // Somente identidade da tentativa; senhas e documentos ficam fora do storage.
+      try { sessionStorage.setItem(chave, JSON.stringify(tentativa)); } catch (_) {}
+    }
+    return tentativa.id;
+  }
   const cidadesBrasil = document.querySelector('#cidades-brasil');
   const cidade = form.elements.cidade;
   const estado = form.elements.estado;
@@ -178,21 +147,59 @@
     form.closest('.cadastro-card').classList.toggle('cadastro-card--cliente', cliente);
     blocoCliente.querySelectorAll('input, select').forEach((campo) => { campo.disabled = !cliente; campo.required = cliente && camposCliente.includes(campo.name); });
     if (cliente && !lista.children.length) adicionarContato();
+    form.elements.tipoPessoa.required = cliente;
+    const juridica = form.elements.tipoPessoa.value === 'JURIDICA';
+    form.querySelectorAll('[data-empresa-linha]').forEach((linha) => { linha.hidden = !juridica; });
+    camposEmpresa.forEach((nome) => {
+      const campo = form.elements[nome];
+      campo.closest('.field').hidden = !juridica;
+      campo.disabled = !cliente || !juridica;
+      campo.required = cliente && juridica;
+    });
+    document.querySelector('#cliente-dados-titulo').textContent = juridica ? 'Dados da empresa' : 'Dados do cliente';
+    document.querySelector('#cpf-cnpj-label').textContent = juridica ? 'CNPJ *' : 'CPF *';
+    document.querySelector('#inscricao-label').textContent = juridica ? 'Inscrição Estadual *' : 'RG *';
+    form.elements.cpfCnpj.placeholder = juridica ? '00.000.000/0000-00' : '000.000.000-00';
+    documentos.atualizar(form.elements.tipoPessoa.value, cliente);
   }
 
   form.querySelectorAll('[name="tipoUsuario"]').forEach((campo) => campo.addEventListener('change', alternarCliente));
+  form.elements.tipoPessoa.addEventListener('change', alternarCliente);
   document.querySelector('#adicionar-contato').addEventListener('click', adicionarContato);
   form.addEventListener('submit', async (evento) => {
     evento.preventDefault();
+    if (enviando) return;
     const tipoUsuario = form.tipoUsuario.value;
-    if (!tipoUsuario || form.senha.value !== form.confirmarSenha.value || form.senha.value.length < 8) return;
-    const payload = { nome: form.nome.value.trim(), email: form.email.value.trim(), senha: form.senha.value, tipoUsuario };
+    if (!tipoUsuario || !form.reportValidity()) { mostrarStatus('Preencha os campos obrigatórios e envie os documentos solicitados.'); return; }
+    if (form.senha.value !== form.confirmarSenha.value) { mostrarStatus('As senhas não conferem.'); return; }
+    if (form.senha.value.length < 8) { mostrarStatus('A senha deve ter pelo menos 8 caracteres.'); return; }
+    const payload = { nome: form.nome.value.trim(), email: form.email.value.trim().toLowerCase(), senha: form.senha.value, tipoUsuario };
     if (tipoUsuario === 'CLIENTE') {
-      payload.cliente = Object.fromEntries(camposCliente.concat('renasem').map((nome) => [nome, form.elements[nome].value.trim()]));
+      payload.tipoPessoa = form.elements.tipoPessoa.value;
+      const tamanhoDocumento = payload.tipoPessoa === 'FISICA' ? 11 : 14;
+      if (!['FISICA', 'JURIDICA'].includes(payload.tipoPessoa) || somenteNumeros(form.cpfCnpj.value).length !== tamanhoDocumento || !Validacoes.validarCpfCnpj(form.cpfCnpj.value)) { mostrarStatus('Informe um CPF ou CNPJ válido para o tipo de pessoa selecionado.'); return; }
+      const camposObrigatorios = camposCliente.filter((nome) => payload.tipoPessoa === 'JURIDICA' || !camposEmpresa.includes(nome));
+      payload.cliente = Object.fromEntries(camposCliente.concat('renasem').map((nome) => [nome, form.elements[nome].disabled ? '' : form.elements[nome].value.trim()]));
       payload.contatos = Array.from(lista.children).map((item) => ({ nome: item.querySelector('[name="contatoNome"]').value.trim(), cpf: item.querySelector('[name="contatoCpf"]').value.trim(), email: item.querySelector('[name="contatoEmail"]').value.trim(), telefone: item.querySelector('[name="contatoTelefone"]').value.trim(), cargo: item.querySelector('[name="contatoCargo"]').value.trim(), departamento: item.querySelector('[name="contatoDepartamento"]').value.trim(), recebeNotaFiscalBoleto: item.querySelector('[name="recebeNotaFiscalBoleto"]').checked, recebeProposta: item.querySelector('[name="recebeProposta"]').checked, recebeRelatorio: item.querySelector('[name="recebeRelatorio"]').checked }));
-      if (!camposCliente.every((nome) => payload.cliente[nome]) || !payload.contatos.every((contato) => contato.nome && contato.cpf && contato.email && contato.telefone && contato.cargo && contato.departamento && (contato.recebeNotaFiscalBoleto || contato.recebeProposta || contato.recebeRelatorio))) return;
+      if (!camposObrigatorios.every((nome) => payload.cliente[nome]) || !payload.contatos.length || !payload.contatos.every((contato) => contato.nome && contato.cpf && contato.email && contato.telefone && contato.cargo && contato.departamento && (contato.recebeNotaFiscalBoleto || contato.recebeProposta || contato.recebeRelatorio))) { mostrarStatus('Preencha os dados obrigatórios e ao menos um contato completo com finalidade.'); return; }
+      payload.cadastroId = identificadorTentativa(payload.email);
     }
-    const botao = form.querySelector('[type="submit"]'); botao.disabled = true;
-    try { await AppAuth.cadastrarUsuario(payload); window.location.href = 'index.html?cadastro=sucesso'; } catch (erro) { botao.disabled = false; }
+    enviando = true;
+    const controles = Array.from(form.querySelectorAll('input, select, textarea, button')).map((campo) => ({ campo, disabled: campo.disabled }));
+    controles.forEach(({ campo }) => { campo.disabled = true; });
+    try {
+      mostrarStatus('Preparando seu cadastro…', 'loading');
+      if (tipoUsuario === 'CLIENTE') payload.documentos = await documentos.coletar();
+      mostrarStatus(tipoUsuario === 'CLIENTE' ? 'Enviando cadastro e documentos. Aguarde a conclusão…' : 'Criando seu acesso…', 'loading');
+      await AppAuth.cadastrarUsuario(payload);
+      mostrarStatus('Cadastro concluído. Redirecionando para o login…', 'success');
+      window.location.href = 'index.html?cadastro=sucesso';
+    } catch (erro) {
+      mostrarStatus(erro.message || 'Não foi possível concluir o cadastro. Tente novamente.');
+    } finally {
+      controles.forEach(({ campo, disabled }) => { campo.disabled = disabled; });
+      enviando = false;
+    }
   });
+  alternarCliente();
 })();

@@ -2,5 +2,6 @@
 .opencode/
 .superpowers/
 .venv/
-/tests/
-tests/
+# Versionar as verificacoes do portal; outros artefatos de teste continuam ignorados.
+/tests/*
+!/tests/*.test.mjs
