@@ -50,7 +50,7 @@
     return `
       <aside class="sidebar">
         <a class="sidebar-brand" href="menu.html">
-          <img class="senai-logo" src="${window.APP_CONFIG?.assetBase || ''}design/brand/logo_senai_fiems.png" alt="SENAI FIEMS">
+          <img class="senai-logo" src="${window.APP_CONFIG?.assetBase || ''}design/brand/senai_alimentos.jpeg" alt="SENAI FIEMS">
           <span>Portal de serviços</span>
         </a>
         <nav class="sidebar-nav" aria-label="Navegação principal">
@@ -93,7 +93,7 @@
       <header class="app-header form-header-light">
         <div class="app-shell header-inner">
           <a class="brand" href="menu.html">
-            <img class="senai-logo" src="${window.APP_CONFIG?.assetBase || ''}design/brand/logo_senai_fiems.png" alt="SENAI FIEMS">
+            <img class="senai-logo" src="${window.APP_CONFIG?.assetBase || ''}design/brand/senai_alimentos.jpeg" alt="SENAI FIEMS">
             <span class="brand-subtitle">Portal de serviços</span>
           </a>
           <div class="user-actions">

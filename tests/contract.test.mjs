@@ -94,7 +94,7 @@ test('cadastro e navegação usam logo, sidebar e grupos', () => {
   const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
   const perfil = readFileSync(join(root, 'pages/dados-pessoais.html'), 'utf8');
   assert.match(cadastroScript, /cadastrarUsuario/);
-  assert.match(cadastro, /logo_senai_fiems\.png/);
+  assert.match(cadastro, /senai_alimentos\.jpeg/);
   assert.match(menu, /sidebar/);
   assert.match(componentes, /dados-pessoais\.html/);
   assert.match(perfil, /data-perfil-grupo/);
