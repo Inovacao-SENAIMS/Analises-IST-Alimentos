@@ -16,7 +16,8 @@ const ABAS = {
   SOLICITACOES_R08: 'SolicitacoesSementesR08',
   AMOSTRAS_R08: 'AmostrasSementesR08',
   CLIENTES: 'Clientes',
-  CONTATOS_CLIENTES: 'ContatosClientes'
+  CONTATOS_CLIENTES: 'ContatosClientes',
+  DOCUMENTOS_USUARIOS: 'DocumentosUsuarios'
 };
 
 const FONTES_HISTORICO = [
@@ -172,7 +173,9 @@ function usuarioPorEmail_(email) {
     email: String(linha[emailColuna]).trim(),
     nome: String(linha[coluna_(tabela.cabecalho, 'nome')]).trim(),
     senha: String(linha[coluna_(tabela.cabecalho, 'senha')]),
-    ativo: ativo_(linha[coluna_(tabela.cabecalho, 'ativo')]),
+    ativo: ativo_(linha[coluna_(tabela.cabecalho, 'ativo')]) && (!valorLinha_(tabela, linha, 'estado_documental') || valorLinha_(tabela, linha, 'estado_documental') === 'CONCLUIDO'),
+    estadoDocumental: String(valorLinha_(tabela, linha, 'estado_documental')),
+    cadastroId: String(valorLinha_(tabela, linha, 'cadastro_id')),
     grupo: grupo
   };
 }
@@ -260,25 +263,21 @@ function cadastrarUsuarioNovo_(dados) {
   if (['COLABORADOR_SENAI', 'CLIENTE'].indexOf(tipoUsuario) < 0) return falha_('Selecione o tipo de usuario.');
   const cliente = dados.cliente;
   const contatos = dados.contatos;
-  const camposCliente = ['razaoSocial', 'nomeFantasia', 'endereco', 'cidade', 'estado', 'cep', 'telefone', 'cpfCnpj', 'inscricaoEstadualRg', 'ramoAtividade', 'numeroFuncionarios'];
+  const camposCliente = ['endereco', 'cidade', 'estado', 'cep', 'telefone', 'cpfCnpj', 'inscricaoEstadualRg'];
+  if (dados.tipoPessoa === 'JURIDICA') camposCliente.push('razaoSocial', 'nomeFantasia', 'ramoAtividade', 'numeroFuncionarios');
   if (tipoUsuario === 'CLIENTE' && (!camposPreenchidos_(cliente, camposCliente) || !Array.isArray(contatos) || !contatos.length || !contatos.every(contatoValido_))) return falha_('Preencha os dados obrigatorios da empresa e ao menos um contato com finalidade.');
-  const lock = LockService.getDocumentLock();
+  if (tipoUsuario === 'CLIENTE') return cadastrarClienteDocumentado_(dados, nome, email, senha);
+  const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
     if (usuarioPorEmail_(email)) return falha_('Ja existe um cadastro com este e-mail.');
     const tabela = valoresComCabecalho_(ABAS.USUARIOS);
     const cabecalho = tabela.cabecalho;
     ['grupo', 'data_cadastro'].forEach(function (coluna) { if (coluna_(cabecalho, coluna) < 0) { tabela.aba.getRange(1, cabecalho.length + 1).setValue(coluna); cabecalho.push(coluna); } });
-    const grupo = tipoUsuario === 'COLABORADOR_SENAI' ? GRUPOS.COLABORADOR : GRUPOS.CLIENTE;
+    const grupo = GRUPOS.COLABORADOR;
     const agora = new Date();
     const usuario = { email: email, senha: senha, nome: nome, ativo: true, grupo: grupo, data_cadastro: agora };
     tabela.aba.appendRow(cabecalho.map(function (coluna) { return usuario[coluna] === undefined ? '' : usuario[coluna]; }));
-    if (tipoUsuario === 'CLIENTE') {
-      const clientes = garantirAba_(ABAS.CLIENTES, ['usuario_email', 'razao_social', 'nome_fantasia', 'renasem', 'endereco', 'cidade', 'estado', 'cep', 'telefone', 'cpf_cnpj', 'inscricao_estadual_rg', 'ramo_atividade', 'numero_funcionarios', 'data_cadastro']);
-      const contatosAba = garantirAba_(ABAS.CONTATOS_CLIENTES, ['usuario_email', 'nome', 'cpf', 'email', 'telefone', 'cargo', 'departamento', 'recebe_nota_fiscal_boleto', 'recebe_proposta', 'recebe_relatorio', 'data_cadastro']);
-      clientes.appendRow([email, cliente.razaoSocial, cliente.nomeFantasia, cliente.renasem || '', cliente.endereco, cliente.cidade, cliente.estado, cliente.cep, cliente.telefone, cliente.cpfCnpj, cliente.inscricaoEstadualRg, cliente.ramoAtividade, cliente.numeroFuncionarios, agora]);
-      contatos.forEach(function (contato) { contatosAba.appendRow([email, contato.nome, contato.cpf, contato.email, contato.telefone, contato.cargo, contato.departamento, Boolean(contato.recebeNotaFiscalBoleto), Boolean(contato.recebeProposta), Boolean(contato.recebeRelatorio), agora]); });
-    }
     return sucesso_('Cadastro realizado.', { email: email, grupo: grupo });
   } finally { lock.releaseLock(); }
 }
@@ -397,21 +396,24 @@ function atualizarUsuarioAdmin(dados, token) {
     return falha_('O administrador atual nÃ£o pode remover o prÃ³prio acesso.');
   }
 
-  const tabela = valoresComCabecalho_(ABAS.USUARIOS);
-  const emailColuna = coluna_(tabela.cabecalho, 'email');
-  const ativoColuna = coluna_(tabela.cabecalho, 'ativo');
-  const grupoColuna = coluna_(tabela.cabecalho, 'grupo');
-  if (ativoColuna < 0 || grupoColuna < 0) return falha_('A aba Usuarios precisa das colunas ativo e grupo.');
-
-  const indice = tabela.linhas.findIndex(function (linha) {
-    return String(linha[emailColuna] || '').trim().toLowerCase() === email;
-  });
-  if (indice < 0) return falha_('UsuÃ¡rio nÃ£o encontrado.');
-
-  tabela.aba.getRange(indice + 2, ativoColuna + 1).setValue(ativo);
-  tabela.aba.getRange(indice + 2, grupoColuna + 1).setValue(grupo);
-
-  return sucesso_('UsuÃ¡rio atualizado.', { email: email, ativo: ativo, grupo: grupo });
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    const tabela = valoresComCabecalho_(ABAS.USUARIOS);
+    const emailColuna = coluna_(tabela.cabecalho, 'email');
+    const ativoColuna = coluna_(tabela.cabecalho, 'ativo');
+    const grupoColuna = coluna_(tabela.cabecalho, 'grupo');
+    if (ativoColuna < 0 || grupoColuna < 0) return falha_('A aba Usuarios precisa das colunas ativo e grupo.');
+    const indice = tabela.linhas.findIndex(function (linha) {
+      return String(linha[emailColuna] || '').trim().toLowerCase() === email;
+    });
+    if (indice < 0) return falha_('Usuário não encontrado.');
+    const estadoDocumental = String(valorLinha_(tabela, tabela.linhas[indice], 'estado_documental'));
+    if (ativo && estadoDocumental && estadoDocumental !== 'CONCLUIDO') return falha_('Não é possível ativar um cadastro com documentos pendentes.');
+    tabela.aba.getRange(indice + 2, ativoColuna + 1).setValue(ativo);
+    tabela.aba.getRange(indice + 2, grupoColuna + 1).setValue(grupo);
+    return sucesso_('Usuário atualizado.', { email: email, ativo: ativo, grupo: grupo });
+  } finally { lock.releaseLock(); }
 }
 
 function apagarLinhasPorEmail_(nomeAba, email, nomeColuna) {
@@ -447,7 +449,7 @@ function excluirUsuarioAdmin(dados, token) {
   });
   if (!existe) return falha_('Usuário não encontrado.');
 
-  const lock = LockService.getDocumentLock();
+  const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
     const clientes = apagarLinhasPorEmail_(ABAS.CLIENTES, email, 'usuario_email');

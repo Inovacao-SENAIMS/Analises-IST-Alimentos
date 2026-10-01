@@ -22,6 +22,14 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+.cadastro-documentos { margin: 28px 0; padding-top: 22px; border-top: 1px solid var(--cinza-300); }
+.documents-help { margin: 0 0 18px; color: var(--cinza-700); line-height: 1.6; }
+.document-upload { min-width: 0; padding: 16px; border: 1px solid var(--cinza-300); border-radius: 12px; background: var(--branco); }
+.document-upload input[type="file"] { width: 100%; min-width: 0; font-size: .88rem; }
+.document-upload input[type="file"]::file-selector-button { padding: 9px 12px; margin-right: 10px; border: 0; border-radius: 6px; color: var(--branco); background: var(--azul-900); cursor: pointer; }
+.document-upload [data-documento-status] { display: block; margin-top: 10px; overflow-wrap: anywhere; line-height: 1.5; }
+.document-remove { align-self: start; margin-top: 8px; }
 body { margin: 0; min-width: 320px; background: var(--bg); }
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }

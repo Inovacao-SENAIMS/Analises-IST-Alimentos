@@ -114,7 +114,7 @@ As três últimas colunas são reservadas ao laboratório e não aparecem na pá
 ## 2. Publicar o Apps Script
 
 1. Na planilha, abra **Extensões → Apps Script**.
-2. Substitua o conteúdo do editor por `apps-script/Code.gs` e salve.
+2. Substitua o conteúdo de `Code.gs` por `apps-script/Code.gs`, crie também o arquivo `Documentos.gs` com o conteúdo de `apps-script/Documentos.gs` e salve ambos. Os dois arquivos pertencem ao mesmo projeto Apps Script.
 3. Em **Implantar → Nova implantação**, escolha **Aplicativo da Web**.
 4. Configure **Executar como: Eu** e **Quem tem acesso: Qualquer pessoa**.
 5. Implante, autorize o projeto e copie a URL que termina em `/exec`.
@@ -144,7 +144,56 @@ Clientes: usuario_email | razao_social | nome_fantasia | renasem | endereco | ci
 ContatosClientes: usuario_email | nome | cpf | email | telefone | cargo | departamento | recebe_nota_fiscal_boleto | recebe_proposta | recebe_relatorio | data_cadastro
 ```
 
-Todos os campos empresariais sao obrigatorios, exceto RENASEM, aplicavel a ensaios de sementes. Cada contato precisa ter ao menos uma finalidade. As abas sao criadas pelo Apps Script no primeiro cadastro de Cliente; apos copiar o novo `Code.gs`, publique uma nova versao do Web App `/exec` para que a alteracao entre em vigor.
+Clientes escolhem Pessoa física ou Pessoa jurídica. Pessoa física informa nome completo, CPF, RG, endereço e contato; razão social, nome fantasia, ramo de atividade e número de funcionários se aplicam apenas à pessoa jurídica. RENASEM permanece opcional, aplicável a ensaios de sementes. Cada contato precisa ter ao menos uma finalidade. As abas são criadas pelo Apps Script no primeiro cadastro de Cliente; após atualizar os dois arquivos `.gs`, publique uma nova versão do Web App `/exec`.
+
+### Documentos obrigatórios no cadastro
+
+A seção **Documentos** fica ao final do formulário, antes de **Criar acesso**, e aparece apenas para Cliente:
+
+| Tipo de pessoa | Documento principal | Documento complementar |
+| --- | --- | --- |
+| Física | Documento com foto | Comprovante de residência |
+| Jurídica | Documento com foto do RT (responsável técnico) | ART — Anotação de Responsabilidade Técnica |
+
+São obrigatórios **dois arquivos**, um por campo, em **PDF, JPG/JPEG ou PNG**, com até **5 MiB (5.242.880 bytes)** cada. O servidor verifica categorias, tamanho real, extensão, MIME e assinatura binária básica. Isso não é uma verificação automática de autenticidade ou validade profissional do documento.
+
+#### Configurar o armazenamento
+
+1. Crie uma pasta dedicada no Google Drive da conta responsável pelo Web App, com acesso **Restrito**, acessível somente à equipe autorizada. Não habilite acesso público, por link ou para todo o domínio; confira também permissões herdadas de pastas superiores.
+2. Copie o ID da pasta (trecho depois de `/folders/` na URL).
+3. Em **Configurações do projeto → Propriedades do script**, adicione `DOCUMENTOS_CADASTRO_FOLDER_ID` com esse ID.
+4. Atualize `Code.gs` e adicione `Documentos.gs` no mesmo projeto Apps Script. Execute uma função que use Drive para autorizar o acesso; você pode criar temporariamente uma função de configuração que leia essa propriedade e chame `DriveApp.getFolderById(id).getName()`. Não execute cadastro real para obter essa autorização.
+5. Publique uma **nova versão** da implantação `/exec`, executando como a conta responsável pelo armazenamento, e atualize também o frontend.
+
+O ID da pasta é configuração do servidor e não deve ser colocado no HTML ou em `js/config.js`. Os arquivos são organizados em subpastas por identificador de cadastro. O portal não gera links públicos nem acrescenta documentos ao histórico de solicitações.
+
+A nova aba `DocumentosUsuarios` é criada automaticamente:
+
+```text
+documento_id | cadastro_id | usuario_email | tipo_pessoa | categoria_documento | arquivo_drive_id | nome_original | mime_type | tamanho_bytes | data_upload
+```
+
+O backend acrescenta colunas sem reordenar as existentes:
+
+- `Usuarios`: `cadastro_id`, `estado_documental`, `cadastro_fingerprint`.
+- `Clientes`: `tipo_pessoa`, `cadastro_id`.
+- `ContatosClientes`: `cadastro_id`, `numero_contato`.
+
+Durante a gravação, o cliente fica **PENDENTE** e sem acesso. Somente após armazenar os dois documentos, o perfil e os contatos, o cadastro muda para **CONCLUIDO** e a conta é ativada. Administradores não podem ativar cadastros pendentes pelo portal. Não altere manualmente essas colunas para contornar a conclusão.
+
+Se ocorrer falha, tente novamente na mesma aba com os mesmos dados, credenciais e arquivos. O identificador é preservado na sessão do navegador; senhas e arquivos não são armazenados nesse mecanismo. Se a página for recarregada, será necessário preencher os dados e selecionar os mesmos arquivos novamente. Caso a sessão tenha sido perdida, a equipe deverá recuperar o cadastro pendente de forma controlada; não há ferramenta de recuperação administrativa nesta entrega.
+
+Falhas parciais são retomadas sem duplicar registros. Se a criação de metadados falhar depois do upload, o servidor tenta mover o arquivo recém-criado para a lixeira e registra falhas de compensação nos logs. Não existe transação conjunta entre Drive e Sheets.
+
+Clientes anteriores à mudança e colaboradores mantêm seu fluxo de acesso. A exclusão administrativa de usuário **não exclui automaticamente documentos no Drive ou seus metadados**; a política de retenção e eventual limpeza precisa ser definida separadamente.
+
+#### Verificação
+
+```powershell
+node --test tests/*.test.mjs
+```
+
+Os testes de cadastro simulam Drive/Sheets e verificam falhas e retomadas sem dados reais. A validação hospedada deve usar arquivos sintéticos: confirme PF, PJ, limite máximo, falha/reenvio e conta bloqueada enquanto pendente. Dois arquivos de 5 MiB geram aproximadamente 13,4 MiB de Base64; a viabilidade desse payload no Web App precisa ser verificada após implantação, reduzindo os limites se necessário.
 
 ## 3. Publicar no GitHub Pages
 

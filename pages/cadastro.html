@@ -12,7 +12,7 @@
       <img class="senai-logo login-logo" src="../design/brand/logo_senai_fiems.png" alt="SENAI FIEMS">
       <p class="eyebrow">Portal de serviços</p>
       <h1 class="page-heading">Crie seu acesso</h1>
-      <p class="page-lead">Cadastre seus dados para solicitar serviços de análise de sementes.</p>
+      <p class="page-lead">Cadastre seus dados para solicitar os serviços do laboratório.</p>
 
       <div id="cadastro-status" class="status" role="alert"></div>
 
@@ -26,7 +26,7 @@
             </label>
             <label class="choice profile-choice profile-choice--cliente">
               <input type="radio" name="tipoUsuario" value="CLIENTE">
-              <span><strong>Cliente</strong><small>Envie solicitações e cadastre sua empresa.</small></span>
+              <span><strong>Cliente</strong><small>Envie solicitações como pessoa física ou jurídica.</small></span>
             </label>
           </div>
         </fieldset>
@@ -36,10 +36,18 @@
           <small class="error-message"></small>
         </div>
         <section id="cliente-cadastro" hidden>
-          <h2 class="section-title">Dados da empresa</h2>
+          <div class="field">
+            <label for="tipo-pessoa">Tipo de pessoa <span>*</span></label>
+            <select id="tipo-pessoa" name="tipoPessoa">
+              <option value="">Selecione</option>
+              <option value="FISICA">Pessoa física</option>
+              <option value="JURIDICA">Pessoa jurídica</option>
+            </select>
+          </div>
+          <h2 class="section-title" id="cliente-dados-titulo">Dados do cliente</h2>
           <div class="cadastro-cliente-grid">
-            <div class="cadastro-cliente-linha cadastro-cliente-linha--razao"><div class="field"><label>Razão Social <span>*</span></label><input name="razaoSocial" autocomplete="organization"></div></div>
-            <div class="cadastro-cliente-linha"><div class="field"><label>Nome Fantasia <span>*</span></label><input name="nomeFantasia"></div></div>
+            <div class="cadastro-cliente-linha cadastro-cliente-linha--razao" data-empresa-linha><div class="field"><label>Razão Social <span>*</span></label><input name="razaoSocial" autocomplete="organization"></div></div>
+            <div class="cadastro-cliente-linha" data-empresa-linha><div class="field"><label>Nome Fantasia <span>*</span></label><input name="nomeFantasia"></div></div>
             <div class="cadastro-cliente-linha"><div class="field"><label>Endereço <span>*</span></label><input name="endereco" autocomplete="street-address"></div></div>
             <div class="cadastro-cliente-linha cadastro-cliente-linha--tripla">
               <div class="field"><label for="cidade">Cidade <span>*</span></label><input id="cidade" name="cidade" list="cidades-brasil" autocomplete="address-level2"><small>Selecione uma sugestão ou digite a cidade.</small></div>
@@ -47,8 +55,8 @@
               <div class="field"><label for="cep">CEP <span>*</span></label><input id="cep" name="cep" inputmode="numeric" autocomplete="postal-code" placeholder="00.000-000"></div>
             </div>
             <div class="cadastro-cliente-linha cadastro-cliente-linha--tripla">
-              <div class="field"><label for="cpf-cnpj">CPF / CNPJ <span>*</span></label><input id="cpf-cnpj" name="cpfCnpj" inputmode="numeric" placeholder="000.000.000-00"></div>
-              <div class="field"><label for="inscricao-estadual-rg">Inscrição Estadual / RG <span>*</span></label><input id="inscricao-estadual-rg" name="inscricaoEstadualRg" placeholder="00.000.000-0"></div>
+              <div class="field"><label for="cpf-cnpj" id="cpf-cnpj-label">CPF / CNPJ <span>*</span></label><input id="cpf-cnpj" name="cpfCnpj" inputmode="numeric" placeholder="000.000.000-00"></div>
+              <div class="field"><label for="inscricao-estadual-rg" id="inscricao-label">Inscrição Estadual / RG <span>*</span></label><input id="inscricao-estadual-rg" name="inscricaoEstadualRg" placeholder="00.000.000-0"></div>
               <div class="field"><label for="renasem">RENASEM</label><input id="renasem" name="renasem"><small>Aplicável a ensaios de sementes.</small></div>
             </div>
             <div class="cadastro-cliente-linha cadastro-cliente-linha--tripla">
@@ -77,6 +85,24 @@
           <input id="confirmar-senha" name="confirmarSenha" type="password" minlength="8" autocomplete="new-password" required>
           <small class="error-message"></small>
         </div>
+        <section id="documentos-cadastro" class="cadastro-documentos" aria-labelledby="documentos-titulo" hidden>
+          <h2 class="section-title" id="documentos-titulo">Documentos</h2>
+          <p class="documents-help" id="documentos-ajuda">Envie os dois documentos obrigatórios para concluir o cadastro. Aceitamos PDF, JPG/JPEG ou PNG, com até 5 MB por arquivo. Um arquivo por campo, total de dois arquivos.</p>
+          <div class="field-grid">
+            <div class="field document-upload" data-documento-campo>
+              <label for="documento-principal" data-documento-rotulo>Documento com foto <span>*</span></label>
+              <input id="documento-principal" name="documentoPrincipal" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" aria-describedby="documentos-ajuda documento-principal-status" disabled>
+              <small id="documento-principal-status" data-documento-status aria-live="polite">Nenhum arquivo selecionado.</small>
+              <button class="button secondary document-remove" data-documento-remover type="button" hidden>Remover arquivo</button>
+            </div>
+            <div class="field document-upload" data-documento-campo>
+              <label for="documento-complementar" data-documento-rotulo>Documento complementar <span>*</span></label>
+              <input id="documento-complementar" name="documentoComplementar" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" aria-describedby="documentos-ajuda documento-complementar-status" disabled>
+              <small id="documento-complementar-status" data-documento-status aria-live="polite">Nenhum arquivo selecionado.</small>
+              <button class="button secondary document-remove" data-documento-remover type="button" hidden>Remover arquivo</button>
+            </div>
+          </div>
+        </section>
         <button class="button primary" type="submit">Criar acesso</button>
       </form>
 
@@ -88,6 +114,8 @@
     <script src="../js/config.js"></script>
     <script src="../components/componentes.js"></script>
     <script src="../js/auth.js"></script>
+    <script src="../js/validacoes.js"></script>
+    <script src="../components/upload-arquivos.js"></script>
     <script src="../js/cadastro.js"></script>
   </body>
 </html>
