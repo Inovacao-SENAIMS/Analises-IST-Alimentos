@@ -82,7 +82,7 @@
         <td data-label="Ação">
           <div class="admin-row-actions">
             <button class="button primary" type="button" data-acao="visualizar" data-id="${escapar(documento.documentoId)}">Visualizar</button>
-            <button class="button secondary" type="button" data-acao="baixar" data-id="${escapar(documento.documentoId)}">Baixar</button>
+            <button class="button docs-download-button" type="button" data-acao="baixar" data-id="${escapar(documento.documentoId)}">Baixar</button>
           </div>
         </td>
       </tr>
