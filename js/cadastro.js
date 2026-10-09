@@ -130,7 +130,7 @@
   function adicionarContato() {
     const item = document.createElement('fieldset');
     item.className = 'contact-card';
-    item.innerHTML = `<legend>Contato</legend><div class="field-grid"><div class="field"><label>Nome *</label><input name="contatoNome"></div><div class="field"><label>CPF *</label><input name="contatoCpf"></div><div class="field"><label>E-mail *</label><input name="contatoEmail" type="email"></div><div class="field"><label>Telefone *</label><input name="contatoTelefone"></div><div class="field"><label>Cargo *</label><input name="contatoCargo"></div><div class="field"><label>Departamento *</label><input name="contatoDepartamento"></div></div><div class="check-grid"><label class="choice"><input type="checkbox" name="recebeNotaFiscalBoleto"> Envio de nota fiscal e boleto</label><label class="choice"><input type="checkbox" name="recebeProposta"> Envio de proposta</label><label class="choice"><input type="checkbox" name="recebeRelatorio"> Envio de relatório</label></div><button class="button secondary remover-contato" type="button">Remover contato</button>`;
+    item.innerHTML = `<legend>Contato</legend><div class="field-grid"><div class="field"><label>Nome</label><input name="contatoNome"></div><div class="field"><label>CPF</label><input name="contatoCpf"></div><div class="field"><label>E-mail</label><input name="contatoEmail" type="email"></div><div class="field"><label>Telefone</label><input name="contatoTelefone"></div><div class="field"><label>Cargo</label><input name="contatoCargo"></div><div class="field"><label>Departamento</label><input name="contatoDepartamento"></div></div><div class="check-grid"><label class="choice"><input type="checkbox" name="recebeNotaFiscalBoleto"> Envio de nota fiscal e boleto</label><label class="choice"><input type="checkbox" name="recebeProposta"> Envio de proposta</label><label class="choice"><input type="checkbox" name="recebeRelatorio"> Envio de relatório</label></div><button class="button secondary remover-contato" type="button">Remover contato</button>`;
     item.querySelectorAll('.check-grid .choice').forEach((opcao) => opcao.classList.add('contact-purpose'));
     const remover = item.querySelector('.remover-contato');
     remover.classList.add('contact-remove-button');
@@ -180,8 +180,18 @@
       if (!['FISICA', 'JURIDICA'].includes(payload.tipoPessoa) || somenteNumeros(form.cpfCnpj.value).length !== tamanhoDocumento || !Validacoes.validarCpfCnpj(form.cpfCnpj.value)) { mostrarStatus('Informe um CPF ou CNPJ válido para o tipo de pessoa selecionado.'); return; }
       const camposObrigatorios = camposCliente.filter((nome) => payload.tipoPessoa === 'JURIDICA' || !camposEmpresa.includes(nome));
       payload.cliente = Object.fromEntries(camposCliente.concat('renasem').map((nome) => [nome, form.elements[nome].disabled ? '' : form.elements[nome].value.trim()]));
-      payload.contatos = Array.from(lista.children).map((item) => ({ nome: item.querySelector('[name="contatoNome"]').value.trim(), cpf: item.querySelector('[name="contatoCpf"]').value.trim(), email: item.querySelector('[name="contatoEmail"]').value.trim(), telefone: item.querySelector('[name="contatoTelefone"]').value.trim(), cargo: item.querySelector('[name="contatoCargo"]').value.trim(), departamento: item.querySelector('[name="contatoDepartamento"]').value.trim(), recebeNotaFiscalBoleto: item.querySelector('[name="recebeNotaFiscalBoleto"]').checked, recebeProposta: item.querySelector('[name="recebeProposta"]').checked, recebeRelatorio: item.querySelector('[name="recebeRelatorio"]').checked }));
-      if (!camposObrigatorios.every((nome) => payload.cliente[nome]) || !payload.contatos.length || !payload.contatos.every((contato) => contato.nome && contato.cpf && contato.email && contato.telefone && contato.cargo && contato.departamento && (contato.recebeNotaFiscalBoleto || contato.recebeProposta || contato.recebeRelatorio))) { mostrarStatus('Preencha os dados obrigatórios e ao menos um contato completo com finalidade.'); return; }
+      payload.contatos = Array.from(lista.children).map((item) => ({
+        nome: item.querySelector('[name="contatoNome"]').value.trim(),
+        cpf: item.querySelector('[name="contatoCpf"]').value.trim(),
+        email: item.querySelector('[name="contatoEmail"]').value.trim(),
+        telefone: item.querySelector('[name="contatoTelefone"]').value.trim(),
+        cargo: item.querySelector('[name="contatoCargo"]').value.trim(),
+        departamento: item.querySelector('[name="contatoDepartamento"]').value.trim(),
+        recebeNotaFiscalBoleto: item.querySelector('[name="recebeNotaFiscalBoleto"]').checked,
+        recebeProposta: item.querySelector('[name="recebeProposta"]').checked,
+        recebeRelatorio: item.querySelector('[name="recebeRelatorio"]').checked
+      })).filter((contato) => contato.nome || contato.cpf || contato.email || contato.telefone || contato.cargo || contato.departamento || contato.recebeNotaFiscalBoleto || contato.recebeProposta || contato.recebeRelatorio);
+      if (!camposObrigatorios.every((nome) => payload.cliente[nome])) { mostrarStatus('Preencha os dados obrigatórios do cadastro.'); return; }
       payload.cadastroId = identificadorTentativa(payload.email);
     }
     enviando = true;

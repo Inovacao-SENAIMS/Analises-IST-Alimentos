@@ -72,6 +72,16 @@ test('PF conclui somente com dois documentos e registra metadados privados', () 
   assert.equal(e.run(p).sucesso, true); assert.equal(e.row('Usuarios').estado_documental, 'CONCLUIDO'); assert.equal(e.row('Usuarios').ativo, true);
   assert.equal(e.state.files.size, 2); assert.equal(e.state.sheets.DocumentosUsuarios.data.length, 3); assert.equal(e.row('Clientes').razao_social, p.nome);
 });
+test('cliente conclui cadastro sem contatos de referencia', () => {
+  for (const contatos of [[], undefined]) {
+    const e = environment(); const p = payload();
+    if (contatos === undefined) delete p.contatos; else p.contatos = contatos;
+    assert.equal(e.run(p).sucesso, true);
+    assert.equal(e.row('Usuarios').ativo, true);
+    assert.equal(e.state.sheets.Clientes.data.length, 2);
+    assert.equal(e.state.sheets.ContatosClientes.data.length, 1);
+  }
+});
 test('PJ exige documento do RT e ART', () => {
   const e = environment(); const p = payload('JURIDICA'); p.documentos[1].categoria = 'COMPROVANTE_RESIDENCIA';
   assert.equal(e.run(p).sucesso, false); assert.equal(e.state.files.size, 0);

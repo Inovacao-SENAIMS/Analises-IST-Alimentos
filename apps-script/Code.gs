@@ -248,11 +248,6 @@ function camposPreenchidos_(dados, campos) {
   return campos.every(function (campo) { return String(dados && dados[campo] || '').trim(); });
 }
 
-function contatoValido_(contato) {
-  return camposPreenchidos_(contato, ['nome', 'cpf', 'email', 'telefone', 'cargo', 'departamento']) &&
-    (contato.recebeNotaFiscalBoleto || contato.recebeProposta || contato.recebeRelatorio);
-}
-
 function cadastrarUsuarioNovo_(dados) {
   dados = dados || {};
   const nome = String(dados.nome || '').trim();
@@ -262,10 +257,9 @@ function cadastrarUsuarioNovo_(dados) {
   if (nome.length < 2 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || senha.length < 8) return falha_('Informe nome, e-mail valido e senha com pelo menos 8 caracteres.');
   if (['COLABORADOR_SENAI', 'CLIENTE'].indexOf(tipoUsuario) < 0) return falha_('Selecione o tipo de usuario.');
   const cliente = dados.cliente;
-  const contatos = dados.contatos;
   const camposCliente = ['endereco', 'cidade', 'estado', 'cep', 'telefone', 'cpfCnpj', 'inscricaoEstadualRg'];
   if (dados.tipoPessoa === 'JURIDICA') camposCliente.push('razaoSocial', 'nomeFantasia', 'ramoAtividade', 'numeroFuncionarios');
-  if (tipoUsuario === 'CLIENTE' && (!camposPreenchidos_(cliente, camposCliente) || !Array.isArray(contatos) || !contatos.length || !contatos.every(contatoValido_))) return falha_('Preencha os dados obrigatorios da empresa e ao menos um contato com finalidade.');
+  if (tipoUsuario === 'CLIENTE' && !camposPreenchidos_(cliente, camposCliente)) return falha_('Preencha os dados obrigatorios da empresa.');
   if (tipoUsuario === 'CLIENTE') return cadastrarClienteDocumentado_(dados, nome, email, senha);
   const lock = LockService.getScriptLock();
   lock.waitLock(30000);

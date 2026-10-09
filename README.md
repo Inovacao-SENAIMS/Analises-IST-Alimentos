@@ -136,7 +136,7 @@ Clientes: usuario_email | razao_social | nome_fantasia | renasem | endereco | ci
 ContatosClientes: usuario_email | nome | cpf | email | telefone | cargo | departamento | recebe_nota_fiscal_boleto | recebe_proposta | recebe_relatorio | data_cadastro
 ```
 
-Clientes escolhem Pessoa física ou Pessoa jurídica. Pessoa física informa nome completo, CPF, RG, endereço e contato; razão social, nome fantasia, ramo de atividade e número de funcionários se aplicam apenas à pessoa jurídica. RENASEM permanece opcional, aplicável a ensaios de sementes. Cada contato precisa ter ao menos uma finalidade. As abas são criadas pelo Apps Script no primeiro cadastro de Cliente; após atualizar os dois arquivos `.gs`, publique uma nova versão do Web App `/exec`.
+Clientes escolhem Pessoa física ou Pessoa jurídica. Pessoa física informa nome completo, CPF, RG, endereço e contato; razão social, nome fantasia, ramo de atividade e número de funcionários se aplicam apenas à pessoa jurídica. RENASEM permanece opcional, aplicável a ensaios de sementes. Os contatos são opcionais para o Cliente e servem como informação de referência; contatos em branco não são gravados. As abas são criadas pelo Apps Script no primeiro cadastro de Cliente; após atualizar os dois arquivos `.gs`, publique uma nova versão do Web App `/exec`.
 
 ### Documentos obrigatórios no cadastro
 

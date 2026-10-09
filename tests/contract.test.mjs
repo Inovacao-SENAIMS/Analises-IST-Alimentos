@@ -388,11 +388,20 @@ test('contatos possuem ações com ícones e finalidades sem contorno', () => {
   assert.match(css, /\.contact-add-button/);
   assert.match(css, /\.contact-remove-button/);
   assert.match(css, /\.contact-purpose[^}]*border:\s*0/);
+  assert.doesNotMatch(script, /<label>(?:Nome|CPF|E-mail|Telefone|Cargo|Departamento) \*<\/label>/);
+  assert.match(script, /filter\(\(contato\) => contato\.nome/);
+  assert.doesNotMatch(script, /ao menos um contato completo com finalidade/);
 });
 
 test('bloco de contatos mantém respiro antes dos dados de acesso', () => {
   const css = readFileSync(join(root, 'css/style.css'), 'utf8');
   assert.match(css, /#cliente-cadastro[^}]*margin-bottom/);
+});
+
+test('cabeçalhos do cadastro têm marcador e respiro entre seções', () => {
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(css, /\.cadastro-card \.section-title::before/);
+  assert.match(css, /#cliente-cadastro \.section-title \{ margin-top:/);
 });
 
 test('dados da empresa organizam linhas, sugestões e máscaras brasileiras', () => {
