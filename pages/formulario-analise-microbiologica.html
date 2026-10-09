@@ -26,6 +26,15 @@
               <p class="section-description">Todos os campos desta seção são obrigatórios.</p>
             </div>
           </div>
+          <fieldset class="field">
+            <legend class="legend-label">Origem da Solicitação <span>*</span></legend>
+            <div class="radio-group">
+              <label class="choice"><input type="radio" name="origem" value="WhatsApp" required>WhatsApp</label>
+              <label class="choice"><input type="radio" name="origem" value="QR Code (Recepção)">QR Code (Recepção)</label>
+              <label class="choice"><input type="radio" name="origem" value="E-mail">E-mail</label>
+            </div>
+            <small class="error-message"></small>
+          </fieldset>
           <div class="field-grid">
             <div class="field">
               <label for="razao-social">Razão Social <span>*</span></label>
@@ -60,18 +69,18 @@
               <small class="error-message"></small>
             </div>
             <div class="field">
-              <label for="lote-micro">Lote <span>*</span></label>
-              <input id="lote-micro" name="lote" required>
+              <label for="lote-micro">Lote</label>
+              <input id="lote-micro" name="lote">
               <small class="error-message"></small>
             </div>
             <div class="field">
-              <label for="lacre">Lacre <span>*</span></label>
-              <input id="lacre" name="lacre" required>
+              <label for="lacre">Lacre</label>
+              <input id="lacre" name="lacre">
               <small class="error-message"></small>
             </div>
             <div class="field">
-              <label for="data-validade">Data de validade <span>*</span></label>
-              <input id="data-validade" name="dataValidade" type="date" required>
+              <label for="data-validade">Data de validade</label>
+              <input id="data-validade" name="dataValidade" type="date">
               <small class="error-message"></small>
             </div>
             <div class="field">
@@ -85,8 +94,8 @@
               <small class="error-message"></small>
             </div>
             <div class="field">
-              <label for="local-coleta">Local da coleta <span>*</span></label>
-              <input id="local-coleta" name="localColeta" required>
+              <label for="local-coleta">Local da coleta</label>
+              <input id="local-coleta" name="localColeta">
               <small class="error-message"></small>
             </div>
             <div class="field">

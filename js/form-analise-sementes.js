@@ -22,9 +22,7 @@
   let ultimoComprovante = null;
 
   function prepararComprovante(dados, solicitacaoId) {
-    const titulo = apiAction === 'salvarSolicitacaoSementesR08'
-      ? 'Solicitação de Análise de Sementes R.08'
-      : 'Solicitação de Análise de Sementes';
+    const titulo = 'Solicitação de Análise de Sementes';
     return {
       solicitacaoId,
       titulo,

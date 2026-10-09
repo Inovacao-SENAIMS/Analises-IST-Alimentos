@@ -88,29 +88,31 @@
 - [ ] FQ080 - Sólidos Totais Dissolvidos
 - [ ] FQ081 - Sólidos Totais Suspensos
 - [ ] FQ065 - Turbidez
+- [ ] Subcontratado - Metais Pesados
 
 ### 4.2 Ensaios para Carnes, Pescados e Derivados
 
-- [ ] FQ076 - Alcalinidade
-- [ ] FQ064 - Cor aparente
-- [ ] FQ085 - Cloreto
-- [ ] FQ066A - Cloro Residual Livre
-- [ ] FQ066B - Cloro Total
-- [ ] FQ069 - Condutividade
-- [ ] FQ074 - DBO - Demanda Bioquímica de Oxigênio
-- [ ] FQ075 - DQO - Demanda Química de Oxigênio
-- [ ] FQ070 - Dureza
-- [ ] FQ078 - Fósforo
-- [ ] FQ084 - Matéria Orgânica
-- [ ] FQ071 - Nitrito
-- [ ] FQ072 - Nitrato
-- [ ] FQ073 - Óleos e Graxas
-- [ ] FQ067 - pH
-- [ ] FQ083 - Sólidos Sedimentáveis
-- [ ] FQ080 - Sólidos Totais Dissolvidos
-- [ ] FQ081 - Sólidos Totais Suspensos
-- [ ] FQ065 - Turbidez
-- [ ] Subcontratado - Metais pesados
+- [ ] FQ0008 - Ácido Sórbico e/ou Sorbato
+- [ ] FQ013 - Amido - Quantitativo
+- [ ] FQ013A - Amido - Qualitativo
+- [ ] FQ016 - Atividade de Água
+- [ ] FQ018 - Bases Voláteis Totais
+- [ ] FQ019 - Cálcio (base seca)
+- [ ] FQ104 - Características Organolépticas
+- [ ] FQ096 - Carboidratos
+- [ ] FQ022 - Cloreto de Sódio
+- [ ] FQ032 - Desglaciamento
+- [ ] FQ058 - Gordura / Lipídios
+- [ ] FQ050 - Índice de Peróxido
+- [ ] FQ064 - Nitrato
+- [ ] FQ065 - Nitrito
+- [ ] FQ071 - pH
+- [ ] FQ107 Subcontratado - Potássio
+- [ ] FQ075 - Proteína
+- [ ] FQ081 - Relação Umidade/Proteína
+- [ ] FQ082 - Resíduo Mineral Fixo (cinzas)
+- [ ] FQ108 Subcontratado - Sódio
+- [ ] FQ090 - Umidade
 
 ### 4.3 Ensaios para Leite, Ovos e Derivados
 
@@ -133,7 +135,7 @@
 - [ ] FQ043 - Índice Crioscópico
 - [ ] FQ050 - Índice de Peróxidos
 - [ ] FQ126 - Insolúveis
-- [ ] FQ058 - Matéria Gorda/ Lipídios
+- [ ] FQ058 - Matéria Gorda / Lipídios
 - [ ] FQ060 - Matéria Gorda no Extrato Seco
 - [ ] FQ070 - Peroxidase
 - [ ] FQ071 - pH
@@ -192,7 +194,6 @@
 - [ ] FQ043a - Proteína (Base Seca)
 - [ ] FQ046 - Umidade
 - [ ] FQ045 - Resíduo Mineral (Cinzas)
-- [ ] FQ046 - Umidade
 - [ ] FQ090 - Valor Calórico/ Energético (Cálculo)
 - [ ] FQ091 - Sólidos Solúveis Totais (°Brix)
 - [ ] FQ099 - Teste de Rancidez

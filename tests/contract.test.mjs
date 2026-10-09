@@ -7,12 +7,14 @@ const root = process.cwd();
 const requiredFiles = [
   'index.html', 'pages/index.html', 'pages/menu.html', 'pages/formulario-analise-sementes.html',
   'pages/formulario-analise-microbiologica.html',
-  'pages/formulario-amostras-fiscais.html', 'pages/formulario-analise-sementes-r08.html',
+  'pages/formulario-amostras-fiscais.html',
+  'pages/recebimento-amostra.html',
   'pages/cadastro.html', 'pages/dados-pessoais.html',
   'pages/administracao-usuarios.html',
   'pages/historico-solicitacoes.html',
   'css/style.css', 'js/config.js', 'js/auth.js', 'js/menu.js',
   'js/validacoes.js', 'js/form-analise-sementes.js', 'js/form-amostras-fiscais.js', 'js/cadastro.js', 'js/perfil.js',
+  'js/checklist-recebimento.js', 'js/form-recebimento-amostra.js', 'js/hex-vault.js',
   'components/componentes.js', 'components/pdf-relatorios.js',
   'apps-script/Code.gs', 'README.md'
 ];
@@ -70,7 +72,7 @@ test('físico-química condiciona campos Outros e inclui retorno nas ações', (
 
 test('contrato contém as ações e abas do fluxo', () => {
   const source = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
-  for (const token of ['doPost', 'login', 'cadastrarUsuario', 'obterPerfil', 'listarUsuariosAdmin', 'atualizarUsuarioAdmin', 'listarHistoricoSolicitacoes', 'obterDetalhesSolicitacao', 'salvarSolicitacao', 'salvarSolicitacaoSementesR08', 'salvarSolicitacaoMicrobiologica', 'salvarSolicitacaoAmostrasFiscais', 'listarOpcoes', 'Usuarios', 'Solicitacoes', 'Amostras', 'SolicitacoesMicrobiologicas', 'EnsaiosMicrobiologicos', 'SolicitacoesAmostrasFiscais', 'AmostrasFiscais', 'SolicitacoesSementesR08', 'AmostrasSementesR08', 'Client_User', 'Manager_User', 'Administrator_User']) {
+  for (const token of ['doPost', 'login', 'cadastrarUsuario', 'obterPerfil', 'listarUsuariosAdmin', 'atualizarUsuarioAdmin', 'listarHistoricoSolicitacoes', 'obterDetalhesSolicitacao', 'salvarSolicitacao', 'salvarSolicitacaoMicrobiologica', 'salvarSolicitacaoAmostrasFiscais', 'listarOpcoes', 'Usuarios', 'Solicitacoes', 'Amostras', 'SolicitacoesMicrobiologicas', 'EnsaiosMicrobiologicos', 'SolicitacoesAmostrasFiscais', 'AmostrasFiscais', 'Client_User', 'Manager_User', 'Administrator_User']) {
     assert.match(source, new RegExp(token));
   }
 });
@@ -100,12 +102,11 @@ test('cadastro e navegação usam logo, sidebar e grupos', () => {
   assert.match(perfil, /data-perfil-grupo/);
 });
 
-test('catálogo centralizado expõe os quatro serviços de análise', () => {
+test('catálogo centralizado expõe os três serviços de análise', () => {
   const config = readFileSync(join(root, 'js/config.js'), 'utf8');
   assert.match(config, /analise-sementes/);
   assert.match(config, /analise-microbiologica/);
   assert.match(config, /amostras-fiscais/);
-  assert.match(config, /analise-sementes-r08/);
 });
 
 test('catálogo de cards não contém texto com encoding corrompido', () => {
@@ -136,16 +137,68 @@ test('análise microbiológica mantém o formulário e os campos laboratoriais s
   assert.doesNotMatch(html, /Data de recebimento|Temperatura de recebimento|Análise Crítica|Situação da amostra/);
 });
 
-test('novas análises mantêm páginas, contratos e campos laboratoriais separados', () => {
+test('amostras fiscais mantêm página, contrato e campos laboratoriais separados', () => {
   const fiscal = readFileSync(join(root, 'pages/formulario-amostras-fiscais.html'), 'utf8');
   const fiscalScript = readFileSync(join(root, 'js/form-amostras-fiscais.js'), 'utf8');
-  const r08 = readFileSync(join(root, 'pages/formulario-analise-sementes-r08.html'), 'utf8');
   assert.match(fiscal, /Razão Social|RazÃ£o Social/);
   assert.match(fiscal, /Fiscal Representativo|Fiscal Representativo/);
   assert.match(fiscalScript, /salvarSolicitacaoAmostrasFiscais/);
-  assert.match(r08, /data-api-action="salvarSolicitacaoSementesR08"/);
   assert.doesNotMatch(fiscal, /Data do Recebimento|Hora do Recebimento|Responsável pelo Recebimento/);
-  assert.doesNotMatch(r08, /Peso amostra|Análise crítica|Protocolo da amostra/);
+});
+
+test('checklist de recebimento é um serviço dedicado', () => {
+  const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
+  const modulo = readFileSync(join(root, 'js/checklist-recebimento.js'), 'utf8');
+  const pagina = readFileSync(join(root, 'pages/recebimento-amostra.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/form-recebimento-amostra.js'), 'utf8');
+  const config = readFileSync(join(root, 'js/config.js'), 'utf8');
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  assert.match(componentes, /renderizarChecklistRecebimento/);
+  assert.match(modulo, /listarHistoricoSolicitacoes/);
+  assert.match(modulo, /salvarChecklistRecebimento/);
+  assert.match(pagina, /data-componente="checklist-recebimento"/);
+  assert.match(pagina, /\.\.\/js\/checklist-recebimento\.js/);
+  assert.match(script, /ChecklistRecebimento\.enviar/);
+  assert.match(config, /recebimento-amostra/);
+  assert.match(config, /categoria: 'recebimento'/);
+  for (const file of [
+    'pages/formulario-analise-sementes.html',
+    'pages/formulario-analise-microbiologica.html',
+    'pages/formulario-amostras-fiscais.html',
+    'pages/formulario-analise-fisico-quimica.html'
+  ]) {
+    assert.doesNotMatch(readFileSync(join(root, file), 'utf8'), /checklist-recebimento/);
+  }
+  assert.match(api, /case 'salvarChecklistRecebimento'/);
+  assert.match(api, /function salvarChecklistRecebimento[\s\S]*podeCriarSolicitacao_/);
+  assert.match(api, /ChecklistsRecebimento/);
+});
+
+test('menu agrupa serviços de análise e de recebimento', () => {
+  const menu = readFileSync(join(root, 'js/menu.js'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(menu, /Serviços de Análise/);
+  assert.match(menu, /Serviços de Recebimento/);
+  assert.match(menu, /services-group/);
+  assert.match(css, /\.services-group/);
+});
+
+test('menu possui o efeito hexagonal-vault', () => {
+  const pagina = readFileSync(join(root, 'pages/menu.html'), 'utf8');
+  const efeito = readFileSync(join(root, 'js/hex-vault.js'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(pagina, /data-hex-vault/);
+  assert.match(pagina, /\.\.\/js\/hex-vault\.js/);
+  assert.match(efeito, /hexagonal vault/);
+  assert.match(css, /\.hex-vault/);
+  assert.match(css, /\.hex-vault \.hex\.on/);
+});
+
+test('botões de abrir formulário usam efeito border-beam', () => {
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(css, /@property --beam-angle/);
+  assert.match(css, /\.form-card \.button::before/);
+  assert.match(css, /border-beam-spin/);
 });
 
 test('administração de usuários possui rota protegida e não expõe senhas', () => {
@@ -190,7 +243,6 @@ test('solicitações gravadas disparam aviso aos contatos do laboratório', () =
   assert.match(api, /Logger\.log/);
   assert.match(api, /notificarNovaSolicitacao_\(id, tipoSolicitacao/);
   assert.match(api, /'IST', 'Análise de Sementes'/);
-  assert.match(api, /'SEMR08', 'Análise de Sementes R\.08'/);
   for (const tipo of ['Amostras Fiscais - Alimentos', 'Análise Microbiológica', 'Análise Físico-Química']) {
     assert.match(api, new RegExp(`notificarNovaSolicitacao_\\(id, '${tipo}'`));
   }
@@ -205,7 +257,6 @@ test('histórico possui rota, filtro protegido e detalhes públicos', () => {
   assert.match(script, /listarHistoricoSolicitacoes/);
   assert.match(script, /obterDetalhesSolicitacao/);
   assert.match(componentes, /data-historico/);
-  assert.match(api, /SolicitacoesSementesR08/);
   assert.match(api, /SolicitacoesAmostrasFiscais/);
   assert.doesNotMatch(script, /data_recebimento|peso_amostra_g|senha/);
 });
@@ -425,7 +476,6 @@ test('páginas de análise e histórico carregam os recursos de relatório PDF',
     'pages/formulario-analise-sementes.html',
     'pages/formulario-analise-microbiologica.html',
     'pages/formulario-amostras-fiscais.html',
-    'pages/formulario-analise-sementes-r08.html',
     'pages/historico-solicitacoes.html'
   ];
   for (const file of paginas) {

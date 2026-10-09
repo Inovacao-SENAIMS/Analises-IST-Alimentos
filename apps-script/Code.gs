@@ -13,19 +13,17 @@ const ABAS = {
   ENSAIOS_FISICO_QUIMICOS: 'EnsaiosFisicoQuimicos',
   SOLICITACOES_FISCAIS: 'SolicitacoesAmostrasFiscais',
   AMOSTRAS_FISCAIS: 'AmostrasFiscais',
-  SOLICITACOES_R08: 'SolicitacoesSementesR08',
-  AMOSTRAS_R08: 'AmostrasSementesR08',
   CLIENTES: 'Clientes',
   CONTATOS_CLIENTES: 'ContatosClientes',
-  DOCUMENTOS_USUARIOS: 'DocumentosUsuarios'
+  DOCUMENTOS_USUARIOS: 'DocumentosUsuarios',
+  CHECKLISTS_RECEBIMENTO: 'ChecklistsRecebimento'
 };
 
 const FONTES_HISTORICO = [
   { tipo: 'analise-sementes', titulo: 'Análise de Sementes', solicitacoes: ABAS.SOLICITACOES, amostras: ABAS.AMOSTRAS },
   { tipo: 'analise-microbiologica', titulo: 'Análise Microbiológica', solicitacoes: ABAS.SOLICITACOES_MICRO, ensaios: ABAS.ENSAIOS_MICRO },
   { tipo: 'analise-fisico-quimica', titulo: 'Análise Físico-Química', solicitacoes: ABAS.SOLICITACOES_FISICO_QUIMICAS, ensaios: ABAS.ENSAIOS_FISICO_QUIMICOS },
-  { tipo: 'amostras-fiscais', titulo: 'Amostras Fiscais - Alimentos', solicitacoes: ABAS.SOLICITACOES_FISCAIS, amostras: ABAS.AMOSTRAS_FISCAIS },
-  { tipo: 'analise-sementes-r08', titulo: 'Análise de Sementes R.08', solicitacoes: ABAS.SOLICITACOES_R08, amostras: ABAS.AMOSTRAS_R08 }
+  { tipo: 'amostras-fiscais', titulo: 'Amostras Fiscais - Alimentos', solicitacoes: ABAS.SOLICITACOES_FISCAIS, amostras: ABAS.AMOSTRAS_FISCAIS }
 ];
 
 const GRUPOS = {
@@ -91,8 +89,8 @@ function doPost(e) {
         return responder_(salvarSolicitacaoFisicoQuimica(entrada.dados, entrada.token));
       case 'salvarSolicitacaoAmostrasFiscais':
         return responder_(salvarSolicitacaoAmostrasFiscais(entrada.dados, entrada.token));
-      case 'salvarSolicitacaoSementesR08':
-        return responder_(salvarSolicitacaoSementesR08(entrada.dados, entrada.token));
+      case 'salvarChecklistRecebimento':
+        return responder_(salvarChecklistRecebimento(entrada.dados, entrada.token));
       default:
         return responder_(falha_('Operação não reconhecida.'));
     }
@@ -513,10 +511,6 @@ function camposPublicos_(fonte, tabela, linha) {
       ['Requerente', 'requerente'], ['RENASEM (Requerente)', 'renasem_requerente'], ['Pagante', 'pagante'],
       ['CPF/CNPJ', 'cpf_cnpj'], ['Finalidade', 'finalidade'], ['Observações', 'observacoes']
     ],
-    'analise-sementes-r08': [
-      ['Requerente', 'requerente'], ['RENASEM (Requerente)', 'renasem_requerente'], ['Pagante', 'pagante'],
-      ['CPF/CNPJ', 'cpf_cnpj'], ['Finalidade', 'finalidade'], ['Observações', 'observacoes']
-    ],
     'analise-microbiologica': [
       ['Razão Social', 'razao_social'], ['CNPJ/CPF', 'cpf_cnpj'], ['Responsável', 'responsavel'],
       ['Tipo de amostra', 'tipo_amostra'], ['Lote', 'lote'], ['Finalidade', 'finalidade']
@@ -680,10 +674,6 @@ function salvarSolicitacao(dados, token) {
   return salvarSolicitacaoSementes_(dados, token, ABAS.SOLICITACOES, ABAS.AMOSTRAS, 'IST', 'Análise de Sementes');
 }
 
-function salvarSolicitacaoSementesR08(dados, token) {
-  return salvarSolicitacaoSementes_(dados, token, ABAS.SOLICITACOES_R08, ABAS.AMOSTRAS_R08, 'SEMR08', 'Análise de Sementes R.08');
-}
-
 function salvarSolicitacaoSementes_(dados, token, nomeAbaSolicitacoes, nomeAbaAmostras, prefixo, tipoSolicitacao) {
   const usuario = validarToken_(token);
   const permissao = podeCriarSolicitacao_(usuario);
@@ -707,6 +697,7 @@ function salvarSolicitacaoSementes_(dados, token, nomeAbaSolicitacoes, nomeAbaAm
     solicitacao_id: id,
     data_hora_envio: agora,
     usuario: usuario.email,
+    origem: dados.origem,
     requerente: dados.requerente,
     renasem_requerente: dados.renasemRequerente,
     pagante: dados.pagante,
@@ -784,6 +775,7 @@ function salvarSolicitacaoAmostrasFiscais(dados, token) {
     solicitacao_id: id,
     data_hora_envio: agora,
     usuario: usuario.email,
+    origem: dados.origem,
     protocolo_entrada: dados.protocoloEntrada,
     numero_protocolo: dados.numeroProtocolo,
     razao_social: dados.razaoSocial,
@@ -856,6 +848,7 @@ function salvarSolicitacaoMicrobiologica(dados, token) {
     solicitacao_id: id,
     data_hora_envio: agora,
     usuario: usuario.email,
+    origem: dados.origem,
     razao_social: dados.razaoSocial,
     cpf_cnpj: dados.cpfCnpj,
     responsavel: dados.responsavel,
@@ -914,4 +907,50 @@ function salvarSolicitacaoFisicoQuimica(dados, token) {
   (dados.ensaios || []).forEach(function (ensaio, indice) { ensaios.aba.appendRow(ensaios.cabecalho.map(function (coluna) { return ({ solicitacao_id: id, numero: indice + 1, grupo: ensaio.grupo, codigo: ensaio.codigo, ensaio: ensaio.ensaio })[coluna] || ''; })); });
   notificarNovaSolicitacao_(id, 'Análise Físico-Química', usuario.email, agora);
   return sucesso_('Solicitação físico-química salva.', { solicitacaoId: id });
+}
+
+function salvarChecklistRecebimento(dados, token) {
+  const usuario = validarToken_(token);
+  const permissao = podeCriarSolicitacao_(usuario);
+  if (permissao) return permissao;
+  if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
+
+  dados = dados || {};
+  const tipo = String(dados.tipoReferencia || '').trim();
+  const solicitacaoId = String(dados.solicitacaoId || '').trim();
+  const fonte = fonteHistorico_(tipo);
+  if (!fonte || !solicitacaoId) return falha_('Informe a referência e o número da análise.');
+
+  const tabela = valoresComCabecalho_(fonte.solicitacoes);
+  const existe = tabela.linhas.some(function (linha) {
+    return String(valorLinha_(tabela, linha, 'solicitacao_id')) === solicitacaoId;
+  });
+  if (!existe) return falha_('Solicitação vinculada não encontrada.');
+
+  const agora = new Date();
+  const id = 'CHK-' + Utilities.formatDate(agora, Session.getScriptTimeZone() || 'America/Cuiaba', 'yyyyMMdd-HHmmss') + '-' + Utilities.getUuid().slice(0, 6).toUpperCase();
+  const cabecalho = ['checklist_id', 'solicitacao_id', 'tipo_referencia', 'data_recebimento', 'hora_recebimento', 'temperatura_amostra', 'quantidade_amostra', 'peso_volume', 'numero_amostra', 'situacao_amostra', 'responsavel', 'observacoes', 'usuario', 'data_registro'];
+  garantirAba_(ABAS.CHECKLISTS_RECEBIMENTO, cabecalho);
+  const registro = {
+    checklist_id: id,
+    solicitacao_id: solicitacaoId,
+    tipo_referencia: tipo,
+    data_recebimento: dados.dataRecebimento,
+    hora_recebimento: dados.hora,
+    temperatura_amostra: dados.temperatura,
+    quantidade_amostra: dados.quantidade,
+    peso_volume: dados.pesoVolume,
+    numero_amostra: dados.numeroAmostra,
+    situacao_amostra: dados.situacao,
+    responsavel: dados.responsavel,
+    observacoes: dados.observacoes,
+    usuario: usuario.email,
+    data_registro: agora
+  };
+  const alvo = valoresComCabecalho_(ABAS.CHECKLISTS_RECEBIMENTO);
+  alvo.aba.appendRow(alvo.cabecalho.map(function (coluna) {
+    return registro[coluna] === undefined ? '' : registro[coluna];
+  }));
+
+  return sucesso_('Checklist de recebimento salvo.', { checklistId: id, solicitacaoId: solicitacaoId });
 }

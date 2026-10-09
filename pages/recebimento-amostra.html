@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Recebimento de Amostra | SENAI FIEMS</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" type="image/png" href="../design/components/favicon/favicon_logo.png">
+  </head>
+  <body>
+    <div data-componente="form-header"></div>
+
+    <main class="app-shell page page--form">
+      <div data-componente="botao-voltar-menu" data-classe="form-back-button"></div>
+      <p class="eyebrow">Serviço de recebimento</p>
+      <h1 class="page-heading">Recebimento de Amostra</h1>
+      <p class="page-lead">Preencha o checklist de recebimento e vincule-o a uma solicitação existente.</p>
+      <div id="recebimento-status" class="status" role="alert"></div>
+
+      <form id="recebimento-form" novalidate>
+        <div data-componente="checklist-recebimento"></div>
+
+        <div class="form-actions">
+          <div data-componente="botao-enviar" data-id="recebimento-submit" data-texto="Registrar recebimento"></div>
+          <div data-componente="botao-limpar" data-id="recebimento-clear"></div>
+          <div data-componente="botao-voltar-menu"></div>
+        </div>
+      </form>
+
+      <div data-componente="footer"></div>
+    </main>
+
+    <script src="../js/config.js"></script>
+    <script src="../components/componentes.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/validacoes.js"></script>
+    <script src="../js/checklist-recebimento.js"></script>
+    <script src="../js/form-recebimento-amostra.js"></script>
+  </body>
+</html>

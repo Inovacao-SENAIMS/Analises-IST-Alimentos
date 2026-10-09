@@ -21,12 +21,12 @@
         <div class="section-heading">
           <span class="section-number">1</span>
           <div>
-            <h2 class="section-title">Origem e Dados do Cliente</h2>
+            <h2 class="section-title">Origem da Solicitação</h2>
             <p class="section-description">Informe o canal de contato e os dados do cliente solicitante.</p>
           </div>
         </div>
         <fieldset class="field">
-          <legend class="legend-label">Origem <span>*</span></legend>
+          <legend class="legend-label">Origem da Solicitação <span>*</span></legend>
           <div class="radio-group">
             <label class="choice"><input type="radio" name="origem" value="WhatsApp" required>WhatsApp</label>
             <label class="choice"><input type="radio" name="origem" value="QR Code (Recepção)">QR Code (Recepção)</label>
@@ -69,8 +69,8 @@
         </div>
         <div class="field-grid">
           <div class="field">
-            <label for="fq-tipo-amostra">Tipo de amostra</label>
-            <input id="fq-tipo-amostra" name="tipoAmostra">
+            <label for="fq-tipo-amostra">Tipo de amostra <span>*</span></label>
+            <input id="fq-tipo-amostra" name="tipoAmostra" required>
             <small class="error-message"></small>
           </div>
           <div class="field">
@@ -104,23 +104,23 @@
             <small class="error-message"></small>
           </div>
           <div class="field">
-            <label for="fq-data-coleta">Data da coleta</label>
-            <input id="fq-data-coleta" name="dataColeta" type="date">
+            <label for="fq-data-coleta">Data da coleta <span>*</span></label>
+            <input id="fq-data-coleta" name="dataColeta" type="date" required>
             <small class="error-message"></small>
           </div>
           <div class="field">
-            <label for="fq-hora-coleta">Hora da coleta</label>
-            <input id="fq-hora-coleta" name="horaColeta" type="time">
+            <label for="fq-hora-coleta">Hora da coleta <span>*</span></label>
+            <input id="fq-hora-coleta" name="horaColeta" type="time" required>
             <small class="error-message"></small>
           </div>
           <div class="field">
-            <label for="fq-temperatura-coleta">Temperatura da coleta (°C)</label>
-            <input id="fq-temperatura-coleta" name="temperaturaColeta" type="number">
+            <label for="fq-temperatura-coleta">Temperatura da coleta (°C) <span>*</span></label>
+            <input id="fq-temperatura-coleta" name="temperaturaColeta" type="number" required>
             <small class="error-message"></small>
           </div>
           <div class="field">
-            <label for="fq-responsavel-coleta">Responsável pela coleta</label>
-            <input id="fq-responsavel-coleta" name="responsavelColeta">
+            <label for="fq-responsavel-coleta">Responsável pela coleta <span>*</span></label>
+            <input id="fq-responsavel-coleta" name="responsavelColeta" required>
             <small class="error-message"></small>
           </div>
         </div>

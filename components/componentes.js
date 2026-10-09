@@ -11,7 +11,8 @@
     flask: '<svg viewBox="0 0 24 24" focusable="false"><path d="M9 3h6M10 3v6l-5.5 9.2A1.2 1.2 0 0 0 5.5 20h13a1.2 1.2 0 0 0 1-1.8L14 9V3"/><path d="M8 15h8"/></svg>',
     clipboard: '<svg viewBox="0 0 24 24" focusable="false"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M9 10h6M9 14h6M9 18h3"/></svg>',
     admin: '<svg viewBox="0 0 24 24" focusable="false"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg>',
-    historico: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5M8 17h3"/></svg>'
+    historico: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5M8 17h3"/></svg>',
+    recebimento: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 8h16v12H4z"/><path d="m4 8 1.5-4h13L20 8"/><path d="M10 12h4"/></svg>'
   };
 
   function renderizarIcone(nome) {
@@ -104,6 +105,92 @@
       </header>`;
   }
 
+  function renderizarChecklistRecebimento() {
+    const tipos = [
+      ['analise-sementes', 'Análise de Sementes'],
+      ['analise-microbiologica', 'Análise Microbiológica'],
+      ['analise-fisico-quimica', 'Análise Físico-Química'],
+      ['amostras-fiscais', 'Amostras Fiscais - Alimentos']
+    ];
+    const opcoesReferencia = tipos
+      .map(([valor, rotulo]) => `<option value="${valor}">${rotulo}</option>`)
+      .join('');
+    return `
+      <section class="form-section" id="checklist-recebimento">
+        <div class="section-heading">
+          <div>
+            <h2 class="section-title">Checklist de Recebimento de Amostra</h2>
+            <p class="section-description">Preenchimento opcional. Vincule o recebimento a uma solicitação existente.</p>
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <label for="checklist-referencia">Referência</label>
+            <select id="checklist-referencia" name="checklistReferencia">
+              <option value="">Selecione</option>
+              ${opcoesReferencia}
+            </select>
+            <small class="error-message"></small>
+          </div>
+          <div class="field">
+            <label for="checklist-numero-analise">Número da Análise</label>
+            <select id="checklist-numero-analise" name="checklistNumeroAnalise" disabled>
+              <option value="">Selecione a referência</option>
+            </select>
+            <small class="error-message"></small>
+          </div>
+          <div class="field">
+            <label for="checklist-data-recebimento">Data do Recebimento</label>
+            <input id="checklist-data-recebimento" name="checklistDataRecebimento" type="date">
+            <small class="error-message"></small>
+          </div>
+          <div class="field">
+            <label for="checklist-hora">Hora</label>
+            <input id="checklist-hora" name="checklistHora" type="time">
+            <small class="error-message"></small>
+          </div>
+          <div class="field">
+            <label for="checklist-temperatura">Temperatura da Amostra (ºC)</label>
+            <input id="checklist-temperatura" name="checklistTemperatura" type="number" step="0.1">
+            <small class="error-message"></small>
+          </div>
+          <div class="field">
+            <label for="checklist-quantidade">Quantidade da Amostra</label>
+            <input id="checklist-quantidade" name="checklistQuantidade">
+            <small class="error-message"></small>
+          </div>
+          <div class="field">
+            <label for="checklist-peso-volume">Peso/Volume</label>
+            <input id="checklist-peso-volume" name="checklistPesoVolume">
+            <small class="error-message"></small>
+          </div>
+          <div class="field">
+            <label for="checklist-numero-amostra">Número da Amostra</label>
+            <input id="checklist-numero-amostra" name="checklistNumeroAmostra">
+            <small class="error-message"></small>
+          </div>
+          <fieldset class="field">
+            <legend class="legend-label">Situação da Amostra</legend>
+            <div class="radio-group">
+              <label class="choice"><input type="radio" name="checklistSituacao" value="Conforme">Conforme</label>
+              <label class="choice"><input type="radio" name="checklistSituacao" value="Não Conforme">Não Conforme</label>
+            </div>
+          </fieldset>
+          <div class="field">
+            <label for="checklist-responsavel">Responsável</label>
+            <input id="checklist-responsavel" name="checklistResponsavel">
+            <small class="error-message"></small>
+          </div>
+          <div class="field full">
+            <label for="checklist-observacoes">Observações</label>
+            <textarea id="checklist-observacoes" name="checklistObservacoes"></textarea>
+            <small class="error-message"></small>
+          </div>
+        </div>
+        <small id="checklist-error" class="error-message"></small>
+      </section>`;
+  }
+
   function inicializarLayout() {
     document.querySelectorAll('[data-componente="sidebar"]').forEach((alvo) => {
       alvo.outerHTML = renderizarSidebar(alvo.dataset.paginaAtiva || 'servicos');
@@ -141,6 +228,10 @@
       alvo.outerHTML = renderizarBotaoExportarResumo(alvo.dataset.id || 'export-summary-pdf');
     });
 
+    document.querySelectorAll('[data-componente="checklist-recebimento"]').forEach((alvo) => {
+      alvo.outerHTML = renderizarChecklistRecebimento();
+    });
+
     document.querySelectorAll('[data-sidebar-toggle]').forEach((botao) => {
       botao.addEventListener('click', () => {
         document.querySelector('.sidebar')?.classList.toggle('open');
@@ -166,6 +257,7 @@
     renderizarSidebar,
     renderizarRodape,
     renderizarCabecalhoFormulario,
+    renderizarChecklistRecebimento,
     inicializarLayout
   };
 

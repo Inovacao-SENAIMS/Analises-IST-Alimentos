@@ -18,12 +18,26 @@
   const alvo = document.querySelector('[data-formularios]');
   if (!alvo) return;
 
-  alvo.innerHTML = APP_CONFIG.formularios.map((formulario) => `
+  const grupos = [
+    { titulo: 'Serviços de Análise', categoria: 'analise' },
+    { titulo: 'Serviços de Recebimento', categoria: 'recebimento' }
+  ];
+
+  const cartao = (formulario) => `
     <a class="card form-card" href="${formulario.caminho}" aria-label="Abrir ${formulario.titulo}">
       ${AppComponents.renderizarIcone(formulario.icone)}
       <h2>${formulario.titulo}</h2>
       <p>${formulario.descricao}</p>
       <span class="button primary">Abrir formulário →</span>
-    </a>
-  `).join('');
+    </a>`;
+
+  alvo.innerHTML = grupos.map((grupo) => {
+    const itens = APP_CONFIG.formularios.filter((formulario) => (formulario.categoria || 'analise') === grupo.categoria);
+    if (!itens.length) return '';
+    return `
+      <div class="services-group">
+        <h2 class="services-group-title">${grupo.titulo}</h2>
+        <div class="cards-grid">${itens.map(cartao).join('')}</div>
+      </div>`;
+  }).join('');
 })();

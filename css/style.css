@@ -176,6 +176,14 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
 .login-card .page-heading { font-size: 1.8rem; }
 .login-help { margin: 16px 0 0; color: var(--cinza-700); font-size: .85rem; line-height: 1.5; }
 .cards-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+.services-group { grid-column: 1 / -1; display: grid; gap: 16px; }
+.services-group-title { margin: 0; color: var(--azul-900); font-size: 1.45rem; font-weight: 800; letter-spacing: .01em; }
+.services-group + .services-group { position: relative; margin-top: 48px; padding-top: 42px; border-top: 1px solid var(--cinza-300); }
+.services-group + .services-group::before { position: absolute; top: -1.5px; left: 0; width: 72px; height: 3px; content: ''; border-radius: 3px; background: var(--verde-500); }
+.content-area > .content-inner { position: relative; z-index: 1; }
+.hex-vault { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; -webkit-mask-image: radial-gradient(ellipse at 50% 22%, #000 42%, transparent 84%); mask-image: radial-gradient(ellipse at 50% 22%, #000 42%, transparent 84%); }
+.hex-vault .hex { position: absolute; background: rgba(0, 82, 155, .05); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); transition: background-color .8s ease, filter .8s ease; }
+.hex-vault .hex.on { background: rgba(0, 174, 239, .4); filter: drop-shadow(0 0 7px rgba(0, 174, 239, .65)); }
 .form-card { position: relative; display: flex; flex-direction: column; gap: 14px; min-height: 285px; overflow: hidden; padding: 26px; color: #fff; background: radial-gradient(circle at 86% 8%, rgba(0, 174, 239, .26), transparent 34%), linear-gradient(145deg, #003876 0%, #00529b 58%, #00325f 100%); border: 1px solid rgba(255,255,255,.18); border-radius: 1rem; box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 18px 36px rgba(0,56,118,.16); text-decoration: none; isolation: isolate; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
 .form-card::before { position: absolute; inset: 0; z-index: -1; content: ''; border: 1px solid transparent; border-radius: inherit; background: linear-gradient(135deg, rgba(255,255,255,.6), transparent 32%, rgba(0,174,239,.4)) border-box; -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: .65; pointer-events: none; }
 .form-card::after { position: absolute; right: -46px; bottom: -58px; width: 170px; height: 170px; content: ''; border-radius: 50%; background: rgba(0,174,239,.16); filter: blur(2px); }
@@ -186,6 +194,25 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
 .form-card p { margin: 0; color: rgba(255,255,255,.82); line-height: 1.55; }
 .form-card .button { width: fit-content; margin-top: auto; color: #fff; background: linear-gradient(135deg, #e84910, #c93708); border: 0; box-shadow: 0 8px 18px rgba(0,0,0,.14); }
 .form-card .button:hover { background: linear-gradient(135deg, #f35a1f, #d9440d); }
+@property --beam-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.form-card .button { position: relative; }
+.form-card .button::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 2px;
+  content: '';
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(from var(--beam-angle), transparent 0 60%, rgba(255, 255, 255, .95) 78%, rgba(205, 233, 255, .95) 82%, transparent 90% 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: border-beam-spin 3.4s linear infinite;
+}
+@keyframes border-beam-spin { to { --beam-angle: 360deg; } }
+@media (prefers-reduced-motion: reduce) { .form-card .button::before { animation: none; } }
 .back-link { display: inline-block; margin-bottom: 18px; color: var(--azul-700); font-weight: 700; text-decoration: none; }
 .back-link.form-menu-button { display: inline-flex; align-items: center; gap: 10px; color: #fff; font-weight: 800; text-decoration: none; }
 .desktop-table-header { display: none; }
@@ -209,7 +236,7 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
 .avatar { width: 34px; height: 34px; font-size: .85rem; }
 .sidebar-logout { width: 100%; min-height: 0; border: 0; border-radius: 0; padding: 8px 0; color: var(--brand-primary); background: transparent; text-align: left; font-weight: 800; transition: color .2s ease; }
 .sidebar-logout:hover { color: var(--brand-accent-dark); }
-.content-area { display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
+.content-area { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 100vh; }
 .content-inner { display: flex; flex: 1; flex-direction: column; width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 52px 0 72px; }
 .mobile-topbar { display: none; }
 .profile-card { display: flex; align-items: flex-start; gap: 26px; max-width: 720px; padding: 30px; }
