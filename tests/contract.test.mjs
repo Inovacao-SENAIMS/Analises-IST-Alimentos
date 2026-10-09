@@ -541,6 +541,20 @@ test('botão da tabela baixa o relatório individual da solicitação', () => {
   assert.doesNotMatch(script, /carregarDetalhes\(botao\.dataset\.tipo, botao\.dataset\.id\)/);
 });
 
+test('histórico permite visualizar o relatório em modal', () => {
+  const pagina = readFileSync(join(root, 'pages/historico-solicitacoes.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/historico-solicitacoes.js'), 'utf8');
+  const pdf = readFileSync(join(root, 'components/pdf-relatorios.js'), 'utf8');
+  assert.match(pagina, /id="history-pdf-modal"/);
+  assert.match(pagina, /id="history-pdf-body"/);
+  assert.match(script, />Visualizar<\/button>/);
+  assert.match(script, /visualizarRelatorio/);
+  assert.match(script, /RelatoriosPdf\.arquivoIndividual/);
+  assert.match(script, /doc-preview-frame/);
+  assert.match(pdf, /arquivoIndividual/);
+  assert.match(pdf, /URL\.createObjectURL/);
+});
+
 test('páginas organizadas e entrada do GitHub Pages preservada', () => {
   const entrada = readFileSync(join(root, 'index.html'), 'utf8');
   assert.match(entrada, /pages\/index\.html/);

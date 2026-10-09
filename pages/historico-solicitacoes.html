@@ -73,6 +73,20 @@
       </main>
     </div>
 
+    <div class="doc-modal" id="history-pdf-modal" hidden>
+      <div class="doc-modal-backdrop" data-pdf-close></div>
+      <div class="doc-modal-panel" role="dialog" aria-modal="true" aria-labelledby="history-pdf-title">
+        <div class="doc-modal-head">
+          <strong id="history-pdf-title">Relatório</strong>
+          <div class="doc-modal-actions">
+            <button class="button primary" type="button" data-pdf-download>Baixar PDF</button>
+            <button class="button" type="button" data-pdf-close>Fechar</button>
+          </div>
+        </div>
+        <div class="doc-modal-body" id="history-pdf-body"></div>
+      </div>
+    </div>
+
     <script src="../js/config.js"></script>
     <script src="../components/componentes.js"></script>
     <script src="../js/auth.js"></script>

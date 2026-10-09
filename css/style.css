@@ -354,6 +354,11 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
 .history-table th, .history-table td { padding: 13px 12px; border-bottom: 1px solid var(--cinza-300); text-align: left; vertical-align: middle; }
 .history-table th { color: var(--azul-900); background: #f4f7fa; font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; }
 .history-table td .button { min-height: 36px; padding: 8px 12px; font-size: .8rem; }
+@media (min-width: 720px) {
+  .history-table { min-width: 1040px; }
+  .history-actions { flex-wrap: nowrap; }
+  .history-table th:last-child, .history-table td:last-child { white-space: nowrap; }
+}
 .history-status-pill { display: inline-flex; padding: 5px 9px; border-radius: 999px; color: #17663f; background: #e5f5ec; font-size: .76rem; font-weight: 800; }
 .history-received-pill { display: inline-flex; margin-left: 6px; padding: 5px 9px; border-radius: 999px; color: #0b3a66; background: #e2effb; font-size: .76rem; font-weight: 800; }
 .history-empty { margin: 24px 0 4px; color: var(--muted); text-align: center; }

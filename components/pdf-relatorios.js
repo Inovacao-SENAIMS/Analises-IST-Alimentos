@@ -114,7 +114,7 @@
     }
   }
 
-  function gerarDocumento(titulo, dados) {
+  function construirDocumento(titulo, dados) {
     if (!dados || !dados.solicitacaoId) throw new Error('Não foi possível preparar os dados do relatório.');
     const doc = obterDocumento();
     const dataEnvio = texto(dados.dataEnvio, new Date().toLocaleString('pt-BR'));
@@ -127,7 +127,17 @@
     y = escreverSecao(doc, 'Dados informados', dados.campos, y);
     escreverRelacionados(doc, dados.relacionados, y);
     escreverRodapes(doc);
-    doc.save(nomeArquivo(titulo, dados.solicitacaoId));
+    return { doc, nome: nomeArquivo(titulo, dados.solicitacaoId) };
+  }
+
+  function baixarDocumento(titulo, dados) {
+    const { doc, nome } = construirDocumento(titulo, dados);
+    doc.save(nome);
+  }
+
+  function arquivoDocumento(titulo, dados) {
+    const { doc, nome } = construirDocumento(titulo, dados);
+    return { nome, url: URL.createObjectURL(doc.output('blob')) };
   }
 
   function gerarResumo(solicitacoes, filtros) {
@@ -184,13 +194,16 @@
 
   window.RelatoriosPdf = {
     baixarComprovante(dados) {
-      return gerarDocumento('Comprovante de solicitação', dados);
+      return baixarDocumento('Comprovante de solicitação', dados);
     },
     baixarIndividual(detalhes) {
-      return gerarDocumento('Relatório individual da solicitação', detalhes);
+      return baixarDocumento('Relatório individual da solicitação', detalhes);
+    },
+    arquivoIndividual(detalhes) {
+      return arquivoDocumento('Relatório individual da solicitação', detalhes);
     },
     baixarChecklist(item) {
-      return gerarDocumento('Checklist de Recebimento de Amostra', comprovanteChecklist(item));
+      return baixarDocumento('Checklist de Recebimento de Amostra', comprovanteChecklist(item));
     },
     baixarResumo(solicitacoes, filtros) {
       return gerarResumo(solicitacoes, filtros);

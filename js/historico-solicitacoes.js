@@ -19,6 +19,10 @@
   let solicitacoes = [];
   let detalhesAtuais = null;
   const selecionadas = new Map();
+  const pdfModal = document.querySelector('#history-pdf-modal');
+  const pdfTitulo = document.querySelector('#history-pdf-title');
+  const pdfCorpo = document.querySelector('#history-pdf-body');
+  let pdfAtual = null;
 
   if (ehAdministrador) {
     selecao.hidden = false;
@@ -73,13 +77,16 @@
         <td data-label="Data de envio">${escapar(dataFormatada(item.dataEnvio))}</td>
         <td data-label="Usuário">${escapar(item.usuario)}</td>
         <td data-label="Status"><span class="history-status-pill">${escapar(item.status)}</span>${item.recebido ? '<span class="history-received-pill">Recebido</span>' : ''}</td>
-        <td data-label="Ação" class="history-actions"><button class="button primary history-detail-button" data-tipo="${escapar(item.tipo)}" data-id="${escapar(item.solicitacaoId)}" type="button">Baixar PDF</button>${ehAdministrador ? `<button class="button danger history-delete-button" data-tipo="${escapar(item.tipo)}" data-id="${escapar(item.solicitacaoId)}" type="button">Excluir</button>` : ''}</td>
+        <td data-label="Ação" class="history-actions"><button class="button secondary history-view-button" data-tipo="${escapar(item.tipo)}" data-id="${escapar(item.solicitacaoId)}" type="button">Visualizar</button><button class="button primary history-detail-button" data-tipo="${escapar(item.tipo)}" data-id="${escapar(item.solicitacaoId)}" type="button">Baixar PDF</button>${ehAdministrador ? `<button class="button danger history-delete-button" data-tipo="${escapar(item.tipo)}" data-id="${escapar(item.solicitacaoId)}" type="button">Excluir</button>` : ''}</td>
       </tr>
     `).join('');
     vazio.hidden = filtradas.length > 0;
 
     corpo.querySelectorAll('.history-detail-button').forEach((botao) => {
       botao.addEventListener('click', () => baixarRelatorio(botao.dataset.tipo, botao.dataset.id));
+    });
+    corpo.querySelectorAll('.history-view-button').forEach((botao) => {
+      botao.addEventListener('click', () => visualizarRelatorio(botao.dataset.tipo, botao.dataset.id));
     });
     corpo.querySelectorAll('.history-select-item').forEach((campo) => {
       campo.addEventListener('change', () => {
@@ -141,6 +148,36 @@
       const resultado = await AppAuth.requisitarApi('obterDetalhesSolicitacao', { dados: { tipo, solicitacaoId } });
       RelatoriosPdf.baixarIndividual(resultado.dados);
       mostrarStatus('Download iniciado.', 'success');
+    } catch (erro) {
+      mostrarStatus(erro.message, 'error');
+    }
+  }
+
+  function fecharPdf() {
+    if (pdfAtual && pdfAtual.url) URL.revokeObjectURL(pdfAtual.url);
+    pdfAtual = null;
+    if (pdfModal) {
+      pdfModal.hidden = true;
+      pdfCorpo.innerHTML = '';
+    }
+  }
+
+  function abrirPdf(dados) {
+    if (!pdfModal) return;
+    const arquivo = RelatoriosPdf.arquivoIndividual(dados);
+    fecharPdf();
+    pdfAtual = { dados, ...arquivo };
+    pdfTitulo.textContent = `Relatório — ${dados.solicitacaoId}`;
+    pdfCorpo.innerHTML = `<iframe class="doc-preview-frame" src="${arquivo.url}" title="Relatório ${escapar(dados.solicitacaoId)}"></iframe>`;
+    pdfModal.hidden = false;
+  }
+
+  async function visualizarRelatorio(tipo, solicitacaoId) {
+    mostrarStatus('Preparando visualização…');
+    try {
+      const resultado = await AppAuth.requisitarApi('obterDetalhesSolicitacao', { dados: { tipo, solicitacaoId } });
+      abrirPdf(resultado.dados);
+      mostrarStatus('Visualização pronta.', 'success');
     } catch (erro) {
       mostrarStatus(erro.message, 'error');
     }
@@ -210,5 +247,14 @@
     detalhe.hidden = true;
     botaoIndividual.hidden = true;
   });
+  if (pdfModal) {
+    pdfModal.querySelectorAll('[data-pdf-close]').forEach((elemento) => elemento.addEventListener('click', fecharPdf));
+    pdfModal.querySelector('[data-pdf-download]').addEventListener('click', () => {
+      if (pdfAtual) RelatoriosPdf.baixarIndividual(pdfAtual.dados);
+    });
+    document.addEventListener('keydown', (evento) => {
+      if (evento.key === 'Escape' && !pdfModal.hidden) fecharPdf();
+    });
+  }
   carregarHistorico();
 })();
