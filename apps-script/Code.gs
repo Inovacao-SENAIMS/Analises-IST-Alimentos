@@ -56,6 +56,40 @@ function notificarNovaSolicitacao_(id, tipo, usuarioEmail, dataEnvio) {
   }
 }
 
+/**
+ * Diagnóstico somente leitura do armazenamento de documentos.
+ * Execute no editor do Apps Script (menu Executar) e leia o log (Ctrl+Enter).
+ * Não grava nada e serve para autorizar o Drive e conferir a pasta configurada.
+ */
+function verificarArmazenamentoDocumentos() {
+  const bruto = PropertiesService.getScriptProperties().getProperty('DOCUMENTOS_CADASTRO_FOLDER_ID');
+  const id = normalizarIdPasta_(bruto);
+  const resultado = {
+    propriedadeConfigurada: Boolean(id),
+    valorBruto: String(bruto == null ? '' : bruto),
+    idNormalizado: id,
+    executaComo: Session.getEffectiveUser().getEmail(),
+    acessaComo: Session.getActiveUser().getEmail()
+  };
+  if (!id) {
+    resultado.ok = false;
+    resultado.detalhe = 'Defina DOCUMENTOS_CADASTRO_FOLDER_ID em Configurações do projeto → Propriedades do script.';
+  } else {
+    try {
+      const pasta = DriveApp.getFolderById(id);
+      resultado.ok = pasta.getSharingAccess() === DriveApp.Access.PRIVATE;
+      resultado.nomePasta = pasta.getName();
+      resultado.acesso = String(pasta.getSharingAccess());
+      resultado.detalhe = resultado.ok ? 'Configuração válida: pasta encontrada e com acesso Restrito.' : 'Pasta encontrada, mas o acesso não é Restrito. Ajuste para Restrito no Drive.';
+    } catch (erro) {
+      resultado.ok = false;
+      resultado.detalhe = 'Não foi possível abrir a pasta: ' + erro;
+    }
+  }
+  Logger.log(JSON.stringify(resultado, null, 2));
+  return resultado;
+}
+
 function doPost(e) {
   try {
     const entrada = JSON.parse((e && e.postData && e.postData.contents) || '{}');

@@ -109,6 +109,20 @@ test('PNG e JPEG validos aceitos', () => {
   assert.equal(e.run(p).sucesso, true);
 });
 test('pasta nao configurada nao cria conta', () => { const e = environment(); e.state.props = {}; assert.equal(e.run(payload()).sucesso, false); assert.equal(e.state.sheets.Usuarios.data.length, 1); });
+test('configuracao aceita ID com espacos ou URL completa da pasta', () => {
+  for (const valor of ['  root  ', 'https://drive.google.com/drive/folders/root']) {
+    const e = environment(); e.state.props.DOCUMENTOS_CADASTRO_FOLDER_ID = valor;
+    assert.equal(e.run(payload()).sucesso, true);
+    assert.equal(e.state.files.size, 2);
+  }
+});
+test('pasta inacessivel orienta revisar a configuracao', () => {
+  const e = environment(); e.state.props.DOCUMENTOS_CADASTRO_FOLDER_ID = 'pasta-inexistente';
+  const r = e.run(payload());
+  assert.equal(r.sucesso, false);
+  assert.match(r.mensagem, /não foi encontrada|não tem acesso/);
+  assert.equal(e.state.sheets.Usuarios.data.length, 1);
+});
 test('falha de Drive bloqueia login e reenvio retoma sem duplicar', () => {
   const e = environment(); const p = payload(); e.state.fail = 'Drive'; assert.equal(e.run(p).sucesso, false);
   assert.equal(e.row('Usuarios').ativo, false); assert.equal(e.row('Usuarios').estado_documental, 'PENDENTE');

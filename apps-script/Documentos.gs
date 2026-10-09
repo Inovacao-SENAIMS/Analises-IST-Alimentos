@@ -59,6 +59,14 @@ function gravarRegistroCadastro_(tabela, registro, indice) {
   else tabela.aba.appendRow(valores);
 }
 
+function normalizarIdPasta_(valor) {
+  const texto = String(valor == null ? '' : valor).trim();
+  if (!texto) return '';
+  const porPasta = texto.match(/\/folders\/([A-Za-z0-9_-]+)/);
+  const porConsulta = texto.match(/[?&]id=([A-Za-z0-9_-]+)/);
+  return (porPasta ? porPasta[1] : porConsulta ? porConsulta[1] : texto).replace(/\s+/g, '');
+}
+
 function cadastrarClienteDocumentado_(dados, nome, email, senha) {
   let documentos;
   let raiz;
@@ -67,9 +75,10 @@ function cadastrarClienteDocumentado_(dados, nome, email, senha) {
     if (!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(cadastroId)) throw new Error('Identificador de cadastro inválido. Atualize a página e tente novamente.');
     documentos = validarDocumentosCadastro_(dados.documentos, dados.tipoPessoa);
     if (!cpfCnpjCadastroValido_(dados.cliente.cpfCnpj, dados.tipoPessoa)) throw new Error('Informe um CPF ou CNPJ válido para o tipo de pessoa.');
-    const pastaId = PropertiesService.getScriptProperties().getProperty('DOCUMENTOS_CADASTRO_FOLDER_ID');
-    if (!pastaId) throw new Error('O armazenamento de documentos ainda não foi configurado. Entre em contato com o laboratório.');
-    raiz = DriveApp.getFolderById(pastaId);
+    const pastaId = normalizarIdPasta_(PropertiesService.getScriptProperties().getProperty('DOCUMENTOS_CADASTRO_FOLDER_ID'));
+    if (!pastaId) throw new Error('O armazenamento de documentos ainda não foi configurado (DOCUMENTOS_CADASTRO_FOLDER_ID). Entre em contato com o laboratório.');
+    try { raiz = DriveApp.getFolderById(pastaId); } catch (_) { raiz = null; }
+    if (!raiz) throw new Error('A pasta de documentos configurada não foi encontrada ou a conta que executa o portal não tem acesso a ela. Confira DOCUMENTOS_CADASTRO_FOLDER_ID e as permissões da pasta no Drive.');
     if (raiz.getSharingAccess() !== DriveApp.Access.PRIVATE) throw new Error('A pasta de documentos deve ter acesso Restrito. Entre em contato com o laboratório.');
   } catch (erro) { return falha_(erro.message || 'Não foi possível validar os documentos.'); }
 

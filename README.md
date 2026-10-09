@@ -154,8 +154,18 @@ São obrigatórios **dois arquivos**, um por campo, em **PDF, JPG/JPEG ou PNG**,
 1. Crie uma pasta dedicada no Google Drive da conta responsável pelo Web App, com acesso **Restrito**, acessível somente à equipe autorizada. Não habilite acesso público, por link ou para todo o domínio; confira também permissões herdadas de pastas superiores.
 2. Copie o ID da pasta (trecho depois de `/folders/` na URL).
 3. Em **Configurações do projeto → Propriedades do script**, adicione `DOCUMENTOS_CADASTRO_FOLDER_ID` com esse ID.
-4. Atualize `Code.gs` e adicione `Documentos.gs` no mesmo projeto Apps Script. Execute uma função que use Drive para autorizar o acesso; você pode criar temporariamente uma função de configuração que leia essa propriedade e chame `DriveApp.getFolderById(id).getName()`. Não execute cadastro real para obter essa autorização.
+4. Atualize `Code.gs` e adicione `Documentos.gs` no mesmo projeto Apps Script. No editor, execute `verificarArmazenamentoDocumentos()` para autorizar o Drive e conferir a configuração: o log mostra o ID lido, o nome da pasta, o acesso e a conta de execução (`ok: true` quando está correto). Não execute cadastro real apenas para autorizar o acesso.
 5. Publique uma **nova versão** da implantação `/exec`, executando como a conta responsável pelo armazenamento, e atualize também o frontend.
+
+#### Se aparecer "Nenhum item com o ID fornecido foi encontrado"
+
+Essa mensagem vem do Google Drive ao abrir a pasta configurada — não é erro de código. Confira, nesta ordem:
+
+1. `DOCUMENTOS_CADASTRO_FOLDER_ID` existe em **Configurações do projeto → Propriedades do script**, sem valor vazio. Aceita apenas o ID ou a URL completa (o ID é extraído automaticamente).
+2. A implantação está com **Executar como: Eu**, e essa conta é a dona da pasta — ou a pasta foi compartilhada com ela.
+3. O ID aponta para uma **pasta** que ainda existe (não um arquivo, não algo na lixeira).
+4. O ID foi copiado do **mesmo** projeto Apps Script publicado em `/exec`.
+5. Rode `verificarArmazenamentoDocumentos()` e confira no log `ok: true`. Depois, publique uma **nova versão** da implantação.
 
 O ID da pasta é configuração do servidor e não deve ser colocado no HTML ou em `js/config.js`. Os arquivos são organizados em subpastas por identificador de cadastro. O portal não gera links públicos nem acrescenta documentos ao histórico de solicitações.
 
