@@ -52,7 +52,19 @@
     const filtradas = base().filter((item) =>
       (!usuario.value || String(item.usuario) === usuario.value) &&
       (!requerente.value || String(item.requerente) === requerente.value));
-    preencher(numeroAnalise, filtradas.map((item) => ({ valor: item.solicitacaoId, rotulo: item.solicitacaoId })), 'Nenhuma solicitação encontrada', '');
+    if (!filtradas.length) {
+      numeroAnalise.innerHTML = '<option value="">Nenhuma solicitação encontrada</option>';
+      numeroAnalise.disabled = true;
+      return;
+    }
+    numeroAnalise.innerHTML = [
+      '<option value="">Selecione</option>',
+      ...filtradas.map((item) => {
+        const recebido = Boolean(item.recebido);
+        return `<option value="${item.solicitacaoId}"${recebido ? ' disabled' : ''}>${item.solicitacaoId}${recebido ? ' — Recebido' : ''}</option>`;
+      })
+    ].join('');
+    numeroAnalise.disabled = false;
   }
 
   function atualizarUsuario() {

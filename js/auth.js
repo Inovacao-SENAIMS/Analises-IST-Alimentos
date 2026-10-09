@@ -129,6 +129,11 @@
       elemento.hidden = sessao.grupo !== 'Administrator_User';
     });
 
+    const gruposIst = ['IST_Colaborators', 'Manager_User', 'Administrator_User'];
+    document.querySelectorAll('[data-checklists]').forEach((elemento) => {
+      elemento.hidden = gruposIst.indexOf(sessao.grupo) < 0;
+    });
+
     document.querySelectorAll('[data-logout]').forEach((botao) => {
       botao.addEventListener('click', () => {
         limparSessao();

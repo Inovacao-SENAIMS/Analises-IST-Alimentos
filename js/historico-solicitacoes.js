@@ -72,7 +72,7 @@
         <td data-label="Tipo">${escapar(item.titulo)}</td>
         <td data-label="Data de envio">${escapar(dataFormatada(item.dataEnvio))}</td>
         <td data-label="Usuário">${escapar(item.usuario)}</td>
-        <td data-label="Status"><span class="history-status-pill">${escapar(item.status)}</span></td>
+        <td data-label="Status"><span class="history-status-pill">${escapar(item.status)}</span>${item.recebido ? '<span class="history-received-pill">Recebido</span>' : ''}</td>
         <td data-label="Ação" class="history-actions"><button class="button primary history-detail-button" data-tipo="${escapar(item.tipo)}" data-id="${escapar(item.solicitacaoId)}" type="button">Baixar PDF</button>${ehAdministrador ? `<button class="button danger history-delete-button" data-tipo="${escapar(item.tipo)}" data-id="${escapar(item.solicitacaoId)}" type="button">Excluir</button>` : ''}</td>
       </tr>
     `).join('');

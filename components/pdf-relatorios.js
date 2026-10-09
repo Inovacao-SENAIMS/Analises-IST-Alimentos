@@ -146,12 +146,51 @@
     doc.save(nomeArquivo('relatorio-resumido', `historico-${new Date().toISOString().slice(0, 10)}`));
   }
 
+  const REFERENCIA_CHECKLIST = {
+    'analise-sementes': 'Análise de Sementes',
+    'analise-microbiologica': 'Análise Microbiológica',
+    'analise-fisico-quimica': 'Análise Físico-Química',
+    'amostras-fiscais': 'Análise de Alimentos'
+  };
+
+  function comprovanteChecklist(item) {
+    item = item || {};
+    const tipo = item.tipoReferencia || '';
+    const campos = [
+      ['Referência', item.tipoReferenciaRotulo || REFERENCIA_CHECKLIST[tipo] || tipo],
+      ['Usuário', item.usuarioAmostraNome || item.usuarioAmostra],
+      ['Requerente/Cliente', item.requerenteClienteNome || item.requerenteCliente],
+      ['Número da Análise', item.solicitacaoId],
+      ['Data do Recebimento', item.dataRecebimento],
+      ['Hora do Recebimento', item.horaRecebimento ?? item.hora],
+      ['Temperatura da Amostra (ºC)', item.temperaturaAmostra ?? item.temperatura],
+      ['Quantidade da Amostra', item.quantidadeAmostra ?? item.quantidade],
+      ['Peso/Volume', item.pesoVolume],
+      ['Número da Amostra', item.numeroAmostra],
+      ['Situação da Amostra', item.situacaoAmostra ?? item.situacao],
+      ['Responsável', item.responsavel],
+      ['Observações', item.observacoes]
+    ].map(([rotulo, valor]) => ({ rotulo, valor })).filter((campo) => String(campo.valor ?? '').trim());
+
+    return {
+      solicitacaoId: item.checklistId || item.solicitacaoId || 'checklist',
+      titulo: 'Checklist de Recebimento de Amostra',
+      dataEnvio: item.dataRegistro || new Date().toLocaleString('pt-BR'),
+      status: item.situacaoAmostra || item.situacao || 'Registrado',
+      campos,
+      relacionados: []
+    };
+  }
+
   window.RelatoriosPdf = {
     baixarComprovante(dados) {
       return gerarDocumento('Comprovante de solicitação', dados);
     },
     baixarIndividual(detalhes) {
       return gerarDocumento('Relatório individual da solicitação', detalhes);
+    },
+    baixarChecklist(item) {
+      return gerarDocumento('Checklist de Recebimento de Amostra', comprovanteChecklist(item));
     },
     baixarResumo(solicitacoes, filtros) {
       return gerarResumo(solicitacoes, filtros);

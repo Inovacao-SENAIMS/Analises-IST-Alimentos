@@ -12,9 +12,10 @@ const requiredFiles = [
   'pages/cadastro.html', 'pages/dados-pessoais.html',
   'pages/administracao-usuarios.html',
   'pages/historico-solicitacoes.html',
+  'pages/historico-checklists.html',
   'css/style.css', 'js/config.js', 'js/auth.js', 'js/menu.js',
   'js/validacoes.js', 'js/form-analise-sementes.js', 'js/form-amostras-fiscais.js', 'js/cadastro.js', 'js/perfil.js',
-  'js/checklist-recebimento.js', 'js/form-recebimento-amostra.js', 'js/hex-vault.js',
+  'js/checklist-recebimento.js', 'js/form-recebimento-amostra.js', 'js/hex-vault.js', 'js/historico-checklists.js',
   'components/componentes.js', 'components/pdf-relatorios.js',
   'apps-script/Code.gs', 'README.md'
 ];
@@ -190,6 +191,47 @@ test('checklist cruza os filtros de usuário e requerente', () => {
   assert.match(api, /usuario_amostra/);
   assert.match(api, /requerente_cliente/);
   assert.match(readme, /usuario_amostra/);
+});
+
+test('recebimento gera comprovante em PDF', () => {
+  const pagina = readFileSync(join(root, 'pages/recebimento-amostra.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/form-recebimento-amostra.js'), 'utf8');
+  const pdf = readFileSync(join(root, 'components/pdf-relatorios.js'), 'utf8');
+  assert.match(pagina, /data-componente="botao-baixar-pdf" data-id="recebimento-pdf"/);
+  assert.match(pagina, /\.\.\/components\/pdf-relatorios\.js/);
+  assert.match(script, /RelatoriosPdf\.baixarChecklist/);
+  assert.match(pdf, /baixarChecklist/);
+});
+
+test('histórico de checklists tem rota, ação e item de menu restrito ao IST', () => {
+  const pagina = readFileSync(join(root, 'pages/historico-checklists.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/historico-checklists.js'), 'utf8');
+  const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
+  const auth = readFileSync(join(root, 'js/auth.js'), 'utf8');
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(pagina, /data-pagina-ativa="checklists"/);
+  assert.match(script, /listarChecklists/);
+  assert.match(script, /RelatoriosPdf\.baixarChecklist/);
+  assert.match(componentes, /data-checklists hidden/);
+  assert.match(auth, /data-checklists/);
+  assert.match(api, /case 'listarChecklists'/);
+  assert.match(api, /function listarChecklists[\s\S]*GRUPOS\.COLABORADOR/);
+  assert.match(css, /sidebar-nav a\[data-checklists\]\[hidden\]/);
+});
+
+test('recebimento é único e sinaliza amostra recebida', () => {
+  const modulo = readFileSync(join(root, 'js/checklist-recebimento.js'), 'utf8');
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  const historico = readFileSync(join(root, 'js/historico-solicitacoes.js'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(modulo, /item\.recebido/);
+  assert.match(modulo, /Recebido/);
+  assert.match(api, /function idsRecebidos_/);
+  assert.match(api, /recebido: Boolean/);
+  assert.match(api, /já foi recebida/);
+  assert.match(historico, /history-received-pill/);
+  assert.match(css, /\.history-received-pill/);
 });
 
 test('menu agrupa serviços de análise e de recebimento', () => {

@@ -67,6 +67,9 @@
           <a data-historico class="${paginaAtiva === 'historico' ? 'active' : ''}" href="historico-solicitacoes.html">
             ${renderizarIcone('historico')}<span>Histórico</span>
           </a>
+          <a data-checklists hidden class="${paginaAtiva === 'checklists' ? 'active' : ''}" href="historico-checklists.html">
+            ${renderizarIcone('clipboard')}<span>Histórico de checklists</span>
+          </a>
         </nav>
         <div class="sidebar-footer">
           <div class="sidebar-user">

@@ -101,7 +101,7 @@ As colunas `resultado` e `observacoes_laboratorio` são reservadas ao laboratór
 checklist_id | solicitacao_id | tipo_referencia | usuario_amostra | requerente_cliente | data_recebimento | hora_recebimento | temperatura_amostra | quantidade_amostra | peso_volume | numero_amostra | situacao_amostra | responsavel | observacoes | usuario | data_registro
 ```
 
-Criada automaticamente no primeiro envio do serviço **Recebimento de Amostra** (`pages/recebimento-amostra.html`). Vincula o checklist à solicitação escolhida em `solicitacao_id` (`tipo_referencia` identifica a análise). A ação protegida é `salvarChecklistRecebimento`.
+Criada automaticamente no primeiro envio do serviço **Recebimento de Amostra** (`pages/recebimento-amostra.html`). Vincula o checklist à solicitação escolhida em `solicitacao_id` (`tipo_referencia` identifica a análise). As ações protegidas são `salvarChecklistRecebimento` (gravação) e `listarChecklists` (consulta). Cada solicitação pode ser recebida uma única vez: o servidor bloqueia um novo checklist para a mesma `solicitacao_id` e as listas de vinculação sinalizam/desabilitam as amostras já recebidas (`— Recebido`). O flag `recebido` também aparece no histórico de solicitações. Após o envio, o comprovante pode ser baixado em PDF. A consulta fica em `pages/historico-checklists.html`, acessível pelo menu lateral apenas aos grupos `IST_Colaborators`, `Manager_User` e `Administrator_User`.
 
 ## 2. Publicar o Apps Script
 

@@ -91,6 +91,8 @@ function doPost(e) {
         return responder_(salvarSolicitacaoAmostrasFiscais(entrada.dados, entrada.token));
       case 'salvarChecklistRecebimento':
         return responder_(salvarChecklistRecebimento(entrada.dados, entrada.token));
+      case 'listarChecklists':
+        return responder_(listarChecklists(entrada.token));
       default:
         return responder_(falha_('Operação não reconhecida.'));
     }
@@ -492,11 +494,24 @@ function requerenteDoHistorico_(fonte, tabela, linha) {
   return String(valorLinha_(tabela, linha, coluna)).trim();
 }
 
+function idsRecebidos_() {
+  const conjunto = {};
+  const aba = planilha_().getSheetByName(ABAS.CHECKLISTS_RECEBIMENTO);
+  if (!aba) return conjunto;
+  const tabela = valoresComCabecalho_(ABAS.CHECKLISTS_RECEBIMENTO);
+  tabela.linhas.forEach(function (linha) {
+    const id = String(valorLinha_(tabela, linha, 'solicitacao_id')).trim();
+    if (id) conjunto[id] = true;
+  });
+  return conjunto;
+}
+
 function listarHistoricoSolicitacoes(token) {
   const usuario = validarToken_(token);
   if (!usuario) return falha_('SessÃ£o expirada. FaÃ§a login novamente.');
 
   const nomes = nomesUsuarios_();
+  const recebidos = idsRecebidos_();
   const historico = [];
   FONTES_HISTORICO.forEach(function (fonte) {
     const tabela = valoresComCabecalho_(fonte.solicitacoes);
@@ -512,6 +527,7 @@ function listarHistoricoSolicitacoes(token) {
         usuario: email,
         usuarioNome: nomes[email.toLowerCase()] || email,
         requerente: requerenteDoHistorico_(fonte, tabela, linha),
+        recebido: Boolean(recebidos[String(valorLinha_(tabela, linha, 'solicitacao_id')).trim()]),
         status: String(valorLinha_(tabela, linha, 'status', 'Enviada') || 'Enviada')
       });
     });
@@ -952,6 +968,10 @@ function salvarChecklistRecebimento(dados, token) {
   });
   if (!existe) return falha_('Solicitação vinculada não encontrada.');
 
+  if (idsRecebidos_()[solicitacaoId]) {
+    return falha_('Esta amostra já foi recebida. Um checklist já foi registrado para esta solicitação.');
+  }
+
   const agora = new Date();
   const id = 'CHK-' + Utilities.formatDate(agora, Session.getScriptTimeZone() || 'America/Cuiaba', 'yyyyMMdd-HHmmss') + '-' + Utilities.getUuid().slice(0, 6).toUpperCase();
   const cabecalho = ['checklist_id', 'solicitacao_id', 'tipo_referencia', 'usuario_amostra', 'requerente_cliente', 'data_recebimento', 'hora_recebimento', 'temperatura_amostra', 'quantidade_amostra', 'peso_volume', 'numero_amostra', 'situacao_amostra', 'responsavel', 'observacoes', 'usuario', 'data_registro'];
@@ -980,4 +1000,46 @@ function salvarChecklistRecebimento(dados, token) {
   }));
 
   return sucesso_('Checklist de recebimento salvo.', { checklistId: id, solicitacaoId: solicitacaoId });
+}
+
+function listarChecklists(token) {
+  const usuario = validarToken_(token);
+  if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
+  if ([GRUPOS.COLABORADOR, GRUPOS.GESTOR, GRUPOS.ADMIN].indexOf(usuario.grupo) < 0) {
+    return falha_('Acesso restrito.');
+  }
+
+  const aba = planilha_().getSheetByName(ABAS.CHECKLISTS_RECEBIMENTO);
+  if (!aba) return sucesso_('Nenhum checklist encontrado.', { checklists: [] });
+
+  const tabela = valoresComCabecalho_(ABAS.CHECKLISTS_RECEBIMENTO);
+  const nomes = nomesUsuarios_();
+  const checklists = tabela.linhas.map(function (linha) {
+    const emailAmostra = String(valorLinha_(tabela, linha, 'usuario_amostra')).trim();
+    return {
+      checklistId: String(valorLinha_(tabela, linha, 'checklist_id')),
+      solicitacaoId: String(valorLinha_(tabela, linha, 'solicitacao_id')),
+      tipoReferencia: String(valorLinha_(tabela, linha, 'tipo_referencia')),
+      usuarioAmostra: emailAmostra,
+      usuarioAmostraNome: nomes[emailAmostra.toLowerCase()] || emailAmostra,
+      requerenteCliente: String(valorLinha_(tabela, linha, 'requerente_cliente')),
+      dataRecebimento: valorLinha_(tabela, linha, 'data_recebimento'),
+      horaRecebimento: valorLinha_(tabela, linha, 'hora_recebimento'),
+      temperaturaAmostra: valorLinha_(tabela, linha, 'temperatura_amostra'),
+      quantidadeAmostra: valorLinha_(tabela, linha, 'quantidade_amostra'),
+      pesoVolume: valorLinha_(tabela, linha, 'peso_volume'),
+      numeroAmostra: valorLinha_(tabela, linha, 'numero_amostra'),
+      situacaoAmostra: String(valorLinha_(tabela, linha, 'situacao_amostra')),
+      responsavel: String(valorLinha_(tabela, linha, 'responsavel')),
+      observacoes: String(valorLinha_(tabela, linha, 'observacoes')),
+      usuario: String(valorLinha_(tabela, linha, 'usuario')),
+      dataRegistro: valorLinha_(tabela, linha, 'data_registro')
+    };
+  }).filter(function (item) { return item.checklistId; });
+
+  checklists.sort(function (a, b) {
+    return new Date(b.dataRegistro || 0).getTime() - new Date(a.dataRegistro || 0).getTime();
+  });
+
+  return sucesso_('Checklists carregados.', { checklists: checklists });
 }
