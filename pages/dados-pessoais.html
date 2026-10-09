@@ -24,33 +24,50 @@
           <p class="page-lead">Confira os dados vinculados ao seu acesso.</p>
           <div id="perfil-status" class="status" role="alert"></div>
 
-          <section class="card profile-card">
-            <div class="profile-avatar" data-usuario-inicial>U</div>
-            <div class="profile-fields">
+          <section class="card data-section">
+            <div class="data-section-head">
               <div>
-                <span>Nome</span>
-                <strong data-perfil-nome>Carregando…</strong>
+                <h2 class="data-section-title">Identificação</h2>
+                <p class="data-section-desc">Conta usada para acessar o portal.</p>
               </div>
-              <div>
-                <span>E-mail</span>
-                <strong data-perfil-email>Carregando…</strong>
-              </div>
-              <div>
-                <span>Grupo de acesso</span>
-                <strong class="role-pill" data-perfil-grupo>Carregando…</strong>
-              </div>
+              <span class="data-pill role-pill" data-perfil-grupo>Carregando…</span>
+            </div>
+            <div class="data-field-grid">
+              <div class="data-field"><span>Nome</span><strong data-perfil-nome>Carregando…</strong></div>
+              <div class="data-field"><span>E-mail</span><strong data-perfil-email>Carregando…</strong></div>
             </div>
           </section>
 
-          <section class="card profile-card profile-card--stacked" id="perfil-cadastro" hidden>
-            <h2 class="section-title">Dados do cadastro</h2>
-            <div class="profile-detail-grid" data-perfil-detalhes></div>
+          <section class="card data-section" id="perfil-cadastro" hidden>
+            <div class="data-section-head">
+              <div>
+                <h2 class="data-section-title">Dados do cadastro</h2>
+                <p class="data-section-desc">Informações registradas no seu cadastro de cliente.</p>
+              </div>
+              <span class="data-pill" data-perfil-pessoa></span>
+            </div>
+            <div class="data-field-grid" data-perfil-detalhes></div>
           </section>
 
-          <section class="card profile-card profile-card--stacked" id="perfil-contatos" hidden>
-            <h2 class="section-title">Contatos</h2>
-            <div class="profile-contacts" data-perfil-contatos></div>
+          <section class="card data-section" id="perfil-contatos" hidden>
+            <div class="data-section-head">
+              <div>
+                <h2 class="data-section-title">Contatos</h2>
+                <p class="data-section-desc">Contatos de referência vinculados ao cadastro.</p>
+              </div>
+              <span class="data-pill" data-perfil-contatos-pill></span>
+            </div>
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr><th>Nome</th><th>CPF</th><th>E-mail</th><th>Telefone</th><th>Cargo</th><th>Departamento</th><th>Finalidades</th></tr>
+                </thead>
+                <tbody data-perfil-contatos></tbody>
+              </table>
+            </div>
           </section>
+
+          <p class="data-footnote">Estes dados são somente leitura. Para corrigir alguma informação, entre em contato com o laboratório.</p>
 
           <div data-componente="footer"></div>
         </div>

@@ -33,9 +33,15 @@
     ['numeroFuncionarios', 'Número de funcionários']
   ];
 
+  const ROTULOS_PESSOA = { FISICA: 'Pessoa física', JURIDICA: 'Pessoa jurídica' };
+
   function valorCliente(cliente, chave) {
-    if (chave === 'tipoPessoa') return { FISICA: 'Pessoa física', JURIDICA: 'Pessoa jurídica' }[cliente.tipoPessoa] || cliente.tipoPessoa;
+    if (chave === 'tipoPessoa') return ROTULOS_PESSOA[cliente.tipoPessoa] || cliente.tipoPessoa;
     return cliente[chave];
+  }
+
+  function campo(rotulo, valor) {
+    return `<div class="data-field"><span>${escapar(rotulo)}</span><strong>${escapar(valor)}</strong></div>`;
   }
 
   function renderizarCadastro(cliente) {
@@ -43,31 +49,35 @@
       .map(([chave, rotulo]) => [rotulo, String(valorCliente(cliente, chave) || '').trim()])
       .filter(([, valor]) => valor);
     if (!campos.length) return;
-    document.querySelector('[data-perfil-detalhes]').innerHTML = campos
-      .map(([rotulo, valor]) => `<div><span>${escapar(rotulo)}</span><strong>${escapar(valor)}</strong></div>`)
-      .join('');
+    document.querySelector('[data-perfil-detalhes]').innerHTML = campos.map(([rotulo, valor]) => campo(rotulo, valor)).join('');
+    const pill = document.querySelector('[data-perfil-pessoa]');
+    if (pill) pill.textContent = ROTULOS_PESSOA[cliente.tipoPessoa] || '';
     document.querySelector('#perfil-cadastro').hidden = false;
   }
 
   function renderizarContatos(contatos) {
     if (!Array.isArray(contatos) || !contatos.length) return;
     document.querySelector('[data-perfil-contatos]').innerHTML = contatos.map((contato) => {
-      const linhas = [
-        ['CPF', contato.cpf],
-        ['E-mail', contato.email],
-        ['Telefone', contato.telefone],
-        ['Cargo', contato.cargo],
-        ['Departamento', contato.departamento]
-      ].filter(([, valor]) => String(valor || '').trim());
       const finalidades = [
         [contato.recebeNotaFiscalBoleto, 'Nota fiscal e boleto'],
         [contato.recebeProposta, 'Proposta'],
         [contato.recebeRelatorio, 'Relatório']
       ].filter(([ativo]) => ativo).map(([, rotulo]) => rotulo);
-      const detalhes = linhas.map(([rotulo, valor]) => `<div><span>${escapar(rotulo)}</span><strong>${escapar(valor)}</strong></div>`).join('');
-      const propositos = finalidades.length ? `<ul class="profile-contact-purposes">${finalidades.map((item) => `<li>${escapar(item)}</li>`).join('')}</ul>` : '';
-      return `<article class="profile-contact-card"><strong>${escapar(contato.nome || 'Contato')}</strong>${detalhes}${propositos}</article>`;
+      const celulas = [
+        ['Nome', contato.nome],
+        ['CPF', contato.cpf],
+        ['E-mail', contato.email],
+        ['Telefone', contato.telefone],
+        ['Cargo', contato.cargo],
+        ['Departamento', contato.departamento]
+      ].map(([rotulo, valor]) => `<td data-label="${escapar(rotulo)}">${escapar(String(valor || '').trim() || '—')}</td>`).join('');
+      const propositos = finalidades.length
+        ? `<ul class="data-purposes">${finalidades.map((item) => `<li>${escapar(item)}</li>`).join('')}</ul>`
+        : '<span>—</span>';
+      return `<tr>${celulas}<td data-label="Finalidades">${propositos}</td></tr>`;
     }).join('');
+    const pill = document.querySelector('[data-perfil-contatos-pill]');
+    if (pill) pill.textContent = `${contatos.length} ${contatos.length === 1 ? 'contato' : 'contatos'}`;
     document.querySelector('#perfil-contatos').hidden = false;
   }
 
