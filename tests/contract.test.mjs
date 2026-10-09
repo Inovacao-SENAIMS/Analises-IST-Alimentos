@@ -234,6 +234,22 @@ test('recebimento é único e sinaliza amostra recebida', () => {
   assert.match(css, /\.history-received-pill/);
 });
 
+test('sidebar oferece dropdown de perfil com badge e sair', () => {
+  const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
+  const auth = readFileSync(join(root, 'js/auth.js'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(componentes, /profile-trigger/);
+  assert.match(componentes, /data-profile-toggle/);
+  assert.match(componentes, /profile-menu/);
+  assert.match(componentes, /profile-signout/);
+  assert.match(componentes, /profile-ring/);
+  assert.match(componentes, /data-usuario-email/);
+  assert.match(auth, /data-usuario-email/);
+  assert.match(css, /\.profile-menu\.open/);
+  assert.match(css, /\.profile-ring/);
+  assert.match(css, /\.profile-signout/);
+});
+
 test('menu agrupa serviços de análise e de recebimento', () => {
   const menu = readFileSync(join(root, 'js/menu.js'), 'utf8');
   const css = readFileSync(join(root, 'css/style.css'), 'utf8');

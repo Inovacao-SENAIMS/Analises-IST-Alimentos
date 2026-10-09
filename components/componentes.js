@@ -58,12 +58,6 @@
           <a class="${paginaAtiva === 'servicos' ? 'active' : ''}" href="menu.html">
             ${renderizarIcone('servicos')}<span>Serviços</span>
           </a>
-          <a class="${paginaAtiva === 'perfil' ? 'active' : ''}" href="dados-pessoais.html">
-            ${renderizarIcone('perfil')}<span>Dados pessoais</span>
-          </a>
-          <a data-admin-only hidden class="${paginaAtiva === 'administracao' ? 'active' : ''}" href="administracao-usuarios.html">
-            ${renderizarIcone('admin')}<span>Administração</span>
-          </a>
           <a data-historico class="${paginaAtiva === 'historico' ? 'active' : ''}" href="historico-solicitacoes.html">
             ${renderizarIcone('historico')}<span>Histórico</span>
           </a>
@@ -72,14 +66,31 @@
           </a>
         </nav>
         <div class="sidebar-footer">
-          <div class="sidebar-user">
-            <span class="avatar" data-usuario-inicial>U</span>
-            <span>
-              <strong data-usuario-nome>Usuário</strong>
-              <small data-usuario-grupo>Client_User</small>
-            </span>
+          <div class="sidebar-profile">
+            <button type="button" class="profile-trigger" data-profile-toggle aria-haspopup="menu" aria-expanded="false">
+              <span class="profile-info">
+                <strong data-usuario-nome>Usuário</strong>
+                <small data-usuario-email>usuario@empresa.com</small>
+              </span>
+              <span class="profile-ring" aria-hidden="true">
+                <span class="profile-ring-inner"><span data-usuario-inicial>U</span></span>
+              </span>
+              <span class="profile-chevron" aria-hidden="true">
+                <svg width="12" height="24" viewBox="0 0 12 24" fill="none"><path d="M2 4C6 8 6 16 2 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+              </span>
+            </button>
+            <div class="profile-menu" role="menu">
+              <a role="menuitem" class="${paginaAtiva === 'perfil' ? 'active' : ''}" href="dados-pessoais.html">
+                ${renderizarIcone('perfil')}<span>Dados pessoais</span>
+                <span class="profile-badge" data-usuario-grupo>Client_User</span>
+              </a>
+              <a role="menuitem" data-admin-only hidden class="${paginaAtiva === 'administracao' ? 'active' : ''}" href="administracao-usuarios.html">
+                ${renderizarIcone('admin')}<span>Administração</span>
+              </a>
+              <div class="profile-menu-separator" aria-hidden="true"></div>
+              <button type="button" role="menuitem" class="profile-signout" data-logout>${renderizarIcone('sair')}<span>Sair</span></button>
+            </div>
           </div>
-          ${renderizarBotao(`${renderizarIcone('sair')}Sair`, 'logout-button sidebar-logout', 'data-logout type="button"')}
         </div>
       </aside>`;
   }
@@ -258,6 +269,22 @@
     document.querySelectorAll('.sidebar-nav a').forEach((link) => {
       link.addEventListener('click', () => {
         document.querySelector('.sidebar')?.classList.remove('open');
+      });
+    });
+
+    document.querySelectorAll('[data-profile-toggle]').forEach((botao) => {
+      botao.addEventListener('click', () => {
+        const aberto = botao.getAttribute('aria-expanded') === 'true';
+        botao.setAttribute('aria-expanded', String(!aberto));
+        botao.parentElement.querySelector('.profile-menu')?.classList.toggle('open', !aberto);
+      });
+    });
+
+    document.addEventListener('click', (evento) => {
+      if (evento.target.closest('.sidebar-profile')) return;
+      document.querySelectorAll('.profile-trigger[aria-expanded="true"]').forEach((botao) => {
+        botao.setAttribute('aria-expanded', 'false');
+        botao.parentElement.querySelector('.profile-menu')?.classList.remove('open');
       });
     });
   }

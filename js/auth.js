@@ -125,6 +125,18 @@
       elemento.textContent = sessao.nome || sessao.email;
     });
 
+    document.querySelectorAll('[data-usuario-inicial]').forEach((elemento) => {
+      elemento.textContent = (sessao.nome || sessao.email || 'U').trim().charAt(0).toUpperCase();
+    });
+
+    document.querySelectorAll('[data-usuario-email]').forEach((elemento) => {
+      elemento.textContent = sessao.email || '';
+    });
+
+    document.querySelectorAll('[data-usuario-grupo]').forEach((elemento) => {
+      elemento.textContent = sessao.grupo || '';
+    });
+
     document.querySelectorAll('[data-admin-only]').forEach((elemento) => {
       elemento.hidden = sessao.grupo !== 'Administrator_User';
     });
