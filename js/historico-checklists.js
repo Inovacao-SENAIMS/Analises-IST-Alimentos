@@ -1,6 +1,7 @@
 /* Lista os checklists de recebimento gerados e permite baixar o comprovante. */
 (function () {
   AppAuth.configurarCabecalho();
+  if (!AppAuth.exigirGrupos(['IST_Colaborators', 'Manager_User', 'Administrator_User'])) return;
 
   const corpo = document.querySelector('#checklists-body');
   if (!corpo) return;

@@ -4,7 +4,7 @@
 
   const form = document.querySelector('#recebimento-form');
   if (!form) return;
-  if (AppAuth.bloquearEntradasSolicitacao(form)) return;
+  if (!AppAuth.exigirGrupos(['IST_Colaborators', 'Manager_User', 'Administrator_User'])) return;
 
   const status = document.querySelector('#recebimento-status');
   const botaoPdf = document.querySelector('#recebimento-pdf');

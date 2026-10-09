@@ -82,7 +82,6 @@
             <div class="profile-menu" role="menu">
               <a role="menuitem" class="${paginaAtiva === 'perfil' ? 'active' : ''}" href="dados-pessoais.html">
                 ${renderizarIcone('perfil')}<span>Dados pessoais</span>
-                <span class="profile-badge" data-usuario-grupo>Client_User</span>
               </a>
               <a role="menuitem" data-admin-only hidden class="${paginaAtiva === 'administracao' ? 'active' : ''}" href="administracao-usuarios.html">
                 ${renderizarIcone('admin')}<span>Administração</span>

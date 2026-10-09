@@ -96,11 +96,17 @@ test('cadastro e navegação usam logo, sidebar e grupos', () => {
   const menu = readFileSync(join(root, 'pages/menu.html'), 'utf8');
   const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
   const perfil = readFileSync(join(root, 'pages/dados-pessoais.html'), 'utf8');
+  const perfilScript = readFileSync(join(root, 'js/perfil.js'), 'utf8');
   assert.match(cadastroScript, /cadastrarUsuario/);
   assert.match(cadastro, /senai_alimentos\.jpeg/);
   assert.match(menu, /sidebar/);
   assert.match(componentes, /dados-pessoais\.html/);
   assert.match(perfil, /data-perfil-grupo/);
+  assert.match(perfil, /data-perfil-detalhes/);
+  assert.match(perfil, /data-perfil-contatos/);
+  assert.match(perfilScript, /perfil\.cliente/);
+  assert.match(perfilScript, /renderizarContatos/);
+  assert.doesNotMatch(componentes, /profile-badge/);
 });
 
 test('catálogo centralizado expõe os três serviços de análise', () => {
@@ -171,7 +177,7 @@ test('checklist de recebimento é um serviço dedicado', () => {
     assert.doesNotMatch(readFileSync(join(root, file), 'utf8'), /checklist-recebimento/);
   }
   assert.match(api, /case 'salvarChecklistRecebimento'/);
-  assert.match(api, /function salvarChecklistRecebimento[\s\S]*podeCriarSolicitacao_/);
+  assert.match(api, /function salvarChecklistRecebimento[\s\S]*podeReceberAmostra_/);
   assert.match(api, /ChecklistsRecebimento/);
 });
 
@@ -257,6 +263,24 @@ test('menu agrupa serviços de análise e de recebimento', () => {
   assert.match(menu, /Serviços de Recebimento/);
   assert.match(menu, /services-group/);
   assert.match(css, /\.services-group/);
+});
+
+test('cliente vê apenas serviços de análise; recebimento é restrito ao IST', () => {
+  const menu = readFileSync(join(root, 'js/menu.js'), 'utf8');
+  const auth = readFileSync(join(root, 'js/auth.js'), 'utf8');
+  const formulario = readFileSync(join(root, 'js/form-recebimento-amostra.js'), 'utf8');
+  const historico = readFileSync(join(root, 'js/historico-checklists.js'), 'utf8');
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  assert.match(menu, /grupos: \['IST_Colaborators', 'Manager_User', 'Administrator_User'\]/);
+  assert.match(menu, /grupoUsuario/);
+  assert.match(auth, /function exigirGrupos/);
+  assert.match(auth, /exigirGrupos,/);
+  assert.match(formulario, /exigirGrupos\(/);
+  assert.doesNotMatch(formulario, /bloquearEntradasSolicitacao/);
+  assert.match(historico, /exigirGrupos\(/);
+  assert.match(api, /function podeReceberAmostra_/);
+  assert.match(api, /function salvarChecklistRecebimento[\s\S]*podeReceberAmostra_/);
+  assert.doesNotMatch(api, /function salvarChecklistRecebimento[\s\S]{0,400}podeCriarSolicitacao_/);
 });
 
 test('menu possui o efeito hexagonal-vault', () => {

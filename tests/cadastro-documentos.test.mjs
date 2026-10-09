@@ -82,6 +82,29 @@ test('cliente conclui cadastro sem contatos de referencia', () => {
     assert.equal(e.state.sheets.ContatosClientes.data.length, 1);
   }
 });
+test('cada CPF/CNPJ aceita apenas um cadastro', () => {
+  const e = environment();
+  assert.equal(e.run(payload()).sucesso, true);
+  const repetido = payload(); repetido.email = 'outro@example.test'; repetido.cadastroId = crypto.randomUUID();
+  const r = e.run(repetido);
+  assert.equal(r.sucesso, false); assert.match(r.mensagem, /CPF\/CNPJ/);
+  assert.equal(e.state.sheets.Clientes.data.length, 2);
+  assert.equal(e.state.files.size, 2);
+  const distinto = payload(); distinto.email = 'terceiro@example.test'; distinto.cadastroId = crypto.randomUUID(); distinto.cliente.cpfCnpj = '111.444.777-35';
+  assert.equal(e.run(distinto).sucesso, true);
+  assert.equal(e.state.sheets.Clientes.data.length, 3);
+});
+test('obterPerfil entrega os dados do cadastro do cliente', () => {
+  const e = environment(); const p = payload(); assert.equal(e.run(p).sucesso, true);
+  const token = e.ctx.login(p.email, p.senha).dados.token;
+  const perfil = e.ctx.obterPerfil(token);
+  assert.equal(perfil.sucesso, true);
+  assert.equal(perfil.dados.cliente.cpfCnpj, p.cliente.cpfCnpj);
+  assert.equal(perfil.dados.cliente.cidade, p.cliente.cidade);
+  assert.equal(perfil.dados.contatos.length, 1);
+  assert.equal(perfil.dados.contatos[0].email, 'contato@example.test');
+  assert.equal(perfil.dados.contatos[0].recebeProposta, true);
+});
 test('PJ exige documento do RT e ART', () => {
   const e = environment(); const p = payload('JURIDICA'); p.documentos[1].categoria = 'COMPROVANTE_RESIDENCIA';
   assert.equal(e.run(p).sucesso, false); assert.equal(e.state.files.size, 0);

@@ -101,7 +101,7 @@ As colunas `resultado` e `observacoes_laboratorio` são reservadas ao laboratór
 checklist_id | solicitacao_id | tipo_referencia | usuario_amostra | requerente_cliente | data_recebimento | hora_recebimento | temperatura_amostra | quantidade_amostra | peso_volume | numero_amostra | situacao_amostra | responsavel | observacoes | usuario | data_registro
 ```
 
-Criada automaticamente no primeiro envio do serviço **Recebimento de Amostra** (`pages/recebimento-amostra.html`). Vincula o checklist à solicitação escolhida em `solicitacao_id` (`tipo_referencia` identifica a análise). As ações protegidas são `salvarChecklistRecebimento` (gravação) e `listarChecklists` (consulta). Cada solicitação pode ser recebida uma única vez: o servidor bloqueia um novo checklist para a mesma `solicitacao_id` e as listas de vinculação sinalizam/desabilitam as amostras já recebidas (`— Recebido`). O flag `recebido` também aparece no histórico de solicitações. Após o envio, o comprovante pode ser baixado em PDF. A consulta fica em `pages/historico-checklists.html`, acessível pelo menu lateral apenas aos grupos `IST_Colaborators`, `Manager_User` e `Administrator_User`.
+Criada automaticamente no primeiro envio do serviço **Recebimento de Amostra** (`pages/recebimento-amostra.html`). Vincula o checklist à solicitação escolhida em `solicitacao_id` (`tipo_referencia` identifica a análise). As ações protegidas são `salvarChecklistRecebimento` (gravação) e `listarChecklists` (consulta). Cada solicitação pode ser recebida uma única vez: o servidor bloqueia um novo checklist para a mesma `solicitacao_id` e as listas de vinculação sinalizam/desabilitam as amostras já recebidas (`— Recebido`). O flag `recebido` também aparece no histórico de solicitações. Após o envio, o comprovante pode ser baixado em PDF. A consulta fica em `pages/historico-checklists.html`, acessível pelo menu lateral apenas aos grupos `IST_Colaborators`, `Manager_User` e `Administrator_User`. A seção **Serviços de Recebimento** e o próprio formulário são restritos aos mesmos grupos: o perfil `Client_User` visualiza apenas a seção **Serviços de Análise**, e o backend também bloqueia o recebimento para clientes.
 
 ## 2. Publicar o Apps Script
 
@@ -113,7 +113,7 @@ Criada automaticamente no primeiro envio do serviço **Recebimento de Amostra** 
 6. Cole essa URL em `js/config.js`, no campo `apiUrl`.
 7. Se o código do Apps Script mudar depois da implantação, use **Gerenciar implantações → Editar → Nova versão → Implantar**. Editar o arquivo local não atualiza o Web App hospedado.
 
-O cadastro público está em `pages/cadastro.html`; após o sucesso, o usuário volta para `pages/index.html`. O menu autenticado possui a sidebar com Serviços, Dados pessoais e Sair. A página `pages/dados-pessoais.html` mostra o grupo retornado pelo servidor, sem permitir edição de permissões.
+O cadastro público está em `pages/cadastro.html`; após o sucesso, o usuário volta para `pages/index.html`. O menu autenticado possui a sidebar com Serviços, Dados pessoais e Sair. A página `pages/dados-pessoais.html` mostra o grupo retornado pelo servidor, sem permitir edição de permissões. Para clientes, também lista todos os dados do cadastro (pessoa física/jurídica) e os contatos vinculados.
 
 O segredo usado para assinar tokens é criado automaticamente em Script Properties na primeira execução. O token expira em 8 horas e é validado em `listarOpcoes` e `salvarSolicitacao`.
 
@@ -136,7 +136,7 @@ Clientes: usuario_email | razao_social | nome_fantasia | renasem | endereco | ci
 ContatosClientes: usuario_email | nome | cpf | email | telefone | cargo | departamento | recebe_nota_fiscal_boleto | recebe_proposta | recebe_relatorio | data_cadastro
 ```
 
-Clientes escolhem Pessoa física ou Pessoa jurídica. Pessoa física informa nome completo, CPF, RG, endereço e contato; razão social, nome fantasia, ramo de atividade e número de funcionários se aplicam apenas à pessoa jurídica. RENASEM permanece opcional, aplicável a ensaios de sementes. Os contatos são opcionais para o Cliente e servem como informação de referência; contatos em branco não são gravados. As abas são criadas pelo Apps Script no primeiro cadastro de Cliente; após atualizar os dois arquivos `.gs`, publique uma nova versão do Web App `/exec`.
+Clientes escolhem Pessoa física ou Pessoa jurídica. Pessoa física informa nome completo, CPF, RG, endereço e contato; razão social, nome fantasia, ramo de atividade e número de funcionários se aplicam apenas à pessoa jurídica. RENASEM permanece opcional, aplicável a ensaios de sementes. Os contatos são opcionais para o Cliente e servem como informação de referência; contatos em branco não são gravados. Cada CPF/CNPJ pode ser usado em apenas um cadastro: o backend rejeita um novo cliente com documento já cadastrado. As abas são criadas pelo Apps Script no primeiro cadastro de Cliente; após atualizar os dois arquivos `.gs`, publique uma nova versão do Web App `/exec`.
 
 ### Documentos obrigatórios no cadastro
 

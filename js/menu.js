@@ -20,8 +20,9 @@
 
   const grupos = [
     { titulo: 'Serviços de Análise', categoria: 'analise' },
-    { titulo: 'Serviços de Recebimento', categoria: 'recebimento' }
+    { titulo: 'Serviços de Recebimento', categoria: 'recebimento', grupos: ['IST_Colaborators', 'Manager_User', 'Administrator_User'] }
   ];
+  const grupoUsuario = sessao?.grupo || 'Client_User';
 
   const cartao = (formulario) => `
     <a class="card form-card" href="${formulario.caminho}" aria-label="Abrir ${formulario.titulo}">
@@ -32,6 +33,7 @@
     </a>`;
 
   alvo.innerHTML = grupos.map((grupo) => {
+    if (grupo.grupos && grupo.grupos.indexOf(grupoUsuario) < 0) return '';
     const itens = APP_CONFIG.formularios.filter((formulario) => (formulario.categoria || 'analise') === grupo.categoria);
     if (!itens.length) return '';
     return `

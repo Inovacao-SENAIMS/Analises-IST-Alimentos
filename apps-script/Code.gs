@@ -314,6 +314,11 @@ function podeCriarSolicitacao_(usuario) {
   return usuario && usuario.grupo === GRUPOS.COLABORADOR ? falha_('Usuário Sem Permissão') : null;
 }
 
+function podeReceberAmostra_(usuario) {
+  if (!usuario) return null;
+  return [GRUPOS.COLABORADOR, GRUPOS.GESTOR, GRUPOS.ADMIN].indexOf(usuario.grupo) < 0 ? falha_('Acesso restrito.') : null;
+}
+
 function segredo_() {
   const propriedades = PropertiesService.getScriptProperties();
   let segredo = propriedades.getProperty('TOKEN_SECRET');
@@ -369,11 +374,49 @@ function obterPerfil(token) {
   const usuario = validarToken_(token);
   if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
 
-  return sucesso_('Perfil carregado.', {
-    email: usuario.email,
-    nome: usuario.nome,
-    grupo: usuario.grupo
-  });
+  const perfil = { email: usuario.email, nome: usuario.nome, grupo: usuario.grupo, cliente: null, contatos: [] };
+  const email = usuario.email.toLowerCase().trim();
+  try {
+    const clientes = valoresComCabecalho_(ABAS.CLIENTES);
+    const linha = clientes.linhas.find(function (item) { return String(valorLinha_(clientes, item, 'usuario_email')).toLowerCase().trim() === email; });
+    if (linha) {
+      perfil.cliente = {
+        tipoPessoa: valorLinha_(clientes, linha, 'tipo_pessoa'),
+        razaoSocial: valorLinha_(clientes, linha, 'razao_social'),
+        nomeFantasia: valorLinha_(clientes, linha, 'nome_fantasia'),
+        renasem: valorLinha_(clientes, linha, 'renasem'),
+        endereco: valorLinha_(clientes, linha, 'endereco'),
+        cidade: valorLinha_(clientes, linha, 'cidade'),
+        estado: valorLinha_(clientes, linha, 'estado'),
+        cep: valorLinha_(clientes, linha, 'cep'),
+        telefone: valorLinha_(clientes, linha, 'telefone'),
+        cpfCnpj: valorLinha_(clientes, linha, 'cpf_cnpj'),
+        inscricaoEstadualRg: valorLinha_(clientes, linha, 'inscricao_estadual_rg'),
+        ramoAtividade: valorLinha_(clientes, linha, 'ramo_atividade'),
+        numeroFuncionarios: valorLinha_(clientes, linha, 'numero_funcionarios')
+      };
+      try {
+        const contatos = valoresComCabecalho_(ABAS.CONTATOS_CLIENTES);
+        perfil.contatos = contatos.linhas.filter(function (item) {
+          return String(valorLinha_(contatos, item, 'usuario_email')).toLowerCase().trim() === email;
+        }).map(function (item) {
+          return {
+            nome: valorLinha_(contatos, item, 'nome'),
+            cpf: valorLinha_(contatos, item, 'cpf'),
+            email: valorLinha_(contatos, item, 'email'),
+            telefone: valorLinha_(contatos, item, 'telefone'),
+            cargo: valorLinha_(contatos, item, 'cargo'),
+            departamento: valorLinha_(contatos, item, 'departamento'),
+            recebeNotaFiscalBoleto: valorLinha_(contatos, item, 'recebe_nota_fiscal_boleto') === true,
+            recebeProposta: valorLinha_(contatos, item, 'recebe_proposta') === true,
+            recebeRelatorio: valorLinha_(contatos, item, 'recebe_relatorio') === true
+          };
+        });
+      } catch (_) { /* Aba de contatos ausente. */ }
+    }
+  } catch (_) { /* Sem perfil de cliente para este acesso. */ }
+
+  return sucesso_('Perfil carregado.', perfil);
 }
 
 function administrador_(token) {
@@ -980,7 +1023,7 @@ function salvarSolicitacaoFisicoQuimica(dados, token) {
 
 function salvarChecklistRecebimento(dados, token) {
   const usuario = validarToken_(token);
-  const permissao = podeCriarSolicitacao_(usuario);
+  const permissao = podeReceberAmostra_(usuario);
   if (permissao) return permissao;
   if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
 

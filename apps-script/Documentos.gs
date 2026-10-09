@@ -99,6 +99,12 @@ function cadastrarClienteDocumentado_(dados, nome, email, senha) {
       if (valorLinha_(usuarios, linha, 'cadastro_id') !== cadastroId || String(valorLinha_(usuarios, linha, 'senha')) !== senha || valorLinha_(usuarios, linha, 'cadastro_fingerprint') !== fingerprint) return falha_('Já existe um cadastro com este e-mail. Para retomar uma tentativa, mantenha os mesmos dados e documentos.');
       if (valorLinha_(usuarios, linha, 'estado_documental') === 'CONCLUIDO') return sucesso_('Cadastro já concluído.', { email: email, grupo: GRUPOS.CLIENTE });
     }
+    const clientes = tabelaCadastro_(ABAS.CLIENTES, ['usuario_email', 'razao_social', 'nome_fantasia', 'renasem', 'endereco', 'cidade', 'estado', 'cep', 'telefone', 'cpf_cnpj', 'inscricao_estadual_rg', 'ramo_atividade', 'numero_funcionarios', 'data_cadastro', 'tipo_pessoa', 'cadastro_id']);
+    const documentoCliente = String(dados.cliente.cpfCnpj || '').replace(/\D/g, '');
+    const documentoDuplicado = clientes.linhas.some(function (linha) {
+      return String(valorLinha_(clientes, linha, 'cpf_cnpj') || '').replace(/\D/g, '') === documentoCliente && valorLinha_(clientes, linha, 'cadastro_id') !== cadastroId;
+    });
+    if (documentoDuplicado) return falha_('Já existe um cadastro com este CPF/CNPJ. Cada CPF/CNPJ pode ser usado em apenas um cadastro.');
     const agora = new Date();
     const registroUsuario = { email: email, senha: senha, nome: nome, ativo: false, grupo: GRUPOS.CLIENTE, data_cadastro: indice >= 0 ? valorLinha_(usuarios, usuarios.linhas[indice], 'data_cadastro') : agora, cadastro_id: cadastroId, estado_documental: 'PENDENTE', cadastro_fingerprint: fingerprint };
     if (indice < 0) gravarRegistroCadastro_(usuarios, registroUsuario, -1);
@@ -139,7 +145,6 @@ function cadastrarClienteDocumentado_(dados, nome, email, senha) {
         throw erro;
       }
     });
-    const clientes = tabelaCadastro_(ABAS.CLIENTES, ['usuario_email', 'razao_social', 'nome_fantasia', 'renasem', 'endereco', 'cidade', 'estado', 'cep', 'telefone', 'cpf_cnpj', 'inscricao_estadual_rg', 'ramo_atividade', 'numero_funcionarios', 'data_cadastro', 'tipo_pessoa', 'cadastro_id']);
     const c = dados.cliente;
     if (!clientes.linhas.some(function (linha) { return valorLinha_(clientes, linha, 'cadastro_id') === cadastroId; })) gravarRegistroCadastro_(clientes, { usuario_email: email, razao_social: dados.tipoPessoa === 'FISICA' ? nome : c.razaoSocial, nome_fantasia: dados.tipoPessoa === 'JURIDICA' ? c.nomeFantasia : '', renasem: c.renasem || '', endereco: c.endereco, cidade: c.cidade, estado: c.estado, cep: c.cep, telefone: c.telefone, cpf_cnpj: c.cpfCnpj, inscricao_estadual_rg: c.inscricaoEstadualRg, ramo_atividade: dados.tipoPessoa === 'JURIDICA' ? c.ramoAtividade : '', numero_funcionarios: dados.tipoPessoa === 'JURIDICA' ? c.numeroFuncionarios : '', data_cadastro: agora, tipo_pessoa: dados.tipoPessoa, cadastro_id: cadastroId }, -1);
     const contatos = tabelaCadastro_(ABAS.CONTATOS_CLIENTES, ['usuario_email', 'nome', 'cpf', 'email', 'telefone', 'cargo', 'departamento', 'recebe_nota_fiscal_boleto', 'recebe_proposta', 'recebe_relatorio', 'data_cadastro', 'cadastro_id', 'numero_contato']);

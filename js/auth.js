@@ -2,6 +2,7 @@
 (function () {
   const config = window.APP_CONFIG;
   const chaveSessao = config.sessionStorageKey;
+  const GRUPOS_IST = ['IST_Colaborators', 'Manager_User', 'Administrator_User'];
 
   function obterSessao() {
     try {
@@ -28,6 +29,16 @@
     }
 
     return obterSessao();
+  }
+
+  function exigirGrupos(grupos) {
+    const sessao = exigirSessao();
+    if (!sessao) return null;
+    if (grupos.indexOf(sessao.grupo) < 0) {
+      window.location.href = 'menu.html';
+      return null;
+    }
+    return sessao;
   }
 
   function respostaJson(resposta) {
@@ -141,7 +152,7 @@
       elemento.hidden = sessao.grupo !== 'Administrator_User';
     });
 
-    const gruposIst = ['IST_Colaborators', 'Manager_User', 'Administrator_User'];
+    const gruposIst = GRUPOS_IST;
     document.querySelectorAll('[data-checklists]').forEach((elemento) => {
       elemento.hidden = gruposIst.indexOf(sessao.grupo) < 0;
     });
@@ -159,6 +170,7 @@
     sessaoValida,
     limparSessao,
     exigirSessao,
+    exigirGrupos,
     requisitarApi,
     fazerLogin,
     cadastrarUsuario,
