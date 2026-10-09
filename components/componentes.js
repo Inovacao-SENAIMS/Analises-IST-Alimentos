@@ -12,7 +12,8 @@
     clipboard: '<svg viewBox="0 0 24 24" focusable="false"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M9 10h6M9 14h6M9 18h3"/></svg>',
     admin: '<svg viewBox="0 0 24 24" focusable="false"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg>',
     historico: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5M8 17h3"/></svg>',
-    recebimento: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 8h16v12H4z"/><path d="m4 8 1.5-4h13L20 8"/><path d="M10 12h4"/></svg>'
+    recebimento: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 8h16v12H4z"/><path d="m4 8 1.5-4h13L20 8"/><path d="M10 12h4"/></svg>',
+    documentos: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 11v6M11 14l3 3 3-3"/></svg>'
   };
 
   function renderizarIcone(nome) {
@@ -63,6 +64,9 @@
           </a>
           <a data-checklists hidden class="${paginaAtiva === 'checklists' ? 'active' : ''}" href="historico-checklists.html">
             ${renderizarIcone('clipboard')}<span>Histórico de checklists</span>
+          </a>
+          <a data-documentos hidden class="${paginaAtiva === 'documentos' ? 'active' : ''}" href="gestao-documentos.html">
+            ${renderizarIcone('documentos')}<span>Gestão de Documentos</span>
           </a>
         </nav>
         <div class="sidebar-footer">

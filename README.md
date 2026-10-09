@@ -136,16 +136,16 @@ Clientes: usuario_email | razao_social | nome_fantasia | renasem | endereco | ci
 ContatosClientes: usuario_email | nome | cpf | email | telefone | cargo | departamento | recebe_nota_fiscal_boleto | recebe_proposta | recebe_relatorio | data_cadastro
 ```
 
-Clientes escolhem Pessoa física ou Pessoa jurídica. Pessoa física informa nome completo, CPF, RG, endereço e contato; razão social, nome fantasia, ramo de atividade e número de funcionários se aplicam apenas à pessoa jurídica. RENASEM permanece opcional, aplicável a ensaios de sementes. Os contatos são opcionais para o Cliente e servem como informação de referência; contatos em branco não são gravados. Cada CPF/CNPJ pode ser usado em apenas um cadastro: o backend rejeita um novo cliente com documento já cadastrado. As abas são criadas pelo Apps Script no primeiro cadastro de Cliente; após atualizar os dois arquivos `.gs`, publique uma nova versão do Web App `/exec`.
+Clientes escolhem Pessoa física ou Pessoa jurídica. Pessoa física informa nome completo, CPF, RG, endereço e contato; razão social, nome fantasia, ramo de atividade e número de funcionários se aplicam apenas à pessoa jurídica. RENASEM permanece opcional, aplicável a ensaios de sementes. Os contatos são opcionais para o Cliente e servem como informação de referência; contatos em branco não são gravados. Cada CPF/CNPJ pode ser usado em apenas um cadastro: o backend rejeita um novo cliente com documento já cadastrado. As abas são criadas pelo Apps Script no primeiro cadastro de Cliente; após atualizar os dois arquivos `.gs`, publique uma nova versão do Web  App `/exec`.
 
 ### Documentos obrigatórios no cadastro
 
 A seção **Documentos** fica ao final do formulário, antes de **Criar acesso**, e aparece apenas para Cliente:
 
-| Tipo de pessoa | Documento principal | Documento complementar |
-| --- | --- | --- |
-| Física | Documento com foto | Comprovante de residência |
-| Jurídica | Documento com foto do RT (responsável técnico) | ART — Anotação de Responsabilidade Técnica |
+| Tipo de pessoa | Documento principal                              | Documento complementar                         |
+| -------------- | ------------------------------------------------ | ---------------------------------------------- |
+| Física        | Documento com foto                               | Comprovante de residência                     |
+| Jurídica      | Documento com foto do RT (responsável técnico) | ART — Anotação de Responsabilidade Técnica |
 
 São obrigatórios **dois arquivos**, um por campo, em **PDF, JPG/JPEG ou PNG**, com até **5 MiB (5.242.880 bytes)** cada. O servidor verifica categorias, tamanho real, extensão, MIME e assinatura binária básica. Isso não é uma verificação automática de autenticidade ou validade profissional do documento.
 
@@ -186,6 +186,12 @@ Durante a gravação, o cliente fica **PENDENTE** e sem acesso. Somente após ar
 Se ocorrer falha, tente novamente na mesma aba com os mesmos dados, credenciais e arquivos. O identificador é preservado na sessão do navegador; senhas e arquivos não são armazenados nesse mecanismo. Se a página for recarregada, será necessário preencher os dados e selecionar os mesmos arquivos novamente. Caso a sessão tenha sido perdida, a equipe deverá recuperar o cadastro pendente de forma controlada; não há ferramenta de recuperação administrativa nesta entrega.
 
 Falhas parciais são retomadas sem duplicar registros. Se a criação de metadados falhar depois do upload, o servidor tenta mover o arquivo recém-criado para a lixeira e registra falhas de compensação nos logs. Não existe transação conjunta entre Drive e Sheets.
+
+### Gestão de Documentos
+
+A seção **Gestão de Documentos** (`pages/gestao-documentos.html`) lista os anexos enviados nos cadastros de clientes e fica no menu lateral apenas para `IST_Colaborators`, `Manager_User` e `Administrator_User`. A lista mostra usuário (nome e e-mail), tipo de pessoa, categoria, arquivo, tamanho e data, com filtros por usuário, categoria e tipo de pessoa.
+
+O botão **Visualizar** abre o anexo em um modal na própria página (PDF ou imagem) e o **Baixar** salva o arquivo com o nome original. Os arquivos permanecem privados no Drive: o backend entrega o conteúdo sob demanda pelas ações autenticadas `listarDocumentos` (metadados) e `obterDocumento` (bytes em base64), sem gerar links públicos. Após alterar o Apps Script, publique uma **nova versão** do Web App `/exec` e o frontend.
 
 Clientes anteriores à mudança e colaboradores mantêm seu fluxo de acesso. A exclusão administrativa de usuário **não exclui automaticamente documentos no Drive ou seus metadados**; a política de retenção e eventual limpeza precisa ser definida separadamente.
 

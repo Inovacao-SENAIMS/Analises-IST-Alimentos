@@ -105,6 +105,21 @@ test('obterPerfil entrega os dados do cadastro do cliente', () => {
   assert.equal(perfil.dados.contatos[0].email, 'contato@example.test');
   assert.equal(perfil.dados.contatos[0].recebeProposta, true);
 });
+test('gestão de documentos restringe ao IST e entrega o anexo', () => {
+  const e = environment(); const p = payload(); assert.equal(e.run(p).sucesso, true);
+  const cliente = e.ctx.login(p.email, p.senha).dados.token;
+  assert.equal(e.ctx.listarDocumentos(cliente).sucesso, false);
+  const usuarios = e.state.sheets.Usuarios;
+  usuarios.data[1][usuarios.data[0].indexOf('grupo')] = 'Administrator_User';
+  const token = e.ctx.login(p.email, p.senha).dados.token;
+  const lista = e.ctx.listarDocumentos(token);
+  assert.equal(lista.sucesso, true);
+  assert.equal(lista.dados.documentos.length, 2);
+  assert.equal(lista.dados.documentos[0].usuarioEmail, p.email);
+  const arquivo = e.ctx.obterDocumento({ documentoId: lista.dados.documentos[0].documentoId }, token);
+  assert.equal(arquivo.sucesso, true);
+  assert.equal(Buffer.from(arquivo.dados.base64, 'base64').subarray(0, 5).toString(), '%PDF-');
+});
 test('PJ exige documento do RT e ART', () => {
   const e = environment(); const p = payload('JURIDICA'); p.documentos[1].categoria = 'COMPROVANTE_RESIDENCIA';
   assert.equal(e.run(p).sucesso, false); assert.equal(e.state.files.size, 0);

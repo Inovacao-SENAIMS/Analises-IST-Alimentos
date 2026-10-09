@@ -13,9 +13,11 @@ const requiredFiles = [
   'pages/administracao-usuarios.html',
   'pages/historico-solicitacoes.html',
   'pages/historico-checklists.html',
+  'pages/gestao-documentos.html',
   'css/style.css', 'js/config.js', 'js/auth.js', 'js/menu.js',
   'js/validacoes.js', 'js/form-analise-sementes.js', 'js/form-amostras-fiscais.js', 'js/cadastro.js', 'js/perfil.js',
   'js/checklist-recebimento.js', 'js/form-recebimento-amostra.js', 'js/hex-vault.js', 'js/historico-checklists.js',
+  'js/gestao-documentos.js',
   'components/componentes.js', 'components/pdf-relatorios.js',
   'apps-script/Code.gs', 'README.md'
 ];
@@ -224,6 +226,31 @@ test('histórico de checklists tem rota, ação e item de menu restrito ao IST',
   assert.match(api, /case 'listarChecklists'/);
   assert.match(api, /function listarChecklists[\s\S]*GRUPOS\.COLABORADOR/);
   assert.match(css, /sidebar-nav a\[data-checklists\]\[hidden\]/);
+});
+
+test('gestão de documentos lista, restringe ao IST e entrega anexos', () => {
+  const pagina = readFileSync(join(root, 'pages/gestao-documentos.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/gestao-documentos.js'), 'utf8');
+  const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
+  const auth = readFileSync(join(root, 'js/auth.js'), 'utf8');
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+  assert.match(pagina, /data-pagina-ativa="documentos"/);
+  assert.match(pagina, /id="docs-body"/);
+  assert.match(pagina, /id="documentos-filtros"/);
+  assert.match(pagina, /id="doc-modal"/);
+  assert.match(script, /exigirGrupos\(/);
+  assert.match(script, /listarDocumentos/);
+  assert.match(script, /obterDocumento/);
+  assert.match(script, /base64ParaBlob/);
+  assert.match(componentes, /data-documentos hidden/);
+  assert.match(componentes, /Gestão de Documentos/);
+  assert.match(auth, /data-documentos/);
+  assert.match(api, /case 'listarDocumentos'/);
+  assert.match(api, /case 'obterDocumento'/);
+  assert.match(api, /function obterDocumento[\s\S]*DriveApp\.getFileById/);
+  assert.match(css, /\.doc-modal/);
+  assert.match(css, /sidebar-nav a\[data-documentos\]\[hidden\]/);
 });
 
 test('recebimento é único e sinaliza amostra recebida', () => {

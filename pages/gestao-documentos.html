@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestão de Documentos | SENAI FIEMS</title>
+    <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/png" href="../design/components/favicon/favicon_logo.png">
+  </head>
+  <body class="app-layout">
+    <div class="app-frame">
+      <div data-componente="sidebar" data-pagina-ativa="documentos"></div>
+
+      <main class="content-area">
+        <div class="mobile-topbar">
+          <button class="mobile-menu-button" data-sidebar-toggle type="button" aria-label="Abrir menu">☰</button>
+          <img class="senai-logo" src="../design/brand/senai_alimentos.jpeg" alt="SENAI FIEMS">
+        </div>
+
+        <div class="content-inner">
+          <p class="eyebrow">Gestão</p>
+          <h1 class="page-heading">Gestão de Documentos</h1>
+          <p class="page-lead">Consulte os anexos enviados nos cadastros de clientes. Visualize rapidamente ou baixe cada arquivo.</p>
+          <div id="documentos-status" class="status" role="alert"></div>
+
+          <section class="card admin-card">
+            <form id="documentos-filtros" class="docs-filters" novalidate>
+              <div class="field">
+                <label for="docs-busca">Usuário (nome ou e-mail)</label>
+                <input id="docs-busca" type="search" placeholder="Buscar por nome ou e-mail" autocomplete="off">
+              </div>
+              <div class="field">
+                <label for="docs-categoria">Categoria</label>
+                <select id="docs-categoria"><option value="">Todas</option></select>
+              </div>
+              <div class="field">
+                <label for="docs-tipo">Tipo de pessoa</label>
+                <select id="docs-tipo">
+                  <option value="">Todos</option>
+                  <option value="FISICA">Pessoa física</option>
+                  <option value="JURIDICA">Pessoa jurídica</option>
+                </select>
+              </div>
+              <div class="docs-filters-action">
+                <button id="docs-refresh" class="button admin-refresh-button" type="button">Atualizar</button>
+              </div>
+            </form>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Usuário</th>
+                    <th>Tipo</th>
+                    <th>Categoria</th>
+                    <th>Arquivo</th>
+                    <th>Tamanho</th>
+                    <th>Data</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="docs-body"></tbody>
+              </table>
+            </div>
+            <p id="docs-empty" class="data-footnote" hidden>Nenhum documento encontrado.</p>
+          </section>
+
+          <div data-componente="footer"></div>
+        </div>
+      </main>
+    </div>
+
+    <div class="doc-modal" id="doc-modal" hidden>
+      <div class="doc-modal-backdrop" data-doc-close></div>
+      <div class="doc-modal-panel" role="dialog" aria-modal="true" aria-labelledby="doc-modal-title">
+        <div class="doc-modal-head">
+          <strong id="doc-modal-title">Documento</strong>
+          <div class="doc-modal-actions">
+            <button class="button secondary" type="button" data-doc-download>Baixar</button>
+            <button class="button" type="button" data-doc-close>Fechar</button>
+          </div>
+        </div>
+        <div class="doc-modal-body" id="doc-modal-body"></div>
+      </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../components/componentes.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/gestao-documentos.js"></script>
+  </body>
+</html>

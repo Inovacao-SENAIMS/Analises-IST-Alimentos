@@ -153,7 +153,7 @@
     });
 
     const gruposIst = GRUPOS_IST;
-    document.querySelectorAll('[data-checklists]').forEach((elemento) => {
+    document.querySelectorAll('[data-checklists], [data-documentos]').forEach((elemento) => {
       elemento.hidden = gruposIst.indexOf(sessao.grupo) < 0;
     });
 

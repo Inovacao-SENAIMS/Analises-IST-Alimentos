@@ -127,6 +127,10 @@ function doPost(e) {
         return responder_(salvarChecklistRecebimento(entrada.dados, entrada.token));
       case 'listarChecklists':
         return responder_(listarChecklists(entrada.token));
+      case 'listarDocumentos':
+        return responder_(listarDocumentos(entrada.token));
+      case 'obterDocumento':
+        return responder_(obterDocumento(entrada.dados, entrada.token));
       default:
         return responder_(falha_('Operação não reconhecida.'));
     }
@@ -1113,4 +1117,67 @@ function listarChecklists(token) {
   });
 
   return sucesso_('Checklists carregados.', { checklists: checklists });
+}
+
+function gruposIst_() {
+  return [GRUPOS.COLABORADOR, GRUPOS.GESTOR, GRUPOS.ADMIN];
+}
+
+function listarDocumentos(token) {
+  const usuario = validarToken_(token);
+  if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
+  if (gruposIst_().indexOf(usuario.grupo) < 0) return falha_('Acesso restrito.');
+
+  const aba = planilha_().getSheetByName(ABAS.DOCUMENTOS_USUARIOS);
+  if (!aba) return sucesso_('Nenhum documento encontrado.', { documentos: [] });
+
+  const tabela = valoresComCabecalho_(ABAS.DOCUMENTOS_USUARIOS);
+  const nomes = nomesUsuarios_();
+  const documentos = tabela.linhas.map(function (linha) {
+    const email = String(valorLinha_(tabela, linha, 'usuario_email')).trim().toLowerCase();
+    return {
+      documentoId: String(valorLinha_(tabela, linha, 'documento_id')),
+      usuarioEmail: email,
+      usuarioNome: nomes[email] || email,
+      cadastroId: String(valorLinha_(tabela, linha, 'cadastro_id')),
+      tipoPessoa: String(valorLinha_(tabela, linha, 'tipo_pessoa')),
+      categoria: String(valorLinha_(tabela, linha, 'categoria_documento')),
+      nomeOriginal: String(valorLinha_(tabela, linha, 'nome_original')),
+      mimeType: String(valorLinha_(tabela, linha, 'mime_type')),
+      tamanho: Number(valorLinha_(tabela, linha, 'tamanho_bytes')) || 0,
+      dataUpload: valorLinha_(tabela, linha, 'data_upload')
+    };
+  }).filter(function (documento) { return documento.documentoId && documento.usuarioEmail; });
+
+  documentos.sort(function (a, b) {
+    return new Date(b.dataUpload || 0).getTime() - new Date(a.dataUpload || 0).getTime();
+  });
+
+  return sucesso_('Documentos carregados.', { documentos: documentos });
+}
+
+function obterDocumento(dados, token) {
+  const usuario = validarToken_(token);
+  if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
+  if (gruposIst_().indexOf(usuario.grupo) < 0) return falha_('Acesso restrito.');
+
+  const documentoId = String((dados && dados.documentoId) || '').trim();
+  if (!documentoId) return falha_('Documento não informado.');
+
+  const tabela = valoresComCabecalho_(ABAS.DOCUMENTOS_USUARIOS);
+  const linha = tabela.linhas.find(function (item) { return String(valorLinha_(tabela, item, 'documento_id')) === documentoId; });
+  if (!linha) return falha_('Documento não encontrado.');
+
+  try {
+    const arquivo = DriveApp.getFileById(String(valorLinha_(tabela, linha, 'arquivo_drive_id')));
+    if (arquivo.isTrashed()) return falha_('Este arquivo não está mais disponível no Drive.');
+    const blob = arquivo.getBlob();
+    return sucesso_('Documento carregado.', {
+      nome: String(valorLinha_(tabela, linha, 'nome_original')) || arquivo.getName(),
+      mimeType: String(valorLinha_(tabela, linha, 'mime_type')) || blob.getContentType(),
+      base64: Utilities.base64Encode(blob.getBytes())
+    });
+  } catch (_) {
+    return falha_('Não foi possível abrir o arquivo no Drive. Ele pode ter sido removido.');
+  }
 }
