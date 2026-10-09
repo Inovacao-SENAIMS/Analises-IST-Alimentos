@@ -135,7 +135,7 @@
     const remover = item.querySelector('.remover-contato');
     remover.classList.add('contact-remove-button');
     remover.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Remover contato';
-    remover.addEventListener('click', () => { if (lista.children.length > 1) item.remove(); });
+    remover.addEventListener('click', () => { item.remove(); });
     aplicarMascara(item.querySelector('[name="contatoCpf"]'), mascararCpfCnpj);
     aplicarMascara(item.querySelector('[name="contatoTelefone"]'), mascararTelefone);
     lista.appendChild(item);
@@ -146,7 +146,6 @@
     blocoCliente.hidden = !cliente;
     form.closest('.cadastro-card').classList.toggle('cadastro-card--cliente', cliente);
     blocoCliente.querySelectorAll('input, select').forEach((campo) => { campo.disabled = !cliente; campo.required = cliente && camposCliente.includes(campo.name); });
-    if (cliente && !lista.children.length) adicionarContato();
     form.elements.tipoPessoa.required = cliente;
     const juridica = form.elements.tipoPessoa.value === 'JURIDICA';
     form.querySelectorAll('[data-empresa-linha]').forEach((linha) => { linha.hidden = !juridica; });

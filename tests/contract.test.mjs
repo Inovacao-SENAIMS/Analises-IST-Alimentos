@@ -393,6 +393,13 @@ test('contatos possuem ações com ícones e finalidades sem contorno', () => {
   assert.doesNotMatch(script, /ao menos um contato completo com finalidade/);
 });
 
+test('contatos iniciam vazios e qualquer contato pode ser removido', () => {
+  const script = readFileSync(join(root, 'js/cadastro.js'), 'utf8');
+  assert.doesNotMatch(script, /if \(cliente && !lista\.children\.length\) adicionarContato\(\)/);
+  assert.doesNotMatch(script, /lista\.children\.length > 1/);
+  assert.match(script, /remover\.addEventListener\('click', \(\) => \{ item\.remove\(\); \}\)/);
+});
+
 test('bloco de contatos mantém respiro antes dos dados de acesso', () => {
   const css = readFileSync(join(root, 'css/style.css'), 'utf8');
   assert.match(css, /#cliente-cadastro[^}]*margin-bottom/);

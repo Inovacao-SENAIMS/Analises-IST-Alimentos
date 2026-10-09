@@ -30,7 +30,7 @@ function setup(tipo = 'FISICA', profile = 'CLIENTE') {
   vm.runInContext(readFileSync('js/validacoes.js','utf8'),ctx);
   ctx.Validacoes = ctx.window.Validacoes;
   vm.runInContext(readFileSync('js/cadastro.js','utf8'),ctx);
-  return { fields, uploads, received, status, ctx, block, async submit() { await events.submit({ preventDefault(){}, currentTarget:form }); }, fail(v) { failure=v; } };
+  return { fields, uploads, received, status, ctx, block, list, async submit() { await events.submit({ preventDefault(){}, currentTarget:form }); }, fail(v) { failure=v; } };
 }
 test('inicializacao adapta PF e torna documentos obrigatorios apenas para cliente', () => {
   const e=setup(); assert.equal(e.fields.razaoSocial.disabled,true); assert.equal(e.fields.cpfCnpj.required,true); assert.equal(e.uploads.active,true);
@@ -50,4 +50,7 @@ test('falha visivel permite reenvio com mesmo cadastroId sem guardar senha', asy
 });
 test('colaborador envia cadastro sem serializar documentos', async () => {
   const e=setup('FISICA','COLABORADOR_SENAI'); await e.submit(); assert.equal(e.received.length,1); assert.equal(e.uploads.count,0); assert.equal(e.received[0].documentos,undefined);
+});
+test('cliente começa sem contatos e permite adicionar sob demanda', () => {
+  const e=setup(); assert.equal(e.list.children.length,0);
 });
