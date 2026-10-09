@@ -13,7 +13,7 @@ Aplicativo estático em HTML, CSS e JavaScript puro para coletar solicitações 
 
 As páginas HTML ficam organizadas em `pages/`, usam pontos de montagem `data-componente` e carregam `components/componentes.js`. O `index.html` da raiz funciona como entrada compatível com o GitHub Pages e redireciona para `pages/index.html`. Assim, alterações de navegação, rodapé, cabeçalho ou ícones SVG são feitas em um único lugar.
 
-O menu agrupa os serviços em duas categorias: **análise** (análise de sementes, análise microbiológica, análise físico-química e amostras fiscais de alimentos) e **recebimento** (recebimento de amostra, que registra o checklist de recebimento vinculado a uma solicitação existente). Cada fluxo possui suas próprias abas de gravação para preservar o histórico e facilitar futuras revisões. A rota `pages/historico-solicitacoes.html` consolida as solicitações enviadas e permite consultar detalhes públicos.
+O menu agrupa os serviços em duas categorias: **análise** (análise de sementes, análise microbiológica, análise físico-química e análise de alimentos) e **recebimento** (recebimento de amostra, que registra o checklist de recebimento vinculado a uma solicitação existente). Cada fluxo possui suas próprias abas de gravação para preservar o histórico e facilitar futuras revisões. A rota `pages/historico-solicitacoes.html` consolida as solicitações enviadas e permite consultar detalhes públicos.
 
 ## 1. Criar a planilha
 
@@ -98,7 +98,7 @@ As colunas `resultado` e `observacoes_laboratorio` são reservadas ao laboratór
 ### `ChecklistsRecebimento`
 
 ```text
-checklist_id | solicitacao_id | tipo_referencia | data_recebimento | hora_recebimento | temperatura_amostra | quantidade_amostra | peso_volume | numero_amostra | situacao_amostra | responsavel | observacoes | usuario | data_registro
+checklist_id | solicitacao_id | tipo_referencia | usuario_amostra | requerente_cliente | data_recebimento | hora_recebimento | temperatura_amostra | quantidade_amostra | peso_volume | numero_amostra | situacao_amostra | responsavel | observacoes | usuario | data_registro
 ```
 
 Criada automaticamente no primeiro envio do serviço **Recebimento de Amostra** (`pages/recebimento-amostra.html`). Vincula o checklist à solicitação escolhida em `solicitacao_id` (`tipo_referencia` identifica a análise). A ação protegida é `salvarChecklistRecebimento`.

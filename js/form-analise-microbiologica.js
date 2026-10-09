@@ -15,7 +15,7 @@
   function prepararComprovante(dados, solicitacaoId) {
     return {
       solicitacaoId,
-      titulo: 'Solicitação de Análise Microbiológica',
+      titulo: 'Análise Microbiológica',
       dataEnvio: new Date().toLocaleString('pt-BR'),
       campos: [
         ['Razão social', dados.razaoSocial], ['CPF/CNPJ', dados.cpfCnpj], ['Responsável', dados.responsavel],

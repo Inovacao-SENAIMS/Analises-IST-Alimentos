@@ -13,7 +13,7 @@
   function prepararComprovante(dados, solicitacaoId) {
     return {
       solicitacaoId,
-      titulo: 'Solicitação de Amostras Fiscais - Alimentos',
+      titulo: 'Análise de Alimentos',
       dataEnvio: new Date().toLocaleString('pt-BR'),
       campos: [
         ['Razão social', dados.razaoSocial], ['CPF/CNPJ', dados.cpfCnpj], ['Produto', dados.produto],

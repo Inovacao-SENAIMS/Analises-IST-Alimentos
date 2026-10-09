@@ -4,6 +4,8 @@
   if (!raiz) return;
 
   const referencia = raiz.querySelector('#checklist-referencia');
+  const usuario = raiz.querySelector('#checklist-usuario');
+  const requerente = raiz.querySelector('#checklist-requerente');
   const numeroAnalise = raiz.querySelector('#checklist-numero-analise');
   const erro = raiz.querySelector('#checklist-error');
   let solicitacoes = null;
@@ -15,37 +17,83 @@
     });
   }
 
-  function preencherNumeros(lista) {
-    if (!lista.length) {
-      numeroAnalise.innerHTML = '<option value="">Nenhuma solicitação encontrada</option>';
-      numeroAnalise.disabled = true;
+  function preencher(select, itens, vazio, valorAtual) {
+    if (!itens.length) {
+      select.innerHTML = `<option value="">${vazio}</option>`;
+      select.disabled = true;
       return;
     }
-    numeroAnalise.innerHTML = [
+    select.innerHTML = [
       '<option value="">Selecione</option>',
-      ...lista.map((item) => `<option value="${item.solicitacaoId}">${item.solicitacaoId}</option>`)
+      ...itens.map((item) => `<option value="${item.valor}">${item.rotulo}</option>`)
     ].join('');
-    numeroAnalise.disabled = false;
+    select.disabled = false;
+    if (valorAtual && itens.some((item) => item.valor === valorAtual)) select.value = valorAtual;
   }
 
-  async function carregarNumeros() {
+  function base() {
     const tipo = referencia.value;
+    return tipo ? (solicitacoes || []).filter((item) => item.tipo === tipo) : [];
+  }
+
+  function distintos(lista, chave, chaveRotulo) {
+    const vistos = new Set();
+    const itens = [];
+    lista.forEach((item) => {
+      const valor = String(item[chave] || '').trim();
+      if (!valor || vistos.has(valor)) return;
+      vistos.add(valor);
+      itens.push({ valor, rotulo: String(item[chaveRotulo || chave] || valor).trim() || valor });
+    });
+    return itens.sort((a, b) => a.rotulo.localeCompare(b.rotulo, 'pt-BR'));
+  }
+
+  function atualizarNumero() {
+    const filtradas = base().filter((item) =>
+      (!usuario.value || String(item.usuario) === usuario.value) &&
+      (!requerente.value || String(item.requerente) === requerente.value));
+    preencher(numeroAnalise, filtradas.map((item) => ({ valor: item.solicitacaoId, rotulo: item.solicitacaoId })), 'Nenhuma solicitação encontrada', '');
+  }
+
+  function atualizarUsuario() {
+    const filtradas = base().filter((item) => !requerente.value || String(item.requerente) === requerente.value);
+    preencher(usuario, distintos(filtradas, 'usuario', 'usuarioNome'), 'Nenhum usuário', usuario.value);
+  }
+
+  function atualizarRequerente() {
+    const filtradas = base().filter((item) => !usuario.value || String(item.usuario) === usuario.value);
+    preencher(requerente, distintos(filtradas, 'requerente'), 'Nenhum requerente', requerente.value);
+  }
+
+  function refrescar() {
+    atualizarUsuario();
+    atualizarRequerente();
+    atualizarNumero();
+  }
+
+  async function carregar() {
+    usuario.value = '';
+    requerente.value = '';
     numeroAnalise.value = '';
-    if (!tipo) {
-      numeroAnalise.innerHTML = '<option value="">Selecione a referência</option>';
-      numeroAnalise.disabled = true;
+    if (!referencia.value) {
+      preencher(usuario, [], 'Selecione a referência', '');
+      preencher(requerente, [], 'Selecione a referência', '');
+      preencher(numeroAnalise, [], 'Selecione a referência', '');
       return;
     }
-    numeroAnalise.innerHTML = '<option value="">Carregando…</option>';
-    numeroAnalise.disabled = true;
+    preencher(usuario, [], 'Carregando…', '');
+    preencher(requerente, [], 'Carregando…', '');
+    preencher(numeroAnalise, [], 'Carregando…', '');
     try {
       if (!solicitacoes) {
         const resultado = await AppAuth.requisitarApi('listarHistoricoSolicitacoes');
         solicitacoes = resultado.dados?.solicitacoes || [];
       }
-      preencherNumeros(solicitacoes.filter((item) => item.tipo === tipo));
+      refrescar();
     } catch (e) {
-      numeroAnalise.innerHTML = '<option value="">Erro ao carregar</option>';
+      preencher(usuario, [], 'Erro ao carregar', '');
+      preencher(requerente, [], 'Erro ao carregar', '');
+      preencher(numeroAnalise, [], 'Erro ao carregar', '');
       erro.textContent = e.message;
     }
   }
@@ -58,8 +106,10 @@
   function coletar() {
     const situacao = raiz.querySelector('[name="checklistSituacao"]:checked');
     const dados = {
-      tipoReferencia: valor('checklistReferencia'),
-      solicitacaoId: valor('checklistNumeroAnalise'),
+      tipoReferencia: referencia.value,
+      usuarioAmostra: usuario.value,
+      requerenteCliente: requerente.value,
+      solicitacaoId: numeroAnalise.value,
       dataRecebimento: valor('checklistDataRecebimento'),
       hora: valor('checklistHora'),
       temperatura: valor('checklistTemperatura'),
@@ -91,9 +141,18 @@
 
   referencia.addEventListener('change', () => {
     limparErro();
-    carregarNumeros();
+    carregar();
   });
-
+  usuario.addEventListener('change', () => {
+    limparErro();
+    atualizarRequerente();
+    atualizarNumero();
+  });
+  requerente.addEventListener('change', () => {
+    limparErro();
+    atualizarUsuario();
+    atualizarNumero();
+  });
   numeroAnalise.addEventListener('change', limparErro);
 
   window.ChecklistRecebimento = { coletar, validar, mostrarErro, enviar };

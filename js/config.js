@@ -8,25 +8,25 @@ window.APP_CONFIG = {
   formularios: [
     {
       id: 'analise-sementes',
-      titulo: 'Solicitação de Análise de Sementes',
-      descricao: 'Solicitação de ensaios de análise de sementes para Controle de Qualidade ou emissão de BAS.',
+      titulo: 'Análise de Sementes',
+      descricao: 'Ensaios de análise de sementes para Controle de Qualidade ou emissão de BAS.',
       icone: 'seedling',
       caminho: 'formulario-analise-sementes.html',
       categoria: 'analise'
     },
     {
       id: 'analise-microbiologica',
-      titulo: 'Solicitação de Análise Microbiológica',
-      descricao: 'Solicitação de ensaios microbiológicos para água, gelo, alimentos e bebidas.',
+      titulo: 'Análise Microbiológica',
+      descricao: 'Ensaios microbiológicos para água, gelo, alimentos e bebidas.',
       icone: 'flask',
       caminho: 'formulario-analise-microbiologica.html',
       categoria: 'analise'
     },
-    { id: 'analise-fisico-quimica', titulo: 'Solicitação de Análise Físico-Química', descricao: 'Solicitação de ensaios físico-químicos para água, gelo, carnes, leite, mel, alimentos, bebidas e matérias-primas.', icone: 'flask', caminho: 'formulario-analise-fisico-quimica.html', categoria: 'analise' },
+    { id: 'analise-fisico-quimica', titulo: 'Análise Físico-Química', descricao: 'Ensaios físico-químicos para água, gelo, carnes, leite, mel, alimentos, bebidas e matérias-primas.', icone: 'flask', caminho: 'formulario-analise-fisico-quimica.html', categoria: 'analise' },
     {
       id: 'amostras-fiscais',
-      titulo: 'Amostras Fiscais - Alimentos',
-      descricao: 'Solicitação de análise fiscal indicativa ou representativa de alimentos.',
+      titulo: 'Análise de Alimentos',
+      descricao: 'Análise fiscal indicativa ou representativa de alimentos.',
       icone: 'clipboard',
       caminho: 'formulario-amostras-fiscais.html',
       categoria: 'analise'

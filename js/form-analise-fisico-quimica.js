@@ -136,7 +136,7 @@
 
       ultimoComprovante = {
         solicitacaoId: r.dados.solicitacaoId,
-        titulo: 'Solicitação de Análise Físico-Química',
+        titulo: 'Análise Físico-Química',
         dataEnvio: new Date().toLocaleString('pt-BR'),
         campos: [
           ['Razão social', dados.razaoSocial],

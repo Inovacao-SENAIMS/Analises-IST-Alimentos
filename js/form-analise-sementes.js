@@ -22,7 +22,7 @@
   let ultimoComprovante = null;
 
   function prepararComprovante(dados, solicitacaoId) {
-    const titulo = 'Solicitação de Análise de Sementes';
+    const titulo = 'Análise de Sementes';
     return {
       solicitacaoId,
       titulo,

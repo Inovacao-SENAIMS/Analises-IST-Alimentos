@@ -174,6 +174,24 @@ test('checklist de recebimento é um serviço dedicado', () => {
   assert.match(api, /ChecklistsRecebimento/);
 });
 
+test('checklist cruza os filtros de usuário e requerente', () => {
+  const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
+  const modulo = readFileSync(join(root, 'js/checklist-recebimento.js'), 'utf8');
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  const readme = readFileSync(join(root, 'README.md'), 'utf8');
+  assert.match(componentes, /checklist-usuario/);
+  assert.match(componentes, /checklist-requerente/);
+  assert.match(modulo, /atualizarUsuario/);
+  assert.match(modulo, /atualizarRequerente/);
+  assert.match(modulo, /usuarioNome/);
+  assert.match(api, /function nomesUsuarios_/);
+  assert.match(api, /function requerenteDoHistorico_/);
+  assert.match(api, /usuarioNome:/);
+  assert.match(api, /usuario_amostra/);
+  assert.match(api, /requerente_cliente/);
+  assert.match(readme, /usuario_amostra/);
+});
+
 test('menu agrupa serviços de análise e de recebimento', () => {
   const menu = readFileSync(join(root, 'js/menu.js'), 'utf8');
   const css = readFileSync(join(root, 'css/style.css'), 'utf8');
@@ -243,7 +261,7 @@ test('solicitações gravadas disparam aviso aos contatos do laboratório', () =
   assert.match(api, /Logger\.log/);
   assert.match(api, /notificarNovaSolicitacao_\(id, tipoSolicitacao/);
   assert.match(api, /'IST', 'Análise de Sementes'/);
-  for (const tipo of ['Amostras Fiscais - Alimentos', 'Análise Microbiológica', 'Análise Físico-Química']) {
+  for (const tipo of ['Análise de Alimentos', 'Análise Microbiológica', 'Análise Físico-Química']) {
     assert.match(api, new RegExp(`notificarNovaSolicitacao_\\(id, '${tipo}'`));
   }
 });

@@ -23,7 +23,7 @@ const FONTES_HISTORICO = [
   { tipo: 'analise-sementes', titulo: 'Análise de Sementes', solicitacoes: ABAS.SOLICITACOES, amostras: ABAS.AMOSTRAS },
   { tipo: 'analise-microbiologica', titulo: 'Análise Microbiológica', solicitacoes: ABAS.SOLICITACOES_MICRO, ensaios: ABAS.ENSAIOS_MICRO },
   { tipo: 'analise-fisico-quimica', titulo: 'Análise Físico-Química', solicitacoes: ABAS.SOLICITACOES_FISICO_QUIMICAS, ensaios: ABAS.ENSAIOS_FISICO_QUIMICOS },
-  { tipo: 'amostras-fiscais', titulo: 'Amostras Fiscais - Alimentos', solicitacoes: ABAS.SOLICITACOES_FISCAIS, amostras: ABAS.AMOSTRAS_FISCAIS }
+  { tipo: 'amostras-fiscais', titulo: 'Análise de Alimentos', solicitacoes: ABAS.SOLICITACOES_FISCAIS, amostras: ABAS.AMOSTRAS_FISCAIS }
 ];
 
 const GRUPOS = {
@@ -471,22 +471,47 @@ function usuarioPodeVerSolicitacao_(usuario, linha, tabela) {
   return String(valorLinha_(tabela, linha, 'usuario')).toLowerCase().trim() === usuario.email.toLowerCase().trim();
 }
 
+function nomesUsuarios_() {
+  const mapa = {};
+  try {
+    const tabela = valoresComCabecalho_(ABAS.USUARIOS);
+    const emailColuna = coluna_(tabela.cabecalho, 'email');
+    const nomeColuna = coluna_(tabela.cabecalho, 'nome');
+    if (emailColuna >= 0 && nomeColuna >= 0) {
+      tabela.linhas.forEach(function (linha) {
+        const email = String(linha[emailColuna] || '').trim().toLowerCase();
+        if (email) mapa[email] = String(linha[nomeColuna] || '').trim();
+      });
+    }
+  } catch (_) {}
+  return mapa;
+}
+
+function requerenteDoHistorico_(fonte, tabela, linha) {
+  const coluna = fonte.tipo === 'analise-sementes' ? 'requerente' : 'razao_social';
+  return String(valorLinha_(tabela, linha, coluna)).trim();
+}
+
 function listarHistoricoSolicitacoes(token) {
   const usuario = validarToken_(token);
   if (!usuario) return falha_('SessÃ£o expirada. FaÃ§a login novamente.');
 
+  const nomes = nomesUsuarios_();
   const historico = [];
   FONTES_HISTORICO.forEach(function (fonte) {
     const tabela = valoresComCabecalho_(fonte.solicitacoes);
     tabela.linhas.forEach(function (linha) {
       if (!usuarioPodeVerSolicitacao_(usuario, linha, tabela)) return;
 
+      const email = String(valorLinha_(tabela, linha, 'usuario')).trim();
       historico.push({
         solicitacaoId: String(valorLinha_(tabela, linha, 'solicitacao_id')),
         tipo: fonte.tipo,
         titulo: fonte.titulo,
         dataEnvio: valorLinha_(tabela, linha, 'data_hora_envio', null),
-        usuario: String(valorLinha_(tabela, linha, 'usuario')),
+        usuario: email,
+        usuarioNome: nomes[email.toLowerCase()] || email,
+        requerente: requerenteDoHistorico_(fonte, tabela, linha),
         status: String(valorLinha_(tabela, linha, 'status', 'Enviada') || 'Enviada')
       });
     });
@@ -822,7 +847,7 @@ function salvarSolicitacaoAmostrasFiscais(dados, token) {
     return dadosAmostra[coluna] === undefined ? '' : dadosAmostra[coluna];
   }));
 
-  notificarNovaSolicitacao_(id, 'Amostras Fiscais - Alimentos', usuario.email, agora);
+  notificarNovaSolicitacao_(id, 'Análise de Alimentos', usuario.email, agora);
   return sucesso_('SolicitaÃ§Ã£o fiscal salva.', { solicitacaoId: id });
 }
 
@@ -929,12 +954,14 @@ function salvarChecklistRecebimento(dados, token) {
 
   const agora = new Date();
   const id = 'CHK-' + Utilities.formatDate(agora, Session.getScriptTimeZone() || 'America/Cuiaba', 'yyyyMMdd-HHmmss') + '-' + Utilities.getUuid().slice(0, 6).toUpperCase();
-  const cabecalho = ['checklist_id', 'solicitacao_id', 'tipo_referencia', 'data_recebimento', 'hora_recebimento', 'temperatura_amostra', 'quantidade_amostra', 'peso_volume', 'numero_amostra', 'situacao_amostra', 'responsavel', 'observacoes', 'usuario', 'data_registro'];
+  const cabecalho = ['checklist_id', 'solicitacao_id', 'tipo_referencia', 'usuario_amostra', 'requerente_cliente', 'data_recebimento', 'hora_recebimento', 'temperatura_amostra', 'quantidade_amostra', 'peso_volume', 'numero_amostra', 'situacao_amostra', 'responsavel', 'observacoes', 'usuario', 'data_registro'];
   garantirAba_(ABAS.CHECKLISTS_RECEBIMENTO, cabecalho);
   const registro = {
     checklist_id: id,
     solicitacao_id: solicitacaoId,
     tipo_referencia: tipo,
+    usuario_amostra: dados.usuarioAmostra,
+    requerente_cliente: dados.requerenteCliente,
     data_recebimento: dados.dataRecebimento,
     hora_recebimento: dados.hora,
     temperatura_amostra: dados.temperatura,

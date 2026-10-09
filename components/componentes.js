@@ -110,7 +110,7 @@
       ['analise-sementes', 'Análise de Sementes'],
       ['analise-microbiologica', 'Análise Microbiológica'],
       ['analise-fisico-quimica', 'Análise Físico-Química'],
-      ['amostras-fiscais', 'Amostras Fiscais - Alimentos']
+      ['amostras-fiscais', 'Análise de Alimentos']
     ];
     const opcoesReferencia = tipos
       .map(([valor, rotulo]) => `<option value="${valor}">${rotulo}</option>`)
@@ -129,6 +129,20 @@
             <select id="checklist-referencia" name="checklistReferencia">
               <option value="">Selecione</option>
               ${opcoesReferencia}
+            </select>
+            <small class="error-message"></small>
+          </div>
+          <div class="field">
+            <label for="checklist-usuario">Usuário</label>
+            <select id="checklist-usuario" name="checklistUsuario" disabled>
+              <option value="">Selecione a referência</option>
+            </select>
+            <small class="error-message"></small>
+          </div>
+          <div class="field">
+            <label for="checklist-requerente">Requerente/Cliente</label>
+            <select id="checklist-requerente" name="checklistRequerente" disabled>
+              <option value="">Selecione a referência</option>
             </select>
             <small class="error-message"></small>
           </div>
