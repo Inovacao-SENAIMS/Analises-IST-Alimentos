@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalhe do cliente | SENAI FIEMS</title>
+    <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" type="image/png" href="../design/components/favicon/favicon_logo.png">
+  </head>
+  <body class="app-layout">
+    <div class="app-frame">
+      <div data-componente="sidebar" data-pagina-ativa="clientes"></div>
+
+      <main class="content-area">
+        <div class="mobile-topbar">
+          <button class="mobile-menu-button" data-sidebar-toggle type="button" aria-label="Abrir menu">☰</button>
+          <img class="senai-logo" src="../design/brand/senai_alimentos.jpeg" alt="SENAI FIEMS">
+        </div>
+
+        <div class="content-inner">
+          <a class="back-link" href="lista-clientes.html">← Voltar para Clientes</a>
+          <p class="eyebrow">Gestão</p>
+          <h1 class="page-heading">Detalhe do cliente</h1>
+          <p class="page-lead">Todos os dados registrados do cadastro selecionado. As informações são somente leitura.</p>
+          <div id="detalhe-cliente-status" class="status" role="alert"></div>
+
+          <section class="card data-section">
+            <div class="data-section-head">
+              <div>
+                <h2 class="data-section-title">Identificação e acesso</h2>
+                <p class="data-section-desc">Conta usada para entrar no portal.</p>
+              </div>
+              <div class="clientes-detalhe-pills">
+                <span class="data-pill" data-detalhe-tipo></span>
+                <span class="data-pill role-pill" data-detalhe-grupo>—</span>
+                <span class="data-pill" data-detalhe-situacao>—</span>
+              </div>
+            </div>
+            <div class="data-field-grid">
+              <div class="data-field"><span>Nome</span><strong data-detalhe-nome>Carregando…</strong></div>
+              <div class="data-field"><span>E-mail</span><strong data-detalhe-email>Carregando…</strong></div>
+              <div class="data-field"><span>Conta</span><strong data-detalhe-ativa>Carregando…</strong></div>
+            </div>
+          </section>
+
+          <section class="card data-section">
+            <div class="data-section-head">
+              <div>
+                <h2 class="data-section-title">Dados do cadastro</h2>
+                <p class="data-section-desc">Informações registradas na aba <code>Clientes</code>.</p>
+              </div>
+            </div>
+            <div class="data-field-grid" data-detalhe-cadastro></div>
+          </section>
+
+          <section class="card data-section">
+            <div class="data-section-head">
+              <div>
+                <h2 class="data-section-title">Contatos</h2>
+                <p class="data-section-desc">Contatos de referência vinculados ao cadastro.</p>
+              </div>
+              <span class="data-pill" data-detalhe-contatos-pill>—</span>
+            </div>
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr><th>Nome</th><th>CPF</th><th>E-mail</th><th>Telefone</th><th>Cargo</th><th>Departamento</th><th>Finalidades</th></tr>
+                </thead>
+                <tbody data-detalhe-contatos></tbody>
+              </table>
+              <p class="data-footnote" data-detalhe-contatos-vazio hidden>Nenhum contato vinculado a este cadastro.</p>
+            </div>
+          </section>
+
+          <section class="card data-section">
+            <div class="data-section-head">
+              <div>
+                <h2 class="data-section-title">Documentos enviados</h2>
+                <p class="data-section-desc">Anexos obrigatórios armazenados no Drive. Use a Gestão de Documentos para visualizar ou baixar os arquivos.</p>
+              </div>
+              <span class="data-pill" data-detalhe-documentos-pill>—</span>
+            </div>
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr><th>Categoria</th><th>Arquivo</th><th>Tamanho</th><th>Data</th></tr>
+                </thead>
+                <tbody data-detalhe-documentos></tbody>
+              </table>
+              <p class="data-footnote" data-detalhe-documentos-vazio hidden>Nenhum documento registrado para este cadastro.</p>
+            </div>
+          </section>
+
+          <section class="card data-section">
+            <div class="data-section-head">
+              <div>
+                <h2 class="data-section-title">Solicitações enviadas</h2>
+                <p class="data-section-desc">Total de solicitações por serviço vinculadas ao e-mail do cliente.</p>
+              </div>
+            </div>
+            <div class="data-field-grid" data-detalhe-solicitacoes></div>
+          </section>
+
+          <p class="data-footnote">Estes dados são somente leitura. Para corrigir alguma informação, o cliente deve procurar o laboratório.</p>
+
+          <div data-componente="footer"></div>
+        </div>
+      </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../components/componentes.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/detalhe-cliente.js"></script>
+  </body>
+</html>

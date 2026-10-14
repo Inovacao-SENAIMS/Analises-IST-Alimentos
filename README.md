@@ -195,6 +195,14 @@ O botão **Visualizar** abre o anexo em um modal na própria página (PDF ou ima
 
 Clientes anteriores à mudança e colaboradores mantêm seu fluxo de acesso. A exclusão administrativa de usuário **não exclui automaticamente documentos no Drive ou seus metadados**; a política de retenção e eventual limpeza precisa ser definida separadamente.
 
+### Consulta de Clientes
+
+A seção **Clientes** (`pages/lista-clientes.html`) lista todos os cadastros de clientes e fica no menu lateral apenas para `IST_Colaborators` e `Administrator_User` (o `Manager_User` não vê este item). A tabela mostra nome, e-mail, razão social, tipo de pessoa, CPF/CNPJ, telefone, cidade/UF, data de cadastro e a situação documental (`Concluído` ou `Pendente`), com faixa de filtros por texto (nome, e-mail, razão social e CPF/CNPJ), tipo de pessoa e situação, além do botão **Atualizar**.
+
+Cada linha possui o botão **Detalhes**, que abre `pages/detalhe-cliente.html?email=...`. A página de detalhe exibe, em somente leitura: identificação e acesso (nome, e-mail, grupo, conta ativa e situação documental), os dados completos do cadastro, a tabela de contatos com as finalidades de recebimento, a lista dos documentos enviados (metadados; os arquivos continuam sendo visualizados pela Gestão de Documentos) e um resumo com a quantidade de solicitações enviadas por serviço.
+
+As ações protegidas são `listarClientes` (listagem) e `obterCliente` (detalhe). O backend valida o grupo em cada operação e bloqueia o acesso de `Client_User` e `Manager_User`. Os scripts seguem em `js/lista-clientes.js` e `js/detalhe-cliente.js`; o item de menu usa o ponto de montagem `data-clientes`, mostrado por `js/auth.js` somente para os grupos permitidos. Após alterar o Apps Script, publique uma **nova versão** do Web App `/exec` e atualize o frontend.
+
 #### Verificação
 
 ```powershell

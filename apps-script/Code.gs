@@ -131,6 +131,10 @@ function doPost(e) {
         return responder_(listarDocumentos(entrada.token));
       case 'obterDocumento':
         return responder_(obterDocumento(entrada.dados, entrada.token));
+      case 'listarClientes':
+        return responder_(listarClientes(entrada.token));
+      case 'obterCliente':
+        return responder_(obterCliente(entrada.dados, entrada.token));
       default:
         return responder_(falha_('Operação não reconhecida.'));
     }
@@ -321,6 +325,11 @@ function podeCriarSolicitacao_(usuario) {
 function podeReceberAmostra_(usuario) {
   if (!usuario) return null;
   return [GRUPOS.COLABORADOR, GRUPOS.GESTOR, GRUPOS.ADMIN].indexOf(usuario.grupo) < 0 ? falha_('Acesso restrito.') : null;
+}
+
+function podeConsultarClientes_(usuario) {
+  if (!usuario) return null;
+  return [GRUPOS.COLABORADOR, GRUPOS.ADMIN].indexOf(usuario.grupo) < 0 ? falha_('Acesso restrito.') : null;
 }
 
 function segredo_() {
@@ -1180,4 +1189,199 @@ function obterDocumento(dados, token) {
   } catch (_) {
     return falha_('Não foi possível abrir o arquivo no Drive. Ele pode ter sido removido.');
   }
+}
+
+function contasUsuarios_() {
+  const mapa = {};
+  try {
+    const tabela = valoresComCabecalho_(ABAS.USUARIOS);
+    const emailIdx = coluna_(tabela.cabecalho, 'email');
+    const nomeIdx = coluna_(tabela.cabecalho, 'nome');
+    const ativoIdx = coluna_(tabela.cabecalho, 'ativo');
+    const grupoIdx = coluna_(tabela.cabecalho, 'grupo');
+    const estadoIdx = coluna_(tabela.cabecalho, 'estado_documental');
+    const dataIdx = coluna_(tabela.cabecalho, 'data_cadastro');
+    tabela.linhas.forEach(function (linha) {
+      const email = String(linha[emailIdx] || '').trim().toLowerCase();
+      if (!email) return;
+      mapa[email] = {
+        nome: String(linha[nomeIdx] || '').trim(),
+        ativo: ativo_(linha[ativoIdx]),
+        grupo: grupoIdx >= 0 ? String(linha[grupoIdx] || '').trim() : '',
+        estadoDocumental: estadoIdx >= 0 ? String(linha[estadoIdx] || '').trim() : '',
+        dataCadastro: dataIdx >= 0 && linha[dataIdx] ? linha[dataIdx] : null
+      };
+    });
+  } catch (_) {}
+  return mapa;
+}
+
+function contagensPorEmail_(nomeAba) {
+  const contagens = {};
+  try {
+    const tabela = valoresComCabecalho_(nomeAba);
+    const emailIdx = coluna_(tabela.cabecalho, 'usuario_email');
+    if (emailIdx < 0) return contagens;
+    tabela.linhas.forEach(function (linha) {
+      const email = String(linha[emailIdx] || '').trim().toLowerCase();
+      if (!email) return;
+      contagens[email] = (contagens[email] || 0) + 1;
+    });
+  } catch (_) {}
+  return contagens;
+}
+
+function resumoSolicitacoesCliente_(email) {
+  const alvo = String(email || '').trim().toLowerCase();
+  const resumo = [];
+  FONTES_HISTORICO.forEach(function (fonte) {
+    let quantidade = 0;
+    try {
+      const tabela = valoresComCabecalho_(fonte.solicitacoes);
+      quantidade = tabela.linhas.filter(function (linha) {
+        return String(valorLinha_(tabela, linha, 'usuario')).trim().toLowerCase() === alvo;
+      }).length;
+    } catch (_) { /* Aba ausente. */ }
+    resumo.push({ tipo: fonte.tipo, titulo: fonte.titulo, quantidade: quantidade });
+  });
+  return resumo;
+}
+
+function situacaoCadastro_(estadoDocumental) {
+  return estadoDocumental === 'PENDENTE' ? 'PENDENTE' : (estadoDocumental || 'CONCLUIDO');
+}
+
+function listarClientes(token) {
+  const usuario = validarToken_(token);
+  if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
+  const permissao = podeConsultarClientes_(usuario);
+  if (permissao) return permissao;
+
+  if (!planilha_().getSheetByName(ABAS.CLIENTES)) {
+    return sucesso_('Nenhum cliente encontrado.', { clientes: [] });
+  }
+
+  const tabela = valoresComCabecalho_(ABAS.CLIENTES);
+  const contas = contasUsuarios_();
+  const contatos = contagensPorEmail_(ABAS.CONTATOS_CLIENTES);
+  const documentos = contagensPorEmail_(ABAS.DOCUMENTOS_USUARIOS);
+
+  const clientes = tabela.linhas.reduce(function (lista, linha) {
+    const email = String(valorLinha_(tabela, linha, 'usuario_email')).trim().toLowerCase();
+    if (!email) return lista;
+    const conta = contas[email] || {};
+    const estadoDocumental = String(conta.estadoDocumental || '');
+    lista.push({
+      usuarioEmail: email,
+      nome: conta.nome || email,
+      ativo: Boolean(conta.ativo),
+      tipoPessoa: String(valorLinha_(tabela, linha, 'tipo_pessoa')),
+      razaoSocial: String(valorLinha_(tabela, linha, 'razao_social')),
+      nomeFantasia: String(valorLinha_(tabela, linha, 'nome_fantasia')),
+      cpfCnpj: String(valorLinha_(tabela, linha, 'cpf_cnpj')),
+      telefone: String(valorLinha_(tabela, linha, 'telefone')),
+      cidade: String(valorLinha_(tabela, linha, 'cidade')),
+      estado: String(valorLinha_(tabela, linha, 'estado')),
+      dataCadastro: valorLinha_(tabela, linha, 'data_cadastro', null),
+      situacao: situacaoCadastro_(estadoDocumental),
+      totalContatos: contatos[email] || 0,
+      totalDocumentos: documentos[email] || 0
+    });
+    return lista;
+  }, []);
+
+  clientes.sort(function (a, b) {
+    return new Date(b.dataCadastro || 0).getTime() - new Date(a.dataCadastro || 0).getTime();
+  });
+
+  return sucesso_('Clientes carregados.', { clientes: clientes });
+}
+
+function obterCliente(dados, token) {
+  const usuario = validarToken_(token);
+  if (!usuario) return falha_('Sessão expirada. Faça login novamente.');
+  const permissao = podeConsultarClientes_(usuario);
+  if (permissao) return permissao;
+
+  const email = String(dados && dados.email || '').trim().toLowerCase();
+  if (!email) return falha_('Cliente não informado.');
+
+  if (!planilha_().getSheetByName(ABAS.CLIENTES)) {
+    return falha_('Cliente não encontrado.');
+  }
+
+  const tabela = valoresComCabecalho_(ABAS.CLIENTES);
+  const linha = tabela.linhas.find(function (item) {
+    return String(valorLinha_(tabela, item, 'usuario_email')).trim().toLowerCase() === email;
+  });
+  if (!linha) return falha_('Cliente não encontrado.');
+
+  const contas = contasUsuarios_();
+  const conta = contas[email] || {};
+  const estadoDocumental = String(conta.estadoDocumental || '');
+
+  let contatos = [];
+  try {
+    const contatosTabela = valoresComCabecalho_(ABAS.CONTATOS_CLIENTES);
+    contatos = contatosTabela.linhas.filter(function (item) {
+      return String(valorLinha_(contatosTabela, item, 'usuario_email')).trim().toLowerCase() === email;
+    }).map(function (item) {
+      return {
+        nome: String(valorLinha_(contatosTabela, item, 'nome')),
+        cpf: String(valorLinha_(contatosTabela, item, 'cpf')),
+        email: String(valorLinha_(contatosTabela, item, 'email')),
+        telefone: String(valorLinha_(contatosTabela, item, 'telefone')),
+        cargo: String(valorLinha_(contatosTabela, item, 'cargo')),
+        departamento: String(valorLinha_(contatosTabela, item, 'departamento')),
+        recebeNotaFiscalBoleto: valorLinha_(contatosTabela, item, 'recebe_nota_fiscal_boleto') === true,
+        recebeProposta: valorLinha_(contatosTabela, item, 'recebe_proposta') === true,
+        recebeRelatorio: valorLinha_(contatosTabela, item, 'recebe_relatorio') === true
+      };
+    }).filter(function (item) { return item.nome || item.email; });
+  } catch (_) { /* Aba de contatos ausente. */ }
+
+  let documentos = [];
+  try {
+    const documentosTabela = valoresComCabecalho_(ABAS.DOCUMENTOS_USUARIOS);
+    documentos = documentosTabela.linhas.filter(function (item) {
+      return String(valorLinha_(documentosTabela, item, 'usuario_email')).trim().toLowerCase() === email;
+    }).map(function (item) {
+      return {
+        documentoId: String(valorLinha_(documentosTabela, item, 'documento_id')),
+        categoria: String(valorLinha_(documentosTabela, item, 'categoria_documento')),
+        nomeOriginal: String(valorLinha_(documentosTabela, item, 'nome_original')),
+        mimeType: String(valorLinha_(documentosTabela, item, 'mime_type')),
+        tamanho: Number(valorLinha_(documentosTabela, item, 'tamanho_bytes')) || 0,
+        dataUpload: valorLinha_(documentosTabela, item, 'data_upload')
+      };
+    }).filter(function (item) { return item.documentoId; });
+  } catch (_) { /* Aba de documentos ausente. */ }
+
+  return sucesso_('Cliente carregado.', {
+    cliente: {
+      usuarioEmail: email,
+      nome: conta.nome || email,
+      contaAtiva: Boolean(conta.ativo),
+      grupo: String(conta.grupo || ''),
+      estadoDocumental: estadoDocumental,
+      situacao: situacaoCadastro_(estadoDocumental),
+      tipoPessoa: String(valorLinha_(tabela, linha, 'tipo_pessoa')),
+      razaoSocial: String(valorLinha_(tabela, linha, 'razao_social')),
+      nomeFantasia: String(valorLinha_(tabela, linha, 'nome_fantasia')),
+      renasem: String(valorLinha_(tabela, linha, 'renasem')),
+      cpfCnpj: String(valorLinha_(tabela, linha, 'cpf_cnpj')),
+      inscricaoEstadualRg: String(valorLinha_(tabela, linha, 'inscricao_estadual_rg')),
+      endereco: String(valorLinha_(tabela, linha, 'endereco')),
+      cidade: String(valorLinha_(tabela, linha, 'cidade')),
+      estado: String(valorLinha_(tabela, linha, 'estado')),
+      cep: String(valorLinha_(tabela, linha, 'cep')),
+      telefone: String(valorLinha_(tabela, linha, 'telefone')),
+      ramoAtividade: String(valorLinha_(tabela, linha, 'ramo_atividade')),
+      numeroFuncionarios: String(valorLinha_(tabela, linha, 'numero_funcionarios')),
+      dataCadastro: valorLinha_(tabela, linha, 'data_cadastro', null),
+      contatos: contatos,
+      documentos: documentos,
+      solicitacoes: resumoSolicitacoesCliente_(email)
+    }
+  });
 }

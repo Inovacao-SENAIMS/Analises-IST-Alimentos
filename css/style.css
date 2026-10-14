@@ -231,6 +231,7 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
   .sidebar-nav a[data-admin-only][hidden] { display: none; }
 .sidebar-nav a[data-checklists][hidden] { display: none; }
 .sidebar-nav a[data-documentos][hidden] { display: none; }
+.sidebar-nav a[data-clientes][hidden] { display: none; }
 
 .sidebar-footer { display: grid; gap: 18px; margin-top: auto; padding: 18px 10px 0; border-top: 1px solid var(--border); }
 .sidebar-user { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -339,6 +340,14 @@ form:has(.user-permission-notice) :disabled { cursor: not-allowed; opacity: .62;
 .admin-table td .button { min-height: 36px; padding: 8px 12px; font-size: .8rem; }
 .admin-row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .admin-group { min-width: 170px; padding: 8px 10px; border-radius: 8px; }
+@media (min-width: 720px) {
+  .clientes-table { min-width: 1000px; }
+  .clientes-table .clientes-actions { flex-wrap: nowrap; }
+}
+.clientes-situacao { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; color: var(--sucesso); background: #effaf2; border: 1px solid #b9dfc2; font-size: .74rem; font-weight: 800; white-space: nowrap; }
+.clientes-situacao--pendente { color: #b42318; background: #fff2f0; border-color: #f3c4be; }
+.clientes-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.clientes-detalhe-pills { display: flex; flex-wrap: wrap; gap: 8px; }
 .admin-active { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; font-weight: 700; }
 .admin-active input { width: auto; accent-color: var(--brand-accent); }
 .history-card, .history-detail { padding: 22px; }

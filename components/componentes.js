@@ -13,7 +13,8 @@
     admin: '<svg viewBox="0 0 24 24" focusable="false"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg>',
     historico: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5M8 17h3"/></svg>',
     recebimento: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 8h16v12H4z"/><path d="m4 8 1.5-4h13L20 8"/><path d="M10 12h4"/></svg>',
-    documentos: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 11v6M11 14l3 3 3-3"/></svg>'
+    documentos: '<svg viewBox="0 0 24 24" focusable="false"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 11v6M11 14l3 3 3-3"/></svg>',
+    clientes: '<svg viewBox="0 0 24 24" focusable="false"><circle cx="9" cy="8" r="3"/><path d="M3 19c.7-3 2.7-4.5 6-4.5s5.3 1.5 6 4.5"/><circle cx="17" cy="10" r="2.4"/><path d="M15.5 19c.9-2.2 2.6-3.3 5.5-3.3"/></svg>'
   };
 
   function renderizarIcone(nome) {
@@ -67,6 +68,9 @@
           </a>
           <a data-documentos hidden class="${paginaAtiva === 'documentos' ? 'active' : ''}" href="gestao-documentos.html">
             ${renderizarIcone('documentos')}<span>Gestão de Documentos</span>
+          </a>
+          <a data-clientes hidden class="${paginaAtiva === 'clientes' ? 'active' : ''}" href="lista-clientes.html">
+            ${renderizarIcone('clientes')}<span>Clientes</span>
           </a>
         </nav>
         <div class="sidebar-footer">

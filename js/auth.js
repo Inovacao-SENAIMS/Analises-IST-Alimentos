@@ -157,6 +157,10 @@
       elemento.hidden = gruposIst.indexOf(sessao.grupo) < 0;
     });
 
+    document.querySelectorAll('[data-clientes]').forEach((elemento) => {
+      elemento.hidden = ['IST_Colaborators', 'Administrator_User'].indexOf(sessao.grupo) < 0;
+    });
+
     document.querySelectorAll('[data-logout]').forEach((botao) => {
       botao.addEventListener('click', () => {
         limparSessao();

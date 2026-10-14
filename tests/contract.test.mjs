@@ -14,6 +14,7 @@ const requiredFiles = [
   'pages/historico-solicitacoes.html',
   'pages/historico-checklists.html',
   'pages/gestao-documentos.html',
+  'pages/lista-clientes.html', 'pages/detalhe-cliente.html', 'js/lista-clientes.js', 'js/detalhe-cliente.js',
   'css/style.css', 'js/config.js', 'js/auth.js', 'js/menu.js',
   'js/validacoes.js', 'js/form-analise-sementes.js', 'js/form-amostras-fiscais.js', 'js/cadastro.js', 'js/perfil.js',
   'js/checklist-recebimento.js', 'js/form-recebimento-amostra.js', 'js/hex-vault.js', 'js/historico-checklists.js',
@@ -251,6 +252,44 @@ test('gestão de documentos lista, restringe ao IST e entrega anexos', () => {
   assert.match(api, /function obterDocumento[\s\S]*DriveApp\.getFileById/);
   assert.match(css, /\.doc-modal/);
   assert.match(css, /sidebar-nav a\[data-documentos\]\[hidden\]/);
+});
+
+test('lista de clientes é restrita e abre a página de detalhe', () => {
+  const pagina = readFileSync(join(root, 'pages/lista-clientes.html'), 'utf8');
+  const script = readFileSync(join(root, 'js/lista-clientes.js'), 'utf8');
+  const detalhe = readFileSync(join(root, 'pages/detalhe-cliente.html'), 'utf8');
+  const detalheScript = readFileSync(join(root, 'js/detalhe-cliente.js'), 'utf8');
+  const componentes = readFileSync(join(root, 'components/componentes.js'), 'utf8');
+  const auth = readFileSync(join(root, 'js/auth.js'), 'utf8');
+  const api = readFileSync(join(root, 'apps-script/Code.gs'), 'utf8');
+  const css = readFileSync(join(root, 'css/style.css'), 'utf8');
+
+  assert.match(pagina, /data-pagina-ativa="clientes"/);
+  assert.match(pagina, /id="clientes-filtros"/);
+  assert.match(pagina, /id="clientes-body"/);
+  assert.match(script, /exigirGrupos\(\['IST_Colaborators', 'Administrator_User'\]\)/);
+  assert.match(script, /listarClientes/);
+  assert.match(script, /detalhe-cliente\.html\?email=/);
+  assert.doesNotMatch(script, /senha|data_recebimento|observacoes_laboratorio/);
+  assert.match(detalhe, /data-detalhe-cadastro/);
+  assert.match(detalhe, /data-detalhe-contatos/);
+  assert.match(detalhe, /data-detalhe-documentos/);
+  assert.match(detalheScript, /exigirGrupos\(\['IST_Colaborators', 'Administrator_User'\]\)/);
+  assert.match(detalheScript, /obterCliente/);
+  assert.match(detalheScript, /URLSearchParams/);
+  assert.doesNotMatch(detalheScript, /senha|data_recebimento|observacoes_laboratorio/);
+  assert.match(componentes, /data-clientes hidden/);
+  assert.match(componentes, /lista-clientes\.html/);
+  assert.match(auth, /\['IST_Colaborators', 'Administrator_User'\]/);
+  assert.match(api, /case 'listarClientes'/);
+  assert.match(api, /case 'obterCliente'/);
+  assert.match(api, /function listarClientes[\s\S]*podeConsultarClientes_/);
+  assert.match(api, /function obterCliente[\s\S]*podeConsultarClientes_/);
+  assert.match(api, /function podeConsultarClientes_[\s\S]*GRUPOS\.ADMIN/);
+  assert.match(api, /ABAS\.CLIENTES/);
+  assert.match(api, /ABAS\.CONTATOS_CLIENTES/);
+  assert.match(css, /sidebar-nav a\[data-clientes\]\[hidden\]/);
+  assert.match(css, /\.clientes-table/);
 });
 
 test('recebimento é único e sinaliza amostra recebida', () => {
